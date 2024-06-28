@@ -1,0 +1,83 @@
+---
+
+- name: Add group "jacques"
+  group: 
+    name: jacques
+- name: Add user "jacques"
+  user:
+    name: jacques
+    group: jacques
+    home: /var/www/jacques/
+    create_home: no
+    comment: "jacques.dog user"
+    system: yes
+
+- name: remove old /var/www/jacques/
+  file:
+    path: /var/www/jacques/
+    state: absent
+
+- name: check out jacques.dog site
+  git: 
+    repo: 'https://github.com/kitsnotes/jk.git'
+    dest: /var/www/jacques/
+    version: main
+    force: true
+    
+- name: correct jacques.dog permissions
+  file:
+    path: /var/www/jacques/
+    state: directory
+    recurse: yes
+    owner: jacques
+    group: jacques
+
+- name: Set Facts for nginx.conf generation
+  set_fact:
+    nginx_root: /var/www/jacques
+    nginx_server_name: "jacques.dog www.jacques.dog"
+    nginx_fullchain_ssl_cert: "{{ letsencrypt_certs_dir }}/jacques.dog.crt"
+    nginx_ssl_key: "{{ letsencrypt_keys_dir }}/jacques.dog.key"
+
+- name: Copy nginx configuration for jacques.dog
+  template: 
+    src: provisioning/nginx-basic.conf.j2 
+    dest: /etc/nginx/conf.d/jacques.dog.conf
+    mode: 0644
+    owner: root
+    group: root
+  when: ansible_os_family == "RedHat"
+  notify: "restart nginx"
+
+- name: Copy nginx configuration for jacques.dog
+  template: 
+    src: provisioning/nginx-basic.conf.j2 
+    dest: /etc/nginx/sites-available/jacques.dog
+    mode: 0644
+    owner: root
+    group: root
+  when: ansible_os_family == "Debian"
+  vars:
+    domain_name: jacques.dog
+
+- name: "Create Cloudflare A record for jacques.dog"
+  cloudflare_dns:
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+    account_email: "{{ vault_cloudflare_email }}"
+    zone: jacques.dog
+    record: "@"
+    type: A
+    value: "{{ vault_wan_lgb_ip }}"
+    solo: true
+    state: present
+
+- name: "Create Cloudflare A record for www.jacques.dog"
+  cloudflare_dns:
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+    account_email: "{{ vault_cloudflare_email }}"
+    zone: jacques.dog
+    record: www
+    type: A
+    value: "{{ vault_wan_lgb_ip }}"
+    solo: true
+    state: present

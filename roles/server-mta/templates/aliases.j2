@@ -1,0 +1,18 @@
+# This configuration is managed by ansible
+# Do not make any manual edits they will be lost.
+
+root: server-alerts
+postmaster: server-alerts
+hostmaster: server-alerts
+webmaster: server-alerts
+abuse: server-alerts
+observium: server-alerts
+clamav: server-alerts
+dmarc: server-alerts
+dm-forensics: server-alerts
+snmp: server-alerts
+server-alerts: cat
+
+{% for alias in vault_cat_aliases %}
+{{ alias }}: cat
+{% endfor %}

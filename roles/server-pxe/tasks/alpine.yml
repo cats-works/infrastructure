@@ -1,0 +1,15 @@
+---
+# Playbook for Alpine Linux
+
+- name: Retrieve Alpine Linux {{ pxeprov_alpine_stable_ver }} ISO
+  get_url: 
+    url: '{{ pxeprov_alpine_stable_url }}'
+    dest: /srv/linux/alpine-stable-{{ pxeprov_alpine_stable_ver }}.iso
+
+- name: Mount Alpine Linux {{ pxeprov_alpine_stable_ver }} ISO
+  mount:
+    path: /srv/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/
+    src: /srv/linux/alpine-stable-{{ pxeprov_alpine_stable_ver }}.iso
+    fstype: iso9660
+    opts: ro,loop
+    state: mounted

@@ -1,0 +1,16 @@
+#!ipxe
+
+# This configuration is managed by Ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+set nfs-server {{ vault_lgb_nas_ip }}
+set pxe-server {{ vault_lgb_pxe_ip }}
+set nfs-root /nas/osboot/
+set boot-url http://${pxe-server}/
+set sanboot-url http:/${pxe-server}/
+set boot-dir boot/
+set mac-config-dir bymac/
+set menu-url tftp://${pxe-server}/menu.ipxe
+set win-base-url http://{{ vault_lgb_pxe_ip }}/winpeboot
+set dart-base-url http://{{ vault_lgb_pxe_ip }}/dartboot

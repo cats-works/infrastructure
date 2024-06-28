@@ -1,0 +1,18 @@
+---
+# Ansible tasks to deploy a PXE configuration and preseed file for Debian
+- name: "Include server-pxe-distro vars"
+  include_vars: roles/server-pxe/vars/main.yml
+- name: "Create Preseed Template (Debian GNU/Linux)"
+  template:
+    src: templates/deployment/debian.ps.j2
+    dest: /srv/tftp/ks/{{ vm_name }}.preseed.cfg
+    mode: 0644
+  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  when: pxe_os == "debian-stable"
+- name: Create iPXE boot for MAC address (Debian GNU/Linux EFI)
+  template:
+    src: templates/deployment/debian-pxe.cfg.j2
+    dest: /srv/tftp/bymac/mac-{{ sys_mac_addr | replace(":","-") | lower }}.ipxe
+    mode: 0644
+  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  when: pxe_os == "debian-stable" 

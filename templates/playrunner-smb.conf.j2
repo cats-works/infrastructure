@@ -1,0 +1,39 @@
+[global]
+security = ads
+log level = 1
+dedicated keytab file = /etc/krb5.keytab
+kerberos method = system keytab
+template homedir = /home/%U
+idmap config * : backend = tdb
+idmap config * :  range = 10000-199999
+idmap config KITTYTEL : backend = rid
+idmap config KITTYTEL : range = 2000000-2999999
+
+winbind use default domain = yes
+winbind nss info = template
+winbind refresh tickets = yes
+winbind offline logon = yes
+winbind enum groups = yes
+winbind enum users = yes
+multicast dns register = No
+allow insecure wide links = yes
+load printers = no
+disable spoolss = yes
+template shell = /bin/bash
+realm = {{ vault_krb5_realm }}
+workgroup = KITTYTEL
+
+[ansible]
+    comment = Ansible Playbooks
+    path = /etc/ansible
+    public = yes
+    writable = yes
+    guest ok = no
+    create mask = 660
+    directory mask = 770
+    browseable = Yes
+    read only = no
+    write list = "@domain admins"
+    writeable = yes
+    create mode = 0644
+    directory mode = 0755

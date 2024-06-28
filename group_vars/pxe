@@ -1,0 +1,4 @@
+---
+svr_internal: true
+# Required on Debian systems
+ansible_python_interpreter: /usr/bin/python3

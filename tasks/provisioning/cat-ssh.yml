@@ -1,0 +1,17 @@
+---
+# Playbook to install cat's ssh keys
+
+- name: Ensure ~cat/.ssh exists
+  become: yes
+  file:
+    path: /home/cat/.ssh
+    state: directory
+    owner: cat
+    mode: 0700
+
+- name: Copy cat authorized_keys
+  copy:
+    src: files/cat_authorized_keys
+    dest: /home/cat/.ssh/authorized_keys
+    mode: '0600'
+    owner: cat

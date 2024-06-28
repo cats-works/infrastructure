@@ -1,0 +1,25 @@
+---
+# Tasks to handle the failsafe user configuration
+- name: Add group "catdoor"
+  group: 
+    name: catdoor
+- name: Add user "catdoor"
+  user:
+    name: catdoor
+    group: catdoor
+    home: /var/catdoor/
+    comment: "Kitty Telecom Failsafe"
+- name: Ensure ~cat/.ssh exists
+  become: yes
+  file:
+    path: /var/catdoor/.ssh
+    state: directory
+    owner: catdoor
+    mode: 0700
+
+- name: Copy cat authorized_keys
+  copy:
+    src: files/cat_authorized_keys
+    dest: /var/catdoor/.ssh/authorized_keys
+    mode: '0600'
+    owner: catdoor

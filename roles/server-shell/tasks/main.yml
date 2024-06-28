@@ -1,0 +1,45 @@
+---
+# Playbook to install Shell Server Tools
+
+- name: Install epel-release for Shell Server Role
+  package: 
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+  
+- name: Install packages for Shell Server Role
+  package: 
+    name: 
+      - ansible
+      - mutt
+      - atop
+      - mc
+      - whois
+      - vim-enhanced
+      - tmux
+      - mtr
+      - net-tools
+      - git
+      - make
+      - clang
+      - krb5-workstation
+    state: present
+
+- name: Create Firewall Entry for netbios-dgm
+  firewalld:
+    service: samba
+    permanent: yes
+    zone: public
+    immediate: yes
+    state: enabled
+  when: ansible_os_family == "RedHat"
+
+- name: Install samba smb.conf
+  template:
+    src: provisioning/smb.conf.j2 
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+  - restart smb

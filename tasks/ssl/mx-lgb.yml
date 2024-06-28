@@ -1,0 +1,10 @@
+---
+# Ansible tasks to deploy Lets Encrypt for mx-lgb
+
+- name: Deploy Lets Encrypt for mail.kittytel.net
+  import_tasks: tasks/provisioning/letsencrypt.yml
+  vars:
+    requested_cloudflare_zone: kittytel.net
+    requested_letsencrypt_domain: kittytel.net
+    requested_letsencrypt_san_list:
+      - mail.kittytel.net

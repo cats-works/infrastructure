@@ -1,0 +1,31 @@
+---
+- name: Update all LGB hosts
+  hosts: lgb
+  remote_user: "{{ vault_ansible_deployment_user }}"
+
+  tasks:
+  - name: Upgrade all RPM packages
+    dnf:
+      name: "*"
+      state: latest
+    become_method: sudo
+    become: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Update all apt packages to their latest version
+    apt:
+      name: "*"
+      state: latest
+    become_method: sudo
+    become: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Install all Windows updates
+    win_updates:
+      category_names: '*'
+      reboot: true
+    become_method: runas
+    remote_user: "{{ vault_ad_netbios }}\\{{ vault_ad_deploy_user }}"
+    become_user: "{{ vault_ad_netbios }}\\{{ vault_ad_deploy_user }}"
+    become: yes
+    when: ansible_os_family == "Windows"

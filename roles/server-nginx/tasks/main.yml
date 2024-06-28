@@ -1,0 +1,178 @@
+---
+# FWE Global 'server-nginx' ansible role
+# Authored by The Cat for specific infrastructure usage.
+#
+# Tested on:
+# Rocky Linux          YES
+# Debian Linux         NO
+# Ubuntu Linux         NO
+# Alpine Linux         NO
+
+- name: Install python3-pip
+  become: yes
+  package:
+    name: python3-pip
+    state: present
+
+- name: update pip
+  pip:
+    name: pip
+    state: latest
+
+- name: Install cryptography using pip (for openssl ansible functions)
+  pip:
+    name: cryptography
+
+- name: Install nginx
+  become: yes
+  package:
+    name: nginx
+    state: present
+
+- name: Set firewalld rules for http
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled
+  when: ansible_os_family == "RedHat"
+  
+- name: Set firewalld rules for https
+  firewalld:
+    service: https
+    permanent: true
+    state: enabled
+  when: ansible_os_family == "RedHat"
+
+- name: "Create required directories in /etc/letsencrypt"
+  file:
+    path: "/etc/letsencrypt/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+  - account
+  - certs
+  - csrs
+  - keys
+
+- name: Copy letsencrypt account key
+  template:
+    src: provisioning/letsencrypt.pem.j2
+    dest: "{{ letsencrypt_account_key }}"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: "Create web root path at {{ webserver_default_http_dir }}"
+  file:
+    path: '{{ webserver_default_http_dir }}/'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755 
+
+- name: Install index.html to default webroot
+  copy:
+    src: index.html
+    dest: '{{ webserver_default_http_dir }}/index.html'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install bg.jpg to default webroot
+  copy:
+    src: bg.jpg
+    dest: '{{ webserver_default_http_dir }}/bg.jpg'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install default.css to default webroot
+  copy:
+    src: default.css
+    dest: '{{ webserver_default_http_dir }}/default.css'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: "Generate Let's Encrypt default host private key"
+  openssl_privatekey:
+    path: "{{ letsencrypt_keys_dir }}/default_host.key"
+    size: 4096
+
+- name: "Generate Let's Encrypt default host CSR"
+  openssl_csr:
+    path: "{{ letsencrypt_csrs_dir }}/default_host.csr"
+    privatekey_path: "{{ letsencrypt_keys_dir }}/default_host.key"
+    common_name: "{{ inventory_hostname }}"
+
+- name: "Begin Let's Encrypt default host challenges"
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ vault_acme_email }}"
+    terms_agreed: 1
+    challenge: "{{ acme_challenge_type }}"
+    csr: "{{ letsencrypt_csrs_dir }}/default_host.csr"
+    dest: "{{ letsencrypt_certs_dir }}/default_host.crt"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_default_host.crt"
+    remaining_days: 60
+  register: acme_challenge_your_domain
+
+- name: Create Cloudflare TXT validation records
+  cloudflare_dns:
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+    account_email: "{{ vault_cloudflare_email }}"
+    zone: "{{ default_cloudflare_zone }}"
+    record: "{{ acme_challenge_your_domain.challenge_data[item]['dns-01'].record }}"
+    type: TXT
+    value: "{{ acme_challenge_your_domain.challenge_data[item]['dns-01'].resource_value }}"
+    solo: true
+    state: present
+  with_items: "{{ inventory_hostname }}"
+  when: acme_challenge_your_domain is changed
+
+- name: complete letsencrypt
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ vault_acme_email }}"
+    challenge: "{{ acme_challenge_type }}"
+    remaining_days: 60
+    csr: "{{ letsencrypt_csrs_dir }}/default_host.csr"
+    dest: "{{ letsencrypt_certs_dir }}/default_host.crt"
+    chain_dest: "{{ letsencrypt_certs_dir }}/chain_default_host.crt"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_default_host.crt"
+    data: "{{ acme_challenge_your_domain }}"
+  when: acme_challenge_your_domain is changed
+
+- name: destroy dns-challenge
+  cloudflare_dns:
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+    account_email: "{{ vault_cloudflare_email }}"
+    zone: "{{ default_cloudflare_zone }}"
+    record: "{{ acme_challenge_your_domain.challenge_data[item]['dns-01'].record }}"
+    type: TXT
+    state: absent
+  with_items: "{{ inventory_hostname }}"
+  when: acme_challenge_your_domain is changed
+  
+- name: Correct ssl key configuration
+  file:
+    path: "{{ letsencrypt_keys_dir }}/default_host.key"
+    mode: 0640
+    owner: root
+    group: nginx
+    
+- name: Copy SSL-enabled production nginx configuration
+  template: 
+    src: rhel-nginx-ssl.conf.j2 
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+    owner: root
+    group: root
+  when: ansible_os_family == "RedHat"
+  notify: "restart nginx"

@@ -1,0 +1,15 @@
+---
+# Playbook tasks for obtaining a kerberos keytab from active directory
+
+- name: Generate Kerberos Keytab from AD
+  become: false
+  win_command: "ktpass -princ {{ principal }}@{{ vault_krb5_realm }} -mapuser {{ ad_service_user }}@{{ vault_krb5_realm }} -out C:\\{{ vm_name }}.keytab -mapOp set -crypto ALL -ptype KRB5_NT_PRINCIPAL /pass {{ password }}"
+  delegate_to: "{{ primary_ad_dc }}"
+  
+- name: Copy Kerberos keytab from AD server
+  fetch:
+    src: "C:\\{{ vm_name }}.keytab"
+    dest: "/tmp/{{ vm_name }}.keytab"
+    flat: yes
+  become: false
+  delegate_to: "{{ primary_ad_dc }}"

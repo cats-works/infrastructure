@@ -1,0 +1,29 @@
+---
+pxe_os: debian-stable
+ks_use_disk: vda
+vm_name: mx-lgb
+ad_service_user: KRB5_MAIL
+short_host: "{{ vm_name }}"
+sys_mac_addr: "52:54:00:dc:b1:bf"
+vm_hypervisor: hv-lgb
+vm_vcpus: 2
+vm_memory_mb: 4096
+ip_use_dhcp: true
+private_ip_addr: "{{ vault_mail_ip }}"
+private_ip_gw: "{{ vault_lgb_lan_gw }}"
+private_ip_nm: 255.255.255.0
+vm_internal: yes
+vm_use_efi: true
+vm_autostart: false
+vm_volumes:
+- name: '{{ vm_name }}-disk'
+  device: 'disk'
+  format: 'qcow2'
+  capacity: 45000M
+  type: file
+  pool: "{{ vm_pool_directory }}"
+vm_interfaces:
+- type: 'bridge'
+  mac: "{{ sys_mac_addr }}"
+  source:
+    dev: "{{ vm_local_bridge }}"

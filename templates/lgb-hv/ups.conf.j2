@@ -1,0 +1,14 @@
+# This configuration is managed by ansible
+# Do not make any manual edits they will be lost.
+maxretry = 3
+
+[lgbups]
+	driver = usbhid-ups
+	port = auto
+	desc = "CyberPower SX550G"
+	offdelay = 20
+	ondelay = 0
+	ignorelb
+	override.battery.charge.low = 20
+	override.battery.charge.warning = 40
+	pollinterval = 1

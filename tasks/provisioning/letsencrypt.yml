@@ -1,0 +1,145 @@
+---
+# This is an ansible task list for generating a lets encrypt
+# key/cert pair for a given domain
+
+- name: Install python3-cryptography
+  package: 
+    name: 
+      - python3-cryptography
+    state: present
+
+- name: Create required /etc/letsencrypt structure
+  become: yes
+  file:
+    path: /etc/letsencrypt/keys/
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required /etc/letsencrypt structure
+  become: yes
+  file:
+    path: /etc/letsencrypt/live
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required /etc/letsencrypt structure
+  become: yes
+  file:
+    path: /etc/letsencrypt/csrs
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required /etc/letsencrypt structure
+  become: yes
+  file:
+    path: /etc/letsencrypt/account
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required /etc/letsencrypt structure
+  become: yes
+  file:
+    path: /etc/letsencrypt/certs
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Copy letsencrypt account key
+  copy:
+    src: files/letsencrypt.pem
+    dest: "{{ letsencrypt_account_key }}"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: "Generate Let's Encrypt {{ requested_letsencrypt_domain }} private key"
+  openssl_privatekey:
+    path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
+    size: 4096
+
+- name: "Generate Let's Encrypt {{ requested_letsencrypt_domain }} CSR"
+  openssl_csr:
+    path: "{{ letsencrypt_csrs_dir }}/{{ requested_letsencrypt_domain }}.csr"
+    privatekey_path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
+    common_name: "{{ requested_letsencrypt_domain }}"
+    subject_alt_name: "DNS:{{ requested_letsencrypt_san_list | join(',DNS:') }}"
+
+
+- name: "Begin Let's Encrypt {{ requested_letsencrypt_domain }} challenges"
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ vault_acme_email }}"
+    terms_agreed: 1
+    challenge: "{{ acme_challenge_type }}"
+    csr: "{{ letsencrypt_csrs_dir }}/{{ requested_letsencrypt_domain }}.csr"
+    dest: "{{ letsencrypt_certs_dir }}/{{ requested_letsencrypt_domain }}.crt"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ requested_letsencrypt_domain }}.crt"
+    remaining_days: 60
+  register: acme_challenge_your_domain
+
+- name: Create DNS Record  
+  cloudflare_dns:
+    domain: "{{ requested_cloudflare_zone }}"
+    record: "_acme-challenge.{{ item.key }}"
+    type: TXT
+    value: "\"{{ item.value['dns-01']['resource_value'] }}\""
+    state: present
+    solo: true
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  with_dict: "{{ acme_challenge_your_domain['challenge_data'] | default({}) }}"
+  when: acme_challenge_your_domain['challenge_data'] is defined
+
+- name: wait for DNS record propagation
+  wait_for:
+    timeout: 45
+  when: acme_challenge_your_domain['challenge_data'] is defined
+
+- name: "complete letsencrypt challenges for {{ requested_letsencrypt_domain }}"
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ vault_acme_email }}"
+    challenge: "{{ acme_challenge_type }}"
+    remaining_days: 60
+    csr: "{{ letsencrypt_csrs_dir }}/{{ requested_letsencrypt_domain }}.csr"
+    dest: "{{ letsencrypt_certs_dir }}/{{ requested_letsencrypt_domain}}.crt"
+    chain_dest: "{{ letsencrypt_certs_dir }}/chain_{{ requested_letsencrypt_domain }}.crt"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ requested_letsencrypt_domain }}.crt"
+    data: "{{ acme_challenge_your_domain }}"
+  when: acme_challenge_your_domain is changed
+
+- name: Remove DNS Record  
+  cloudflare_dns:
+    domain: "{{ requested_cloudflare_zone }}"
+    record: "_acme-challenge.{{ item.key }}"
+    type: TXT
+    value: "\"{{ item.value['dns-01']['resource_value'] }}\""
+    state: absent
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  with_dict: "{{ acme_challenge_your_domain['challenge_data'] | default({}) }}"
+  when: acme_challenge_your_domain['challenge_data'] is defined
+
+- name: "Correct ssl key configuration for {{ requested_letsencrypt_domain }} (Debian)"
+  file:
+    path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
+    mode: 0640
+    owner: root
+    group: www-data
+  when: ansible_os_family == "Debian"
+
+- name: "Correct ssl key configuration for {{ requested_letsencrypt_domain }} (RedHat)"
+  file:
+    path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
+    mode: 0640
+    owner: root
+    group: nginx
+  when: ansible_os_family == "RedHat"

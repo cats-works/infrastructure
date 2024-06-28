@@ -1,0 +1,9 @@
+---
+# Playbook to install SSSD or Samba/MIT Kerberos/WinBind for AD Member Role on Linux
+
+- name: include_tasks for SSSD based setup
+  include_tasks: sssd.yml
+  when: ansible_os_family == "RedHat"
+- name: include_tasks for Winbind based setup (Debian/Ubuntu)
+  include_tasks: winbind.yml
+  when: ansible_os_family == "Debian"

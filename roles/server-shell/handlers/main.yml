@@ -1,0 +1,18 @@
+- name: Create Firewall Entry for netbios-dgm
+  firewalld:
+    service: samba
+    permanent: yes
+    zone: public
+    immediate: yes
+    state: enabled
+  when: ansible_os_family == "RedHat"
+
+- name: Install samba smb.conf
+  template:
+    src: provisioning/smb.conf.j2 
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+  - restart smb

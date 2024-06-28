@@ -1,0 +1,58 @@
+---
+default_iface: '{{ ansible_default_ipv4.interface }}'
+regenerate_dkim_keys_domains: []
+
+server_mta_banner: "$myhostname ESMTP $mail_name (Kitty Telecom)"
+snmp_contact: Cat <snmp@kittytel.net>
+
+spf_record: "v=spf1 mx a -all"
+dmarc_record: "v=DMARC1; p=quarantine; rua=mailto:dmarc@kittytel.net; ruf=mailto:dmarc@kittytel.net; fo=1; ri=432000; adkim=s; aspf=s"
+nginx_version: 1.23.3
+nextcloud_version: 26.0.1
+default_php_version: 8.2
+primary_ad_dc: dc-lgb.ad.kittytel.net
+
+ad_linux_server_ou: "OU=Linux,OU=Servers,OU=KittyTel"
+ip_use_dhcp: true
+
+netbios_name: "{{ vm_name }}"
+ad_domain: "{{ vault_internal_host_dns }}"
+# default region suffix:
+region_suffix: lgb
+# Universal SSL settings for daemons
+preferred_ssl_ciphers: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS"
+
+nextcloud_db_user: nextcloud
+librenms_db_user: librenms
+glpi_db_user: inventory
+pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
+vm_new_random_mac: "{{ '52:54:00' | random_mac }}"
+vm_cpu_mode: host-model
+vm_machine: q35
+vm_libvirt_vm_emulator: /usr/bin/qemu-system-x86_64
+webserver_default_http_dir: /var/www/default
+acme_challenge_type: dns-01
+acme_directory: https://acme-v02.api.letsencrypt.org/directory
+acme_version: 2
+letsencrypt_dir: /etc/letsencrypt
+letsencrypt_keys_dir: /etc/letsencrypt/keys
+letsencrypt_csrs_dir: /etc/letsencrypt/csrs
+letsencrypt_certs_dir: /etc/letsencrypt/certs
+letsencrypt_account_key: /etc/letsencrypt/account/account.key
+default_cloudflare_zone: kittytel.net
+libvirt_vm_default_console_log_dir: "/var/log/libvirt-consoles/"
+libvirt_vm_default_uuid_deterministic: False
+libvirt_volume_default_images_path: '/var/lib/libvirt/images'
+libvirt_volume_default_type: volume
+libvirt_volume_default_format: qcow2
+libvirt_volume_default_device: disk
+libvirt_vm_image_cache_path: "{{ libvirt_image_cache_path }}"
+libvirt_vm_arch: x86_64
+libvirt_vm_clock_offset: False
+libvirt_vm_trust_guest_rx_filters: false
+libvirt_vm_virsh_default_env: "{{  { 'LIBVIRT_DEFAULT_URI': libvirt_vm_uri } if libvirt_vm_uri else {} }}"
+libvirt_vm_uri: ""
+libvirt_vm_sudo: true
+libvirt_cpu_mode_default: "{{ 'host-passthrough' if libvirt_vm_engine == 'kvm' else 'host-model' }}"
+libvirt_image_cache_path: "/tmp/"
+# libvirt_: borrowed defaults from stackhpc/ansible-role-libvirt-vm

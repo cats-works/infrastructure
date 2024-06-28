@@ -1,0 +1,68 @@
+---
+- name: Add apt-key for unifi
+  ansible.builtin.get_url:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+    dest: /etc/apt/trusted.gpg.d/unifi-repo.gpg
+    mode: '0644'
+  become: true
+
+- name: Add apt key for mongodb
+  ansible.builtin.get_url:
+    url: https://www.mongodb.org/static/pgp/server-{{ mongodb_version }}.asc
+    dest: /etc/apt/trusted.gpg.d/server-{{ mongodb_version }}.asc
+    mode: '0644'
+  become: true
+
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Add apt-repo for unifi
+  ansible.builtin.apt_repository:
+    repo: deb https://www.ui.com/downloads/unifi/debian {{ unifi_release }} ubiquiti
+    state: present
+  become: true
+
+- name: Set apt component for ubuntu
+  ansible.builtin.set_fact:
+    mongodb_apt_component: multiverse
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Add apt-repo for mongodb
+  ansible.builtin.apt_repository:
+    repo: deb http://repo.mongodb.org/apt/{{ ansible_distribution | lower }} {{ mongodb_apt_suite }} {{ mongodb_apt_component }}
+    state: present
+  become: true
+
+- name: Install mongodb
+  ansible.builtin.apt:
+    name:
+      - mongodb-org-server
+      - mongodb-org-tools
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Install unifi-controller
+  ansible.builtin.apt:
+    name: unifi
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Add default-conf
+  ansible.builtin.template:
+    src: default.conf
+    dest: /etc/default/unifi
+    mode: '0644'
+  become: true
+  notify: Restart_unifi

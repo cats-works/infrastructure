@@ -1,0 +1,31 @@
+---
+# Pre-tasks for creating PXE enabled VM
+- name: "Check if /etc/ansible/host_vars/{{ inventory_hostname_short }}.{{ vault_internal_host_dns }} exists"
+  stat:
+    path: "/etc/ansible/host_vars/{{ inventory_hostname_short }}.{{ vault_internal_host_dns }}"
+  delegate_to: localhost
+  become: no
+- name: Check Hypervisor for existing VM
+  virt:
+    command: list_vms
+  delegate_to: "{{ vm_hypervisor }}"
+  register: vm_list
+- name: Check for VM and set vm_exists fact (noexist)
+  set_fact:
+    vm_exists: false
+  when: vm_name not in vm_list.list_vms
+- name: Check for VM and set vm_exists fact (exists)
+  set_fact:
+    vm_exists: true
+  when: vm_name in vm_list.list_vms
+- name: "Set DNS suffix host fact"
+  set_fact:
+    dns_suffix: "{{ vault_internal_host_dns }}"
+- name: "Set MAC Address Fact (Random)"
+  set_fact:
+      pxe_mac_address: "{{ vm_new_random_mac }}"
+  when: "sys_mac_addr is not defined"
+- name: "Set MAC Address Fact (Defined)"
+  set_fact:
+      pxe_mac_address: "{{ sys_mac_addr }}"
+  when: "sys_mac_addr is defined"

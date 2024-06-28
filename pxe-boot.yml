@@ -1,0 +1,38 @@
+---
+- name: PXE Boot System
+  hosts: pxe_boot
+  remote_user: '{{ vault_ansible_deployment_user }}'
+  become: yes
+  become_method: sudo
+  gather_facts: false
+  tasks:
+  - name: assert limit
+    run_once: yes
+    assert:
+      that:
+      - 'ansible_limit is defined'
+      fail_msg: Playbook must be run with a limit (set a hostname to boot)
+      quiet: yes
+  - name: "Check if /etc/ansible/host_vars/{{ inventory_hostname_short }}.{{ vault_internal_host_dns }} exists"
+    stat:
+      path: "/etc/ansible/host_vars/{{ inventory_hostname_short }}.{{ vault_internal_host_dns }}"
+    delegate_to: localhost
+    become: no
+  - name: Deploy PXE/Kickstart
+    include_tasks: tasks/deployment/kickstart.yml
+    when: pxe_os == "rocky-stable" and vm_hypervisor is undefined
+  - name: Deploy PXE/Preseed
+    include_tasks: tasks/deployment/preseed.yml
+    when: pxe_os == "debian-stable" and vm_hypervisor is undefined
+  - name: Deploy PXE/Unattended Windows
+    include_tasks: tasks/deployment/win-unattend.yml
+    when: pxe_os == "windows" and vm_hypervisor is undefined
+  - name: Pause 240 seconds for system to boot from network
+    pause:
+      seconds: 240
+    delegate_to: localhost
+    become: no
+    when: vm_hypervisor is undefined
+  - name: Cleanup PXE
+    include_tasks: tasks/deployment/pxe-cleanup.yml
+    when: vm_hypervisor is undefined

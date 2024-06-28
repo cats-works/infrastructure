@@ -1,0 +1,106 @@
+---
+# Playbook to install Samba/MIT Kerberos/WinBind for AD Member Role on Linux
+
+- name: Install packages for AD Member Role
+  package:
+    name:
+      - winbind
+      - libpam-winbind
+      - krb5-user
+      - python3-pexpect
+      - libpam-krb5
+      - libnss-winbind
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install packages for AD Member Role (RedHat)
+  package:
+    name:
+      - samba-winbind
+      - samba-winbind-modules
+      - samba-winbind-krb5-locator
+      - python3-pexpect
+      - samba-winbind-clients
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Check if machine is bound
+  shell: /bin/bash -c "/usr/bin/wbinfo -g | grep domain\ admins"
+  register: wbinfo_bound
+  changed_when: false
+  ignore_errors: true
+
+- name: Copy MIT Kerberos configuration
+  template:
+    src: krb5.conf.j2
+    dest: /etc/krb5.conf
+    mode: '0644'
+    owner: root
+    group: root
+  when: wbinfo_bound is failed
+
+- name: Copy Samba smb.conf configuration
+  template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    group: root
+  when: wbinfo_bound is failed
+  notify: restart winbind
+
+- name: Join Kerberos Realm
+  expect:
+    command: /bin/bash -c "/usr/bin/kinit {{ vault_ad_deploy_user }}@{{ vault_krb5_realm }}"
+    responses:
+      Password for *: "{{ vault_ad_pass }}"
+  when: wbinfo_bound is failed
+
+#- name: Join AD via WinBind
+#  expect:
+#    command: /bin/bash -c "/usr/bin/net ads join -U {{ vault_ad_deploy_user }}"
+#    responses:
+#      Enter *: "{{ vault_ad_pass }}"
+#  when: wbinfo_bound is failed
+
+- name: Add winbind passwd nsswitch entry
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^passwd:'
+    line: 'passwd:         files systemd winbind'
+  when: wbinfo_bound is failed
+
+- name: Add winbind passwd nsswitch entry
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^group:'
+    line: 'group:          files systemd winbind'
+  when: wbinfo_bound is failed
+
+- name: Ensure winbind is running
+  service:
+    name: winbind 
+    state: started
+    enabled: yes
+
+- name: Add domain admins to sudoers
+  community.general.sudoers:
+    name: domain-admins
+    state: present
+    group: domain\ admins
+    commands: ALL
+
+- name: Check if the mkhomedir feature is enabled for Debian machines
+  command: 'grep mkhomedir /etc/pam.d/common-session'
+  when: ansible_os_family == 'Debian'
+  register: _mkhomedir
+  changed_when: False
+  failed_when: _mkhomedir.rc == 2
+  check_mode: no
+
+- name: Add pam_mkhomedir.so to /etc/pam.d/common-session
+  lineinfile:
+    path: /etc/pam.d/common-session
+    line: session	optional			pam_mkhomedir.so skel=/etc/skel umask=077
+    create: yes
+  when: ansible_os_family == 'Debian' and _mkhomedir.rc != 0

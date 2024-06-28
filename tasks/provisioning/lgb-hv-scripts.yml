@@ -1,0 +1,31 @@
+---
+- name: install stage2-boot script
+  copy:
+    src: files/scripts/stage2-boot.sh
+    dest: /usr/local/sbin/stage2-boot
+    mode: '0755'
+    owner: root
+    group: root
+- name: install hv-degrade-services.sh script
+  copy:
+    src: files/scripts/hv-degrade-services.sh
+    dest: /usr/libexec/degrade-services
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: install hv-restore-services.sh script
+  copy:
+    src: files/scripts/hv-restore-services.sh
+    dest: /usr/libexec/restore-services
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: install scram script
+  copy:
+    src: files/scripts/vm-scram.sh
+    dest: /usr/local/sbin/scram
+    mode: '0755'
+    owner: root
+    group: root

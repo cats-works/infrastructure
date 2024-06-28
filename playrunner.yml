@@ -1,0 +1,83 @@
+---
+- name: Provision ansible playrunner
+  hosts: playrunner.ad.kittytel.net
+  become: yes
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become_method: sudo
+
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+    - name: Deploy failsafe user account
+      import_tasks: tasks/provisioning/failsafe.yml
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+
+  roles:
+    - monitoring-internal
+    - shell-niceties
+    - secure-ssh
+
+  tasks:
+    - name: Install base requirements
+      package: 
+        name: 
+          - epel-release
+          - python3-firewall
+          - samba
+          - ansible-core
+          - python3-pip
+          - nfs-utils
+        state: present
+
+    - name: Add hashicorp vault repository
+      yum_repository:
+        name: hashicorp
+        description: Hashicorp RPM repos
+        file: hashicorp
+        baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+        gpgkey: https://rpm.releases.hashicorp.com/gpg
+      when: ansible_os_family == "RedHat"
+
+    - name: clean dnf cache
+      command: dnf clean all
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Hashicorp Vault
+      package: 
+        name: 
+          - vault
+        state: present
+
+    - name: Make sure a service unit is running
+      systemd_service:
+        state: started
+        enabled: true
+        name: vault
+
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/provisioning/cat-ssh.yml  
+    - name: restart smb
+      service:
+        name: smb
+        state: restarted
+        enabled: yes
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

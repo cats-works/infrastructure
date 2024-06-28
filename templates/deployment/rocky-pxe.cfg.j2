@@ -1,0 +1,7 @@
+#!ipxe
+
+echo Starting Rocky Linux {{ pxeprov_rocky_stable_ver }} ${archl} installer
+kernel http://{{ pxe_server_ip }}/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_ip }}/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/images/pxeboot/initrd.img
+imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/{{ pxe_os }}/ inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ vm_name }}.ks quiet inst.text
+boot 

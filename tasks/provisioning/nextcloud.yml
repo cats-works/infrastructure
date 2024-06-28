@@ -1,0 +1,102 @@
+---
+## Playbook to deploy NextCloud
+
+- name: create php-fpm user for nextcloud
+  import_tasks: tasks/provisioning/fpmuser.yml
+  vars:
+    fpm_name: nxc
+    php_version: "8.2"
+
+- name: Install requirements
+  package:
+    name: 
+      - redis
+      - php8.2-redis
+      - acl
+      - php8.2-imagick
+    state: present
+
+- name: download nextcloud archive
+  get_url:
+    url:  "https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_version }}.tar.bz2"
+    dest: /tmp/nextcloud.tar.bz2
+
+- name: install nextcloud
+  unarchive: 
+    src: /tmp/nextcloud.tar.bz2
+    dest: /var/www/nxc
+    remote_src: true
+    extra_opts: [--strip-components=1]
+    creates: /var/www/nxc/occ
+
+- name: Install nginx configuration for nextcloud
+  template:
+    src: nextcloud/nginx-rules.j2
+    dest: "/etc/nginx/snippets/nextcloud.conf"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install nextcloud config.php
+  template:
+    src: nextcloud/config.php.j2
+    dest: "/var/www/nxc/config/config.php"
+    mode: '0644'
+    owner: nxc
+    group: nxc
+    force: false
+
+- name: Link /var/www/nxc to /var/www/html/nxc
+  file:
+    src:  /var/www/nxc
+    dest:  /var/www/html/nxc
+    state: link
+
+- name: Install OpenSSL legacy config
+  template:
+    src: nextcloud/openssl.cnf.j2
+    dest: "/usr/lib/ssl/openssl.cnf"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Fix our php open-basedir
+  lineinfile:
+    path: /etc/php/8.2/fpm/pool.d/nxc.conf
+    regexp: '^php_admin_value\[open_basedir'
+    line: php_admin_value[open_basedir] = /var/www/nxc/:/nxc-data:/tmp
+
+- name: Fix our php PATH
+  lineinfile:
+    path: /etc/php/8.2/fpm/pool.d/nxc.conf
+    line: env[PATH] = /usr/local/bin:/usr/bin:/bin
+
+- name: Fix our php memory limit
+  lineinfile:
+    path: /etc/php/8.2/fpm/pool.d/nxc.conf
+    line: php_admin_value[memory_limit] = 512M
+
+- name: Fix our php max_execution_time
+  lineinfile:
+    path: /etc/php/8.2/fpm/pool.d/nxc.conf
+    line: php_admin_value[max_execution_time] = 1800
+
+- name: Fix our php post_max_size
+  lineinfile:
+    path: /etc/php/8.2/fpm/pool.d/nxc.conf
+    line: php_admin_value[post_max_size] = 2048M
+
+- name: upgrade nextcloud
+  become_user: nxc
+  become: yes
+  shell: php8.2 occ upgrade
+  args:
+    chdir: /var/www/nxc/
+
+- name: add nextcloud cronjob
+  cron:
+    name: nextcloud cronjob
+    minute: '*/5'
+    user: nxc
+    job: "php8.2 -f /var/www/nxc/cron.php > /dev/null 2>&1"
+

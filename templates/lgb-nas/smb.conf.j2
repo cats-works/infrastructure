@@ -1,0 +1,176 @@
+# This configuration is managed by ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+[global]
+min protocol = SMB2
+bind interfaces only = yes
+interfaces = lo enp3s0
+security = ads
+multicast dns register = No
+encrypt passwords = yes
+passdb backend = tdbsam
+map to guest = Bad User
+dedicated keytab file = /etc/krb5.keytab
+kerberos method = system keytab
+ea support = yes
+vfs objects = fruit streams_xattr
+fruit:metadata = stream
+load printers = no
+cups options = raw
+printcap name = /dev/null
+realm = {{ vault_krb5_realm }}
+template homedir = /home/%U
+workgroup = KITTYTEL
+template shell = /bin/bash
+idmap backend = tdb
+idmap config * : backend = tdb
+idmap config * : range = 10000-20000
+winbind use default domain = yes
+winbind refresh tickets = yes
+winbind offline logon = yes
+winbind enum groups = yes
+winbind enum users = yes
+server string = Lil NAS X
+allow insecure wide links = yes
+
+[cat]
+comment = cats data
+path = /nas2/cat_data
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+valid users = "@domain admins"
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[Time Machine]
+vfs objects = fruit streams_xattr
+fruit:time machine = yes
+fruit:time machine max size = 1050G
+comment = Time Machine Backups
+path = /nas/tm
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+valid users = "@domain admins"
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[Software]
+comment = Software
+path = /nas/Software
+public = yes
+writable = yes
+guest ok = yes
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0755
+directory mode = 0755
+follow symlinks = yes
+wide links = yes
+
+[VirtualBox VMs]
+comment = VirtualBox VMs
+path = /nas/vbox
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0754
+
+[Legacy]
+comment = Legacy Shares
+path = /nas/smb1
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[UTM VMs]
+comment = UTM VMs
+path = /nas/utm
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[Media]
+comment = Media Library
+path = /nas/media
+public = yes
+writable = yes
+guest ok = yes
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[portal]
+comment = portal site
+path = /nas/portal
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+valid users = "@domain admins"
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[munki]
+comment = Mac Software Distribution
+path = /nas/munki
+public = yes
+writable = yes
+guest ok = yes
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755

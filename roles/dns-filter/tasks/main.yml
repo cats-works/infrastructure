@@ -1,0 +1,47 @@
+---
+# Playbook to install
+# * pihole DNS resolver
+# * unbound local resolver forwarding to quad9 DNS over TLS
+
+- name: Install unbound resolver
+  package: 
+    name: 
+      - unbound
+      - lighttpd-mod-openssl
+    state: present
+
+- name: Install unbound.conf
+  template:
+    src: unbound.conf.j2 
+    dest: /etc/unbound/unbound.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install Pi-Hole setupVars.conf
+  template:
+    src: setupVars.conf.j2 
+    dest: /etc/pihole/setupVars.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: "Clone the Pi-Hole repo"
+  ansible.builtin.git:
+    repo: https://github.com/pi-hole/pi-hole.git
+    depth: 1
+    dest: "{{ ansible_env.HOME }}/downloads/pi-hole"
+    version: master
+
+- name: Run Pi-Hole install script
+  ansible.builtin.shell: >
+    '{{ ansible_env.HOME }}/downloads/pi-hole/automated install/basic-install.sh' --unattended >> 
+    {{ ansible_env.HOME }}/downloads/pihole_install.log
+
+- name: Install lighttpd external.conf
+  template:
+    src: lighttpd-external.conf.j2 
+    dest: /etc/lighttpd/conf-enabled/20-external.conf
+    mode: '0644'
+    owner: root
+    group: root

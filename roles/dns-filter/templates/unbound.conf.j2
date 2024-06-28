@@ -1,0 +1,18 @@
+# This configuration is managed by Ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+server:
+	do-not-query-localhost: no
+	interface: 127.0.0.1
+	interface: ::1
+	port: 5353
+	tls-cert-bundle: /etc/ssl/certs/ca-certificates.crt
+	access-control: 127.0.0.1 allow_snoop
+	access-control: ::1 allow_snoop
+
+forward-zone:
+	name: "."
+	forward-tls-upstream: yes
+	forward-addr: {{ unbound_dns_1 }}
+	forward-addr: {{ unbound_dns_2 }}

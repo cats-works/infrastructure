@@ -1,0 +1,48 @@
+---
+# Playbook to configure for SNMPv2 monitoring
+
+- name: Install packages for Internal SNMPv2 Monitoring (Debian)
+  package: 
+    name: 
+      - snmpd
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install packages for Internal SNMPv2 Monitoring (RedHat)
+  package: 
+    name: 
+      - net-snmp
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Copy snmpd configuration from template
+  template: 
+    src: snmpd.conf.j2 
+    dest: /etc/snmp/snmpd.conf
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Install LibreNMS distro reporting script
+  copy:
+    src: distro.sh
+    dest: /usr/local/bin/distro
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create Firewall Entry for firewalld
+  firewalld:
+    service: snmp
+    permanent: yes
+    zone: public
+    immediate: yes
+    state: enabled
+  when: ansible_os_family == "RedHat"
+
+- name: Enable and Start snmpd
+  service: 
+    name: snmpd
+    state: restarted
+    enabled: yes
+    

@@ -1,0 +1,18 @@
+[Unit]
+Description=Samba SMB Daemon (SMB1)
+Documentation=man:smbd(8) man:samba(7) man:smb.conf(5)
+Wants=network-online.target
+After=network.target network-online.target nmbd-smb1.target
+
+[Service]
+Type=notify
+PIDFile=/run/samba-smb1/smbd.pid
+LimitNOFILE=16384
+EnvironmentFile=/etc/default/smbd-smb1
+ExecStartPre=/usr/share/samba/update-apparmor-samba-profile
+ExecStart=/usr/sbin/smbd --foreground --no-process-group $SMBDOPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target

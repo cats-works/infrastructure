@@ -1,0 +1,30 @@
+---
+# Task to define our VM on libvirt
+- name: Create our VM Disk(s)
+  script: virt_volume.sh -n {{ item.name }}.{{ item.format }} -p {{ item.pool | default('default') }} -c {{ item.capacity }}
+  delegate_to: "{{ vm_hypervisor }}"
+  with_items: "{{ vm_volumes }}"
+- name: Correct VM Disk Permissions
+  file: 
+    path: "{{ libvirt_volume_default_images_path }}/{{ item.name }}.{{ item.format }}"
+    owner: libvirt-qemu
+    group: libvirt-qemu
+    mode: '0600'
+  delegate_to: "{{ vm_hypervisor }}"
+  with_items: "{{ vm_volumes }}"
+- name: Setup Virtual Machine
+  virt:
+    command: define
+    xml: "{{ lookup('template', 'deployment/vm.xml.j2') }}"
+    autostart: "{{ vm_autostart }}"
+  delegate_to: "{{ vm_hypervisor }}"
+- name: Start Virtual Machine
+  virt:
+    name: "{{ vm_name }}"
+    state: running
+  delegate_to: "{{ vm_hypervisor }}"
+- name: Pause 120sec for autoinstaller to process
+  pause:
+    seconds: 120
+  delegate_to: localhost
+  become: no

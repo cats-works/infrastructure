@@ -1,0 +1,34 @@
+---
+- name: Deploy Managed VM
+  hosts: managed_vms
+  remote_user: '{{ vault_ansible_deployment_user }}'
+  become: yes
+  become_method: sudo
+  gather_facts: false
+  pre_tasks:
+    - name: assert limit
+      run_once: yes
+      assert:
+        that:
+        - 'ansible_limit is defined'
+        fail_msg: Playbook must be run with a limit (set a hostname to boot)
+        quiet: yes
+    - name: Deployment Pre-Configuration
+      include_tasks: tasks/deployment/pre-vm.yml
+      when: vm_hypervisor is defined
+  tasks:
+    - name: Deploy PXE/Kickstart
+      include_tasks: tasks/deployment/kickstart.yml
+      when: pxe_os == "rocky-stable" and vm_hypervisor is defined and vm_exists is false
+    - name: Deploy PXE/Preseed
+      include_tasks: tasks/deployment/preseed.yml
+      when: pxe_os == "debian-stable" and vm_hypervisor is defined and vm_exists is false
+    - name: Deploy PXE/Unattended Windows
+      include_tasks: tasks/deployment/win-unattend.yml
+      when: pxe_os == "windows" and vm_hypervisor is defined and vm_exists is false
+    - name: Define VM
+      include_tasks: tasks/deployment/define-vm.yml
+      when: vm_hypervisor is defined and vm_exists is false
+    - name: Cleanup PXE
+      include_tasks: tasks/deployment/pxe-cleanup.yml
+      when: vm_hypervisor is defined and vm_exists is false

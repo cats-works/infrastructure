@@ -1,0 +1,170 @@
+---
+# Playbook to build nginx from source
+
+- name: Install packages for compiling nginx
+  package: 
+    name: 
+      - build-essential
+      - curl
+      - git
+      - libkrb5-dev
+      - libpcre3-dev
+      - libssl-dev
+      - libxml2-dev
+      - libxslt1-dev
+      - libgd-dev
+      - libgeoip-dev
+      - zlib1g-dev
+    state: present
+
+- name: Verify /usr/src exists
+  become: yes
+  file:
+    path: /usr/src/
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Downloading nginx sources
+  get_url:
+    url: "http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
+    dest: "/usr/src/nginx-{{ nginx_version }}.tar.gz"
+  register: nginx_source
+
+- name: check out nginx spnego module
+  git: 
+    repo: 'https://github.com/stnoonan/spnego-http-auth-nginx-module'
+    dest: /usr/src/spnego-http-auth-nginx-module
+    version: master
+  when: nginx_source.changed
+
+- name: Unpacking nginx tarball
+  unarchive:
+    copy: no
+    dest: /usr/src/
+    src: "/usr/src/nginx-{{ nginx_version }}.tar.gz"
+  when: nginx_source.changed
+  register: nginx_source_unpack
+
+- name: Create required nginx /etc dirs
+  become: yes
+  file:
+    path: /etc/nginx
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required nginx /etc dirs
+  become: yes
+  file:
+    path: /etc/nginx/snippets
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required nginx /etc dirs
+  become: yes
+  file:
+    path: /etc/nginx/conf.d/
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required nginx /etc dirs
+  become: yes
+  file:
+    path: /etc/nginx/sites-available/
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Create required nginx /etc dirs
+  become: yes
+  file:
+    path: /etc/nginx/sites-enabled/
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Configuring nginx source with custom modules
+  command: "./configure --sbin-path=/usr/local/sbin --conf-path=/etc/nginx/nginx.conf --with-http_ssl_module  --with-http_realip_module --with-http_addition_module --with-http_sub_module --with-http_dav_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_random_index_module --with-http_secure_link_module --with-http_stub_status_module --with-http_auth_request_module --with-threads --with-stream --with-stream_ssl_module --with-http_slice_module --with-file-aio --with-http_v2_module --pid-path=/run/nginx.pid --lock-path=/run/nginx.lock --add-dynamic-module=../spnego-http-auth-nginx-module"
+  become: yes
+  args:
+    chdir: "/usr/src/nginx-{{ nginx_version }}"
+  when: nginx_source_unpack.changed
+  register: nginx_configure
+
+- name: compiling nginx
+  become: yes
+  shell: make && make install
+  args:
+    chdir: "/usr/src/nginx-{{ nginx_version }}"
+  when: nginx_source_unpack.changed
+
+- name: Copy nginx systemd unit
+  template:
+    src: systemd.j2
+    dest: /etc/systemd/system/nginx.service
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Copy nginx config file
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Copy nginx fastcgi file
+  template:
+    src: fastcgi.conf.j2
+    dest: /etc/nginx/fastcgi.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Copy nginx fastcgi file
+  template:
+    src: fastcgi_params.j2
+    dest: /etc/nginx/fastcgi_params
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Copy nginx mimetypes file
+  template:
+    src: mime.types.j2
+    dest: /etc/nginx/mime.types
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Enable service nginx and ensure it is not masked
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+
+- name: Create /var/log/nginx
+  become: yes
+  file:
+    path: /var/log/nginx/
+    state: directory
+    owner: www-data
+    mode: 0755
+
+- name: Give /var/log/nginx/access.log permissions
+  become: yes
+  file:
+    path: /var/log/nginx/access.log
+    owner: www-data
+    group: www-data
+
+- name: Give /var/log/nginx/error.log permissions
+  become: yes
+  file:
+    path: /var/log/nginx/error.log
+    owner: www-data
+    group: www-data

@@ -1,0 +1,36 @@
+[global]
+    netbios name = {{ vm_name|upper }}
+    realm = {{ vault_krb5_realm }}
+    min protocol = SMB2
+    encrypt passwords = true
+    security = ads
+    idmap config * : backend = tdb
+    idmap config * : range = 10000-20000
+    winbind refresh tickets = Yes
+    winbind enum users = yes
+    winbind enum groups = yes
+    winbind use default domain = yes
+    workgroup = {{ vault_ad_netbios }}
+    dns proxy = yes
+    dedicated keytab file = /etc/krb5.keytab
+    kerberos method = system keytab
+    template shell = /bin/bash
+    template homedir = /home/%U
+    wins server = {{ vault_krb5_realm }}
+    wins proxy = no
+    preferred master = no
+    inherit acls = yes
+    map acl inherit = yes
+    acl group control = yes
+    load printers = no
+    use sendfile = no
+ 
+    vfs objects = fruit streams_xattr
+    fruit:metadata = stream
+    fruit:model = MacSamba
+    fruit:veto_appledouble = no
+    fruit:posix_rename = yes 
+    fruit:zero_file_id = yes
+    fruit:wipe_intentionally_left_blank_rfork = yes 
+    fruit:delete_empty_adfiles = yes 
+

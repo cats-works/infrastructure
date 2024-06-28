@@ -1,0 +1,72 @@
+---
+- name: install nut.conf
+  template:
+    src: templates/lgb-hv/nut.conf.j2
+    dest: /etc/nut/nut.conf
+    mode: '0644'
+    owner: root
+    group: root
+- name: install nut.conf
+  template:
+    src: templates/lgb-hv/nut.conf.j2
+    dest: /etc/nut/nut.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: install ups.conf
+  template:
+    src: templates/lgb-hv/ups.conf.j2
+    dest: /etc/nut/ups.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: install upsd.conf
+  template:
+    src: templates/lgb-hv/upsd.conf.j2
+    dest: /etc/nut/upsd.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: install upsd.users
+  template:
+    src: templates/lgb-hv/upsd.users.j2
+    dest: /etc/nut/upsd.users
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: install upsmon.conf
+  template:
+    src: templates/lgb-hv/upsmon.conf.j2
+    dest: /etc/nut/upsmon.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: restart nut-server
+  service:
+    name: nut-server
+    state: restarted
+    enabled: yes
+
+- name: restart nut-client
+  service:
+    name: nut-server
+    state: restarted
+    enabled: yes
+
+- name: install librenms ups-nut script
+  copy:
+    src: files/scripts/ups-nut.sh 
+    dest: /etc/snmp/ups-nut.sh
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Append our rule to snmpd.conf
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    line: extend ups-nut /etc/snmp/ups-nut.sh

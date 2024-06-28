@@ -1,0 +1,97 @@
+---
+- name: Provision LGB hypervisor
+  hosts: hv-lgb.ad.kittytel.net
+  become: yes
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become_method: sudo
+
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+    - name: Deploy failsafe user account
+      import_tasks: tasks/provisioning/failsafe.yml
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+    - name: Install base dependencies
+      package: 
+        name: 
+          - libvirt-daemon
+          - libvirt-clients
+          - nut-server
+          - nut-snmp
+          - nut
+          - nut-client
+          - lm-sensors
+        state: present
+
+  roles:
+    - monitoring-internal
+    - shell-niceties
+
+  tasks:
+    - name: install motd
+      template:
+        src: templates/lgb-hv/motd.tail.j2
+        dest: /etc/motd
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Install smartmontools and snmp configuration
+      import_tasks: tasks/provisioning/snmp-smart.yml  
+
+    - name: Install NUT UPS configuration
+      import_tasks: tasks/provisioning/nut-ups-lgb.yml  
+
+    - name: Install libvirt helper scripts
+      import_tasks: tasks/provisioning/lgb-hv-scripts.yml  
+
+    - name: install chronyd gps time config
+      template:
+        src: templates/lgb-hv/chrony.conf.j2
+        dest: /etc/chrony/chrony.conf
+        mode: '0644'
+        owner: root
+        group: root
+
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/provisioning/cat-ssh.yml  
+    - name: ensure libvirtd is enabled
+      service:
+        name: libvirtd
+        state: started
+        enabled: yes
+    - name: ensure libvirt-guests is enabled
+      service:
+        name: libvirt-guests
+        state: started
+        enabled: yes
+    - name: restart snmpd
+      service:
+        name: snmpd
+        state: restarted
+        enabled: yes
+    - name: restart chrony
+      service:
+        name: chrony
+        state: restarted
+        enabled: yes
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

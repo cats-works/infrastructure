@@ -1,0 +1,90 @@
+---
+- name: Install packages for PXE Server Role
+  package: 
+    name: 
+      - tftpd-hpa
+      - nginx-light
+      - samba
+      - samba-vfs-modules
+      - di-netboot-assistant
+    state: present
+
+- name: Copy nginx configuration
+  template: 
+    src: nginx.conf 
+    dest: /etc/nginx/sites-enabled/default
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Copy tftpd-hpa configuration
+  template: 
+    src: tftpd-hpa.default 
+    dest: /etc/default/tftpd-hpa
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Create /srv/ks/ folder
+  file:
+    path: /srv/ks/
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Copy smb share configuration
+  template: 
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: restart samba
+
+- name: include_tasks for alpine-stable
+  include_tasks: alpine.yml
+  when: '"alpine-stable" in pxe_distro'
+- name: include_tasks for alpine-virt
+  include_tasks: alpine-virt.yml
+  when: '"alpine-virt" in pxe_distro'
+- name: include_tasks for debian-stable
+  include_tasks: debian.yml
+  when: '"debian-stable" in pxe_distro'
+- name: include_tasks for rocky-stable
+  include_tasks: rocky.yml
+  when: '"rocky-stable" in pxe_distro'
+- name: include_tasks for windows
+  include_tasks: windows.yml
+  when: '"windows" in pxe_distro'
+
+- name: install iPXE
+  include_tasks: ipxe.yml
+
+- name: Ensure nginx is running
+  service:
+    name: nginx 
+    state: restarted
+    enabled: yes
+
+- name: Ensure samba is running
+  service:
+    name: smbd 
+    state: restarted
+    enabled: yes
+  when: ansible_os_family == "Debian"
+
+- name: Ensure samba is running
+  service:
+    name: smb
+    state: restarted
+    enabled: yes
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure tftpd-hpa is running
+  service:
+    name: tftpd-hpa 
+    state: restarted
+    enabled: yes
+  notify:
+    - restart tftpd-hpa

@@ -1,0 +1,33 @@
+---
+
+- name: Install smartmontools
+  package: 
+    name: 
+      - smartmontools
+    state: present
+
+- name: restart smartmontools
+  service:
+    name: smartmontools
+    state: restarted
+    enabled: yes
+
+- name: install librenms SMART script
+  copy:
+    src: files/scripts/smart
+    dest: /etc/snmp/smart
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Append our rule to snmpd.conf
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    line: extend smart /etc/snmp/smart
+
+- name: Add root cronjob for SMART 
+  ansible.builtin.cron:
+    name: "snmp smart"
+    minute: "*/3"
+    job: "/etc/snmp/smart -u"
+    user: root

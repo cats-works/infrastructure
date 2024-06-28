@@ -1,0 +1,8 @@
+---
+# Secure DNS forwarding should use @853#host.name.for.tls syntax
+unbound_dns_1: 9.9.9.11@853#dns.quad9.net
+unbound_dns_2: 149.112.112.11@853#dns.quad9.net
+pihole_query_logging: false
+pihole_use_dnssec: false
+pihole_webtheme: default-dark
+pihole_cache_size: 10000

@@ -1,0 +1,19 @@
+# This configuration is managed by ansible
+# Do not make any manual edits they will be lost.
+
+Include /etc/ssh/sshd_config.d/*.conf
+SyslogFacility AUTH
+LogLevel INFO
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials yes
+UsePAM yes
+
+AllowTcpForwarding no
+X11Forwarding no
+PrintMotd no
+UseDNS yes
+AcceptEnv LANG LC_*
+Subsystem sftp internal-sftp

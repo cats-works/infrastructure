@@ -1,0 +1,26 @@
+---
+- name: Install "php{{ php_version | default(default_php_version) }}-fpm and deps"
+  package:
+    name: 
+      - "php{{ php_version | default(default_php_version) }}-fpm"
+      - "php{{ php_version | default(default_php_version) }}-curl"
+      - "php{{ php_version | default(default_php_version) }}-opcache"
+      - "php{{ php_version | default(default_php_version) }}-zip"
+      - "php{{ php_version | default(default_php_version) }}-gd"
+      - "php{{ php_version | default(default_php_version) }}-gmp"
+      - "php{{ php_version | default(default_php_version) }}-bcmath"
+      - "php{{ php_version | default(default_php_version) }}-pdo"
+      - "php{{ php_version | default(default_php_version) }}-mbstring"
+      - "php{{ php_version | default(default_php_version) }}-ldap"
+      - "php{{ php_version | default(default_php_version) }}-intl"
+      - "php{{ php_version | default(default_php_version) }}-imap"
+      - "php{{ php_version | default(default_php_version) }}-mysqlnd"
+      - "php{{ php_version | default(default_php_version) }}-pgsql"
+      - "php{{ php_version | default(default_php_version) }}-snmp"
+      - "php{{ php_version | default(default_php_version) }}-soap"
+      - "php{{ php_version | default(default_php_version) }}-xml"
+    state: present
+    
+- name: Disable default pool
+  command: mv /etc/php/{{ php_version | default(default_php_version) }}/fpm/pool.d/www.conf /etc/php/{{ php_version | default(default_php_version) }}/fpm/pool.d/www.disabled creates=/etc/php/{{ php_version | default(default_php_version) }}/fpm/pool.d/www.disabled
+  notify: restart php{{ php_version | default(default_php_version) }}-fpm

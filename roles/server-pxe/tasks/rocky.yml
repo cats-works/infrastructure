@@ -1,0 +1,17 @@
+---
+# Playbook for Rocky Linux
+# ALL TASKS in this playbook MUST conclude with the
+#   when: pxe_distro == "rocky-stable"
+
+- name: "Retrieve Rocky Linux Stable ISO"
+  get_url: 
+    url: '{{ pxeprov_rocky_stable_url }}'
+    dest: /srv/linux/rocky-stable-{{ pxeprov_rocky_stable_ver }}.iso
+  
+- name: Mount Rocky Linux {{ pxeprov_rocky_stable_ver }} ISO
+  mount:
+    path: /srv/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/
+    src: /srv/linux/rocky-stable-{{ pxeprov_rocky_stable_ver }}.iso
+    fstype: iso9660
+    opts: ro,loop
+    state: mounted

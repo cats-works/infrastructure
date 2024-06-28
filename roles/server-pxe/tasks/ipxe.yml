@@ -1,0 +1,89 @@
+---
+- name: Install build-essential and deps for building iPXE
+  package: 
+    name: 
+      - build-essential
+      - mtools
+      - binutils
+      - git
+      - gnu-efi
+      - liblzma-dev
+    state: present
+
+- name: "Retrieve wimboot"
+  get_url: 
+    url: https://github.com/ipxe/wimboot/releases/latest/download/wimboot
+    dest: /srv/wimboot
+
+- name: check out iPXE source
+  git: 
+    repo: 'https://github.com/ipxe/ipxe.git'
+    dest: /usr/src/ipxe/
+#    version: "{{ ipxe_version }}"
+    force: true
+
+- name: Install embed.ipxe
+  template:
+    src: templates/ipxe/embed.ipxe.j2
+    dest: /tmp/embed.ipxe
+    owner: root
+    group: root
+    mode: 0644
+    
+- name: compile ipxe UNDI
+  become: yes
+  shell: make bin/undionly.kpxe EMBED=/tmp/embed.ipxe
+  args:
+    chdir: "/usr/src/ipxe/src/"
+
+- name: compile ipxe EFI
+  become: yes
+  shell: make bin-x86_64-efi/ipxe.efi EMBED=/tmp/embed.ipxe
+  args:
+    chdir: "/usr/src/ipxe/src/"
+
+- name: copy our built ipxe UNDI
+  become: yes
+  copy:
+    src: /usr/src/ipxe/src/bin/undionly.kpxe
+    dest: /srv/tftp/undionly.kpxe
+    remote_src: true
+
+- name: copy our built ipxe EFI
+  become: yes
+  copy:
+    src: /usr/src/ipxe/src/bin-x86_64-efi/ipxe.efi
+    dest: /srv/tftp/ipxe.efi
+    remote_src: true
+
+#- name: Install boot.ipxe
+#  template:
+#    src: templates/ipxe/boot.ipxe.j2
+#    dest: /srv/boot.ipxe
+#    owner: root
+#    group: root
+#    mode: 0644
+    
+- name: Install boot.ipxe
+  template:
+    src: templates/ipxe/boot.ipxe.j2
+    dest: /srv/tftp/boot.ipxe
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install boot.ipxe.cfg
+  template:
+    src: templates/ipxe/boot.ipxe.cfg.j2
+    dest: /srv/tftp/boot.ipxe.cfg
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install menu.ipxe
+  template:
+    src: templates/ipxe/ipxe.menu.j2
+    dest: /srv/tftp/menu.ipxe
+    owner: root
+    group: root
+    mode: 0644

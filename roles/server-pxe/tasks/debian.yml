@@ -1,0 +1,34 @@
+---
+# Playbook for Debian GNU/Linux
+
+- name: "Retrieve Debian GNU/Linux Stable ISO"
+  get_url: 
+    url: '{{ pxeprov_debian_stable_url }}'
+    dest: /srv/linux/debian-stable-{{ pxeprov_debian_stable_ver }}.iso
+
+- name: Mount Debian GNU/Linux {{ pxeprov_debian_stable_ver }} ISO
+  mount:
+    path: /srv/distro/debian-stable-{{ pxeprov_debian_stable_ver }}/
+    src: /srv/linux/debian-stable-{{ pxeprov_debian_stable_ver }}.iso
+    fstype: iso9660
+    opts: ro,loop
+    state: present
+
+- name: Delete old debian-netinst-{{ pxeprov_debian_stable_cn }}
+  file:
+    state: absent
+    path: /srv/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/
+
+- name: Create folder for debian-netinst-{{ pxeprov_debian_stable_cn }}
+  file:
+    path: /srv/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Unarchive debian netinst tarball
+  unarchive:
+    src: "{{ pxeprov_debian_netinst_url }}"
+    dest: /srv/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/
+    remote_src: yes

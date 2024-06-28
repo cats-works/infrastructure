@@ -1,0 +1,29 @@
+---
+# Lets Encrypt SSL renewal
+- name: SSL Certificate Renewal mx-lgb
+  hosts: mx-lgb.ad.kittytel.net
+  become: yes
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  tasks:
+    - name: Deploy ACME certificates for mx-lgb
+      import_tasks: tasks/ssl/mx-lgb.yml
+
+    - name: Set fact for SSL change on mx
+      set_fact:
+        mx_changed: true
+      when: acme_challenge_your_domain['challenge_data'] is defined
+
+    - name: restart dovecot
+      service:
+        name: dovecot
+        state: restarted
+        enabled: yes
+      when: mx_changed is defined
+
+    - name: restart postfix
+      service:
+        name: postfix
+        state: restarted
+        enabled: yes
+      when: mx_changed is defined
+      

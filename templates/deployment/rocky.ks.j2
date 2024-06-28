@@ -1,0 +1,59 @@
+#version=RHEL9
+text
+keyboard --vckeymap=us --xlayouts='us'
+lang en_US.UTF-8
+timezone America/Los_Angeles --isUtc
+
+{% if ip_use_dhcp %}
+network --bootproto=dhcp --device=link --noipv6 --nameserver={{ int_dns_primary }},{{ int_dns_secondary }} --activate
+{% endif %}
+
+{% if not ip_use_dhcp and public_ip_addr is defined %}
+network --bootproto=static --ip={{ public_ip_addr }} --netmask={{ public_ip_nm }} --gateway={{ public_ip_gw }} --device=link --noipv6 --nameserver={{ int_dns_primary }},{{ int_dns_secondary }} --activate
+{% endif %}
+
+{% if not ip_use_dhcp and private_ip_addr is defined %}
+network --bootproto=static  --ip={{ private_ip_addr }} --netmask={{ private_ip_nm }} --gateway={{ private_ip_gw }} --device=link --noipv6 --nameserver={{ int_dns_primary }},{{ int_dns_secondary }} --activate
+{% endif %}
+
+
+url --url="{{ rocky_linux_mirror }}/9/BaseOS/x86_64/os/"
+
+authselect --useshadow --passalgo=sha512
+rootpw --iscrypted {{ vault_ks_root_pw_crypted }}
+
+selinux --enforcing
+firewall --enabled --ssh
+firstboot --disable
+
+reboot
+skipx
+
+ignoredisk --only-use={{ ks_use_disk }}
+clearpart --all --initlabel
+reqpart --add-boot
+part pv.01 --fstype="lvmpv" --grow
+volgroup vg_os pv.01
+logvol / --fstype="ext4" --name=root --vgname=vg_os --percent=100 --grow
+
+user --name={{ vault_ansible_deployment_user }} --password="{{ vault_ks_root_pw_crypted }}" --iscrypted
+sshkey --username={{ vault_ansible_deployment_user }} "{{ vault_ansible_deployment_sshkey }}"
+
+%packages
+@^minimal-environment
+nano
+sudo
+%end
+
+%addon com_redhat_kdump --disable --reserve-mb='auto'
+%end
+
+%anaconda
+pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
+pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+%end
+
+%post
+echo "{{ vault_ansible_deployment_user }}        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers.d/kt-deploy
+%end

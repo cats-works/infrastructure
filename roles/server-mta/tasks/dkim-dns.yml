@@ -1,0 +1,21 @@
+---
+# Playbook to install Postfix, ClamAV, OpenDKIM, OpenDMARC, SpamAssassin
+- name: "get DKIM public record for {{ dkim_dns_name }}" 
+  shell:
+    cmd: grep -Po "(?<=\")(.+)(?=\")" /etc/opendkim/keys/{{ dkim_dns_name }}/default.txt  | sed -z 's/\n//g;'
+  register: dkim_dns_value
+
+- name: "get selector {{ dkim_dns_name }}" 
+  shell:
+    cmd: cut -f1 /etc/opendkim/keys/{{ dkim_dns_name }}/default.txt | head -n1
+  register: dkim_dns_selector
+
+- name: "create DKIM record for {{ dkim_dns_selector.stdout_lines | join('') }}.{{ dkim_dns_name }}" 
+  cloudflare_dns:
+    domain: "{{ dkim_dns_name }}"
+    record: "{{ dkim_dns_selector.stdout_lines | join('') }}.{{ dkim_dns_name }}"
+    type: TXT
+    value: "{{ dkim_dns_value.stdout_lines | join('') }}"
+    state: present
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"

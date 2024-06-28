@@ -1,0 +1,48 @@
+---
+ansible_connection: winrm
+ansible_winrm_transport: kerberos
+ansible_port: 5985
+ansible_user: "ANSIBLE@AD.KITTYTEL.NET"
+ansible_password: "{{ vault_ad_pass }}"
+
+win_deploy_server_versions:
+  - server2022
+  - server2019
+  - server2016
+  - server2012r2
+  - server2012
+  - server2008r2
+  - server2008
+
+win_deploy_ltsc_versions:
+  - ltsc2021
+  - ltsc2019
+  - ltsc2016
+  - ltsc2015
+
+win_deploy_client_versions:
+  - win1123h2
+  - win81
+
+deploy_windows_version: "server2022"
+win_deploy_server_core: false
+win_deploy_reg_user: "User"
+win_deploy_reg_org: "Kitty Telecom"
+win_deploy_network_location: "Work"
+win_deploy_skip_auto_activation: "false"
+
+win_deploy_timezone: "Pacific Standard Time"
+
+win_deploy_server_2022_key: "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"
+win_deploy_server_2019_key: "WMDGN-G9PQG-XVVXX-R3X43-63DFG"
+win_deploy_server_2016_key: "CB7KF-BWN84-R7R2Y-793K2-8XDDG"
+win_deploy_server_2012_r2_key: "W3GGN-FT8W3-Y4M27-J84CP-Q3VJ9"
+win_deploy_server_2012_key: "48HP8-DN98B-MYWDG-T2DCC-8W83P"
+win_deploy_server_2008_r2_key: "74YFP-3QFB3-KQT8W-PMXWJ-7M648"
+
+win_deploy_ltsc_2019_key: "M7XTQ-FN8P6-TTKYV-9D4CC-J462D"
+win_deploy_ltsc_2016_key: "DCPHK-NFMTC-H88MJ-PFHPY-QJ4BJ"
+win_deploy_ltsc_2015_key: "WNMTR-4C88C-JK8YV-HQ7T2-76DF9"
+win_deploy_81_key: "MHF9N-XY6XB-WVXMC-BTDCT-MKKG7"
+win_deploy_8_key: "32JNW-9KQ84-P47T8-D8GGY-CWCK7"
+win_deploy_7_key: "33PXH-7Y6KF-2VJC9-XBBR8-HVTHH"

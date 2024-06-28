@@ -1,0 +1,30 @@
+<?php
+// This configuration is managed by Ansible (Site: LBC)
+// Last Update: {{ ansible_date_time.iso8601 }}
+// Do not make any manual edits they will be lost.
+
+$config['own_hostname'] = 'kittytel.net';
+$config['auth_mechanism'] = 'active_directory';
+$config['auth_ad_url'] = 'ldaps://dc-lgb.ad.kittytel.net';
+$config['auth_ad_domain'] = '{{ vault_krb5_realm }}';
+$config['auth_ad_base_dn'] = 'dc=ad,dc=kittytel,dc=net';
+$config['auth_ad_check_certificates'] = false;
+$config['auth_ad_binduser'] = '{{ vault_librenms_ad_user }}';
+$config['auth_ad_bindpassword'] = '{{ vault_librenms_ad_pw }}';
+$config['auth_ad_timeout'] = 3;
+$config['auth_ad_debug'] = true;
+$config['active_directory']['users_purge'] = 30;
+$config['auth_ad_require_groupmembership'] = false;
+$config['auth_ad_groups']['Domain Admins']['level'] = 10;
+$config['email_html'] = false;
+$config['email_smtp_host'] = '{{ vault_mailserver_ip }}';
+$config['email_from'] = 'server-alerts@kittytel.net';
+$config['email_user'] = 'Kitty Telecom';
+$config['email_smtp_port'] = 25;
+$config['email_smtp_secure'] = 'off';
+$config['user'] = 'librenms';
+$config['enable_syslog'] = 1;
+$config['snmp']['community'] = array('{{ vault_snmp2_comm }}');
+$config['rrd_purge'] = 0;
+$config['enable_billing'] = 1;
+$config['show_services'] = 1;

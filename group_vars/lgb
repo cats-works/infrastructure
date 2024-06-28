@@ -1,0 +1,19 @@
+---
+region_suffix: lgb
+int_dns_primary: "{{ vault_lgb_ad_ip }}"
+int_dns_secondary: "{{ vault_lgb_pihole_ip }}"
+pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
+snmp_location: Long Beach, CA
+timezone: America/Los_Angeles
+win_deploy_timezone: "Pacific Standard Time"
+
+rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky/
+vm_pool_directory: default
+vm_local_bridge: adbr0
+vm_libvirt_vm_engine: kvm
+vm_libvirt_vm_arch: x86_64
+vm_enable_spice: yes
+vm_use_efi: true
+vm_console_log_enabled: false
+vm_autostart: false
+

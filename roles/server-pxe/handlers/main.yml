@@ -1,0 +1,23 @@
+--- 
+- name: restart nginx
+  service: 
+    name: nginx 
+    state: restarted 
+    enabled: yes
+
+- name: restart samba
+  service: 
+    name: smb 
+    state: restarted 
+    enabled: yes
+  when: ansible_os_family == "RedHat"
+
+- name: restart samba
+  service: 
+    name: smbd
+    state: restarted 
+    enabled: yes
+  when: ansible_os_family == "Debian"
+
+- name: restart tftpd-hpa
+  service: name=tftpd-hpa state=restarted enabled=yes

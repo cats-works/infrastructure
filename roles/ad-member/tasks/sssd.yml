@@ -1,0 +1,141 @@
+---
+# Playbook to install Samba/MIT Kerberos/WinBind for AD Member Role on Linux
+
+- name: Install packages for AD Member Role (SSSD/RedHat)
+  package: 
+    name: 
+      - samba-common-tools
+      - realmd
+      - oddjob
+      - oddjob-mkhomedir
+      - sssd
+      - adcli
+      - krb5-workstation
+      - python3-pexpect
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install packages for AD Member Role (SSSD/Debian)
+  package: 
+    name: 
+      - krb5-user
+      - realmd
+      - sssd
+      - oddjob
+      - oddjob-mkhomedir
+      - adcli
+      - samba-common
+      - samba-common-bin
+      - samba-winbind
+      - chrony
+      - python3-setuptools
+      - python3-apt
+      - packagekit
+      - sssd-tools
+      - python3-pip
+      - sudo
+      - samba-vfs-modules
+      - sssd-winbind-idmap
+    state: present
+  when: ansible_os_family == "Debian"
+
+#- name: Install pexpect using pip
+#  pip:
+#    name: pexpect
+#  when: ansible_os_family = "Debian"
+
+- name: Check if machine is bound
+  shell: /bin/bash -c "/usr/sbin/realm list | grep sssd"
+  register: realmd_bound
+  changed_when: false
+  ignore_errors: true
+
+- name: Join system to AD and put the computer object in the Linux OU
+  expect:
+    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" --os-name="Red Hat Linux" --os-version="`cat /etc/redhat-release`" {{ vault_krb5_realm }}"
+    responses:
+      Password for *: "{{ vault_ad_deploy_pass }}"
+  when: realmd_bound is failed and ansible_os_family == "RedHat"
+
+- name: Join system to AD and put the computer object in the Linux OU
+  expect:
+    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" --os-name="Debian Linux" --os-version="`cat /etc/debian_version`" {{ vault_krb5_realm }}"
+    responses:
+      Password for *: "{{ vault_ad_deploy_pass }}"
+  when: realmd_bound is failed and ansible_os_family == "Debian"
+
+- name: Copy SSSD configuration
+  template:
+    src: sssd.conf.j2
+    dest: /etc/sssd/sssd.conf
+    mode: '0600'
+    owner: root
+    group: root
+  when: realmd_bound is failed
+
+- name: Add default_domain_suffix to sssd.conf
+  lineinfile: 
+    dest: /etc/sssd/sssd.conf
+    line: 'default_domain_suffix = {{ vault_krb5_realm }}'
+    insertafter: '^\[sssd\]'
+  notify:
+    - restart sssd
+  when: realmd_bound is failed
+
+- name: stop sssd service
+  systemd_service:
+    name: sssd
+    state: stopped
+  when: realmd_bound is failed
+
+- name: clear sssd cache
+  shell: /bin/bash -c "rm -rf /var/lib/sss/{db,mc}/*"
+  when: realmd_bound is failed
+  
+- name: start sssd service
+  systemd_service:
+    name: sssd
+    state: started
+  when: realmd_bound is failed
+
+- name: Copy SSH config
+  template:
+    src: sshd_ad.conf.j2
+    dest: /etc/ssh/sshd_config.d/ad_key.conf
+    mode: '0600'
+    owner: root
+    group: root
+  when: realmd_bound is failed
+
+- name: start sshd service
+  systemd_service:
+    name: sshd
+    state: restarted
+  when: realmd_bound is failed
+
+- name: Restrict access based on Shell Enabled AD group
+  command: /bin/bash -c "/usr/sbin/realm permit -g Domain\ Admins@{{ vault_krb5_realm }}"
+  when: realmd_bound is failed
+
+#- name: Restrict access based on Shell Enabled AD group
+#  command: /bin/bash -c "/usr/sbin/realm permit -g Shell\ Enabled@{{ vault_krb5_realm }}"
+#  when: realmd_bound is failed
+
+- name: Add ad group to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    line: '%Domain\ Admins@{{ vault_krb5_realm }} ALL=(ALL) NOPASSWD: ALL'
+    insertafter: '^%wheel'
+  when: realmd_bound is failed
+
+#- name: Disable fully qualified users
+#  lineinfile:
+#    dest: /etc/sssd/sssd.conf
+#    insertafter: '^use_fully_qualified_names'
+#    line: full_name_format = %1$s
+ # notify:
+ #   - restart sssd
+ # when: realmd_bound is failed
+
+
+

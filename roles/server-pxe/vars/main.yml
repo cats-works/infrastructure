@@ -1,0 +1,30 @@
+---
+
+# Stable Versions (Edit as needed)
+pxeprov_debian_stable_ver: 12.4.0
+pxeprov_debian_stable_cn: bookworm
+pxeprov_ubuntu_stable_ver: 21.04
+pxeprov_ubuntu_lts_ver: 20.04
+pxeprov_alpine_stable_ver: 3.19.1
+pxeprov_rocky_stable_ver: 9.3
+
+ipxe_version: "v1.21.1"
+
+# You should *probably* stop editing here if you don't know what you're doing
+
+# Defaults
+#pxe_distro: 'na'
+pxe_http_ip: '{{ ansible_default_ipv4.address }}'
+
+# URL's (Don't edit based on version but edit if these ever change)
+pxeprov_debian_stable_url: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-{{ pxeprov_debian_stable_ver }}-amd64-netinst.iso
+pxeprov_debian_netinst_url: https://deb.debian.org/debian/dists/{{ pxeprov_debian_stable_cn }}/main/installer-amd64/current/images/netboot/netboot.tar.gz
+pxeprov_ubuntu_lts_url: https://releases.ubuntu.com/{{ pxeprov_ubuntu_lts_ver }}/ubuntu-{{ pxeprov_ubuntu_lts_ver }}-server-amd64.iso
+pxeprov_ubusvr_lts_url: https://releases.ubuntu.com/{{ pxeprov_ubuntu_lts_ver }}/ubuntu-{{ pxeprov_ubuntu_lts_ver }}-live-server-amd64.iso
+pxeprov_ubuntu_stable_url: https://releases.ubuntu.com/{{ pxeprov_ubuntu_lts_ver }}/ubuntu-{{ pxeprov_ubuntu_lts_ver }}-server-amd64.iso
+pxeprov_ubusvr_stable_url: https://releases.ubuntu.com/{{ pxeprov_ubuntu_lts_ver }}/ubuntu-{{ pxeprov_ubuntu_lts_ver }}-live-server-amd64.iso
+pxeprov_rocky_stable_url: https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-{{ pxeprov_rocky_stable_ver }}-x86_64-minimal.iso
+pxeprov_alpine_stable_url: https://dl-cdn.alpinelinux.org/alpine/v3.17/releases/x86_64/alpine-standard-{{ pxeprov_alpine_stable_ver }}-x86_64.iso
+pxeprov_alpine_virt_url: https://dl-cdn.alpinelinux.org/alpine/v{{ pxeprov_alpine_stable_ver | regex_search('^([0-9]*\.[0-9]*)') }}/releases/x86_64/alpine-virt-{{ pxeprov_alpine_stable_ver }}-x86_64.iso
+
+deploy_pxe_wds: false

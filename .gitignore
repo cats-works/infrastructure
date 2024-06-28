@@ -1,0 +1,11 @@
+host_vars/*/vault
+group_vars/*/vault
+*.code-workspace
+.VolumeIcon.icns
+.DS_Store
+*/.DS_Store
+._*
+files/*.pem
+files/catdoor_key
+files/cat_authorized_keys
+

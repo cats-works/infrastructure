@@ -1,0 +1,202 @@
+---
+- name: Provision Mail Server
+  hosts: mx-lgb.ad.kittytel.net
+  become: yes
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become_method: sudo
+
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+    - name: Deploy failsafe user account
+      import_tasks: tasks/provisioning/failsafe.yml
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+    - name: Update all apt packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "Debian"
+    - name: Install base dependencies
+      package: 
+        name: 
+          - python3-firewall
+          - nfs-common
+        state: present
+    - name: create mailstore NAS mountpoint
+      file:
+        path: /mail-data/
+        state: directory
+        mode: '0755'
+    - name: Deploy ACME certificates
+      import_tasks: tasks/ssl/mx-lgb.yml
+
+  roles:
+    - monitoring-internal
+    - shell-niceties
+    - ad-member
+    - server-mta
+    - secure-ssh
+
+  tasks:
+    - name: mount mailstore NAS
+      mount:
+        src: nas-lgb:/nas/mailspools
+        path: /mail-data
+        opts: rw,sync,hard,noatime
+        state: mounted
+        fstype: nfs4
+        
+    - name: Check for existing mail keytab
+      stat:
+        path: /etc/dovecot/mail.keytab
+      register: no_mail_keytab
+
+    - name: Generate SMTP kerberos keytab from AD
+      import_tasks: tasks/provisioning/keytab.yml
+      vars:
+        principal: smtp/mail.kittytel.net
+        password: "{{ vault_krb5_ad_user_pw }}"
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: rename SMTP keytab
+      copy:
+        src:  "/tmp/mx-lgb.keytab"
+        dest: "/tmp/smtp.keytab"
+      delegate_to: 127.0.0.1
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: Generate SMTP kerberos keytab from AD
+      import_tasks: tasks/provisioning/keytab.yml
+      vars:
+        principal: sieve/mail.kittytel.net
+        password: "{{ vault_krb5_ad_user_pw }}"
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: rename SMTP keytab
+      copy:
+        src:  "/tmp/mx-lgb.keytab"
+        dest: "/tmp/sieve.keytab"
+      delegate_to: 127.0.0.1
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: Generate IMAP kerberos keytab from AD
+      import_tasks: tasks/provisioning/keytab.yml
+      vars:
+        principal: imap/mail.kittytel.net
+        password: "{{ vault_krb5_ad_user_pw }}"
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: copy IMAP keytab into SMTP keytab
+      command: ktutil copy /tmp/smtp.keytab /tmp/mx-lgb.keytab
+      delegate_to: 127.0.0.1
+      ignore_errors: true
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: copy SIEVE keytab into SMTP keytab
+      command: ktutil copy /tmp/sieve.keytab /tmp/mx-lgb.keytab
+      delegate_to: 127.0.0.1
+      ignore_errors: true
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: Install kerberos keytab
+      copy:
+        src:  '/tmp/mx-lgb.keytab'
+        dest:  /etc/dovecot/mail.keytab
+        mode: '0640'
+        owner: root
+        group: dovecot
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: remove cached keytab
+      file:
+        path:  "/tmp/mx-lgb.keytab"
+        state: absent
+      delegate_to: 127.0.0.1
+      when: no_mail_keytab.stat.islnk is not defined
+
+    - name: remove cached keytab
+      file:
+        path:  "/tmp/smtp.keytab"
+        state: absent
+      delegate_to: 127.0.0.1
+      when: no_mail_keytab.stat.islnk is not defined
+
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/provisioning/cat-ssh.yml  
+    - name: restart postfix
+      service:
+        name: postfix
+        state: restarted
+        enabled: yes
+    - name: restart spamassassin
+      service:
+        name: spamd
+        state: restarted
+        enabled: yes
+    - name: restart clamav-daemon
+      service:
+        name: clamav-daemon
+        state: restarted
+        enabled: yes
+    - name: restart clamav-milter
+      service:
+        name: clamav-milter
+        state: restarted
+        enabled: yes
+    - name: restart clamav-freshclam
+      service:
+        name: clamav-freshclam
+        state: restarted
+        enabled: yes        
+    - name: restart opendkim
+      service:
+        name: opendkim
+        state: restarted
+        enabled: yes
+      
+    - name: restart opendmarc
+      service:
+        name: opendmarc
+        state: restarted
+        enabled: yes
+
+    - name: restart dovecot
+      service:
+        name: dovecot
+        state: restarted
+        enabled: yes
+    - name: restart snmpd
+      service:
+        name: snmpd
+        state: restarted
+        enabled: yes
+    - name: "create A record {{ vm_name }}.kittytel.net" 
+      cloudflare_dns:
+        domain: kittytel.net
+        record: "{{ vm_name }}.kittytel.net"
+        type: A
+        value: "{{ vault_wan_lgb_ip }}"
+        state: present
+        account_email: "{{ vault_cloudflare_email }}"
+        account_api_token: "{{ vault_cloudflare_api_key }}"
+
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

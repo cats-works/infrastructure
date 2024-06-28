@@ -1,0 +1,251 @@
+---
+# Playbook to install Postfix, ClamAV, OpenDKIM, OpenDMARC, SpamAssassin
+- name: Install packages for MTA Server Role
+  package: 
+    name: 
+      - clamav
+      - dovecot-core
+      - dovecot-gssapi
+      - dovecot-ldap
+      - dovecot-antispam
+      - dovecot-sieve
+      - dovecot-managesieved
+      - dovecot-imapd
+      - postfix
+      - postfix-policyd-spf-python
+      - opendmarc
+      - opendkim
+      - clamav-milter
+      - spamc
+      - spamassassin
+    state: latest
+
+- name: Install postfix main.cf
+  template:
+    src: templates/main.cf.j2
+    dest: /etc/postfix/main.cf
+    mode: '0644'
+    owner: root
+    group: root
+- name: Install postfix master.cf
+  template:
+    src: templates/master.cf.j2
+    dest: /etc/postfix/master.cf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install postfix virtual
+  template:
+    src: templates/virtual.j2
+    dest: /etc/postfix/virtual
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install aliases
+  template:
+    src: templates/aliases.j2
+    dest: /etc/aliases
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install dovecot.conf
+  template:
+    src: templates/dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install OpenDMARC configuration
+  template:
+    src: templates/opendmarc.conf.j2
+    dest: /etc/opendmarc.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install OpenDKIM configuration
+  template:
+    src: templates/opendkim.conf.j2
+    dest: /etc/opendkim.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Creating /etc/opendkim
+  file:
+    path: /etc/opendkim/
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create directory for dkim keys for each domain
+  file:
+    path: /etc/opendkim/keys/{{ item }}
+    state: directory
+    owner: opendkim
+    group: opendkim
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: Generate opendkim keys for each new domain {{ regenerate_dkim_keys_domains }}
+  shell:
+    cmd: opendkim-genkey -r -d {{ item }} -D /etc/opendkim/keys/{{ item }} -s default -v
+  loop: "{{ regenerate_dkim_keys_domains|flatten(levels=1) }}"
+
+- name: Make opendkim the owner of dkim all keys
+  file:
+    path: /etc/opendkim/keys/{{ item }}/default.private
+    state: file
+    owner: opendkim
+    group: opendkim
+  loop: "{{ regenerate_dkim_keys_domains|flatten(levels=1) }}"
+
+- name: Install OpenDKIM trusted hosts file
+  template:
+    src: templates/opendkim-trusted-hosts.j2
+    dest: /etc/opendkim/trusted.hosts
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install OpenDKIM key table
+  template:
+    src: templates/key.table.j2
+    dest: /etc/opendkim/key.table
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install OpenDKIM signing table
+  template:
+    src: templates/signing.table.j2
+    dest: /etc/opendkim/signing.table
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Create postfix opendkim socket dir
+  file:
+    path: /var/spool/postfix/opendkim/
+    state: directory
+    owner: opendkim
+    group: opendkim
+
+- name: Create postfix opendmarc socket dir
+  file:
+    path: /var/spool/postfix/opendmarc/
+    state: directory
+    owner: opendmarc
+    group: opendmarc
+
+- name: Install clamad-milter.conf
+  template:
+    src: templates/clamav-milter.conf.j2
+    dest: /etc/clamav/clamav-milter.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Install virus-action script
+  template:
+    src: templates/virus-action.sh.j2
+    dest: /usr/local/bin/virus-action.sh
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Rebuild postfix virtual.db
+  command: 
+    cmd: postmap virtual
+    chdir: /etc/postfix
+
+- name: Rebuild aliases
+  command: newaliases
+
+- name: Correcting permissions on opendkim spool folder
+  file:
+    path: /var/spool/postfix/opendkim/
+    mode: 0775
+    owner: postfix
+    group: opendkim
+
+- name: Correcting permissions on opendmarc spool folder
+  file:
+    path: /var/spool/postfix/opendkim/
+    mode: 0775
+    owner: postfix
+    group: opendkim
+
+- name: Correcting permissions on clamav spool folder
+  file:
+    path: /var/spool/postfix/clamav/
+    mode: 0775
+    owner: postfix
+    group: clamav
+
+- name: Create directory for dkim keys for each domain
+  file:
+    path: "/etc/opendkim/keys/{{ item }}"
+    state: directory
+    owner: opendkim
+    group: opendkim
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: create mail. A record
+  cloudflare_dns:
+    domain: "{{ item }}"
+    record: "mail.{{ item }}"
+    type: A
+    value: "{{ vault_wan_lgb_ip }}"
+    state: present
+    solo: true
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: create MX record
+  cloudflare_dns:
+    domain: "{{ item }}"
+    record: "{{ item }}"
+    type: MX
+    value: "mail.{{ item }}"
+    state: present
+    priority: 1
+    solo: true
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: create SPF record
+  cloudflare_dns:
+    domain: "{{ item }}"
+    record: "{{ item }}"
+    type: TXT
+    solo: true
+    value: "{{ spf_record }}"
+    state: present
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: create DMARC record
+  cloudflare_dns:
+    domain: "{{ item }}"
+    record: "_dmarc.{{ item }}"
+    type: TXT
+    value: "{{ dmarc_record }}"
+    state: present
+    solo: true
+    account_email: "{{ vault_cloudflare_email }}"
+    account_api_token: "{{ vault_cloudflare_api_key }}"
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"
+
+- name: create DKIM record
+  include_tasks: tasks/dkim-dns.yml
+  vars:
+    dkim_dns_name: "{{ item }}"
+  loop: "{{ vault_mail_domains|flatten(levels=1) }}"

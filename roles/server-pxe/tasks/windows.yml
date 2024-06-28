@@ -1,0 +1,50 @@
+---
+# You will need to obtain your own images.  I am not providing auto-download through these playbooks.
+
+- name: Mount Windows 10 LTSC 2021 ISO
+  mount:
+    path: /srv/distro/windows-10-ltsc-2021/
+    src: /srv/windows/en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted
+- name: Mount Windows 10 LTSC 2019 ISO
+  mount:
+    path: /srv/distro/windows-10-ltsc-2019/
+    src: /srv/windows/en_windows_10_enterprise_ltsc_2019_x64_dvd_74865958.iso
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted
+
+- name: Mount Windows 11 Enterprise ISO
+  mount:
+    path: /srv/distro/windows-11-enterprise/
+    src: /srv/windows/win11-enterprise.iso
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted
+
+- name: Mount Windows 11 23H2 SAC ISO
+  mount:
+    path: /srv/distro/win1123H2/
+    src: /srv/windows/Win11_23H2_English_x64v2.iso
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted
+
+- name: Mount Windows Server 2022 ISO
+  mount:
+    path: /srv/distro/win2k22/
+    src: /srv/windows/en_windows_server_2022x64_dvd_.iso
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted
+
+
+#- name: Mount Windows 7 Enterprise ISO
+#  mount:
+#    path: /srv/distro/windows-7-enterprise/
+#    src: /srv/windows/en_windows_7_enterprise_with_sp1_x64_dvd_u_677651.iso
+#    fstype: udf
+#    opts: ro,loop,nofail
+#    state: mounted

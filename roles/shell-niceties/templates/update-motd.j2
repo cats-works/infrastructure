@@ -1,0 +1,33 @@
+#!/bin/sh
+PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+
+# redirect errors to stdout
+exec 2>&1
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+if [ -z "$DISTRIB_DESCRIPTION" ] && [ -x /usr/bin/lsb_release ]; then
+   # Fall back to using the very slow lsb_release utility
+   DISTRIB_DESCRIPTION=$(lsb_release -s -d)
+fi
+
+if [ -z "$DISTRIB_DESCRIPTION" ] && [ -f /etc/alpine-release ]; then
+    DISTRIB_DESCRIPTION="Alpine Linux `cat /etc/alpine-release`"
+fi
+
+CSPATH=`which cowsay`
+COWSAY=`which cat`
+if [ -x "$CSPATH" ]; then
+        COWSAY=`which cowsay`
+fi
+
+LCPATH=`which lolcat`
+LOLCAT=`which cat`
+if [ -x "$LCPATH" ]; then
+        LOLCAT="`which lolcat` -f"
+fi
+
+FORTUNE=`which fortune`
+INFO_WARN=$(echo "ANSIBLE MANAGED PRIVATE SERVER. ACCESS FOR AUTHORIZED USERS ONLY." | figlet -tc -f term)
+INFO_LOGO=$(echo "KittyTel" | awk '{print toupper($0)}' | figlet -tc -f standard)
+INFO_HOST=$(printf "System: %s on %s (%s)" "$(hostname)" "$DISTRIB_DESCRIPTION" "$(uname -r)" | figlet -tc -f term)
+INFO_QUOTE=$($FORTUNE | $COWSAY | figlet -tc -f term)
+printf "%s\n\n%s\n%s\n%s\n\n" "$INFO_WARN" "$INFO_LOGO" "$INFO_HOST" "$INFO_QUOTE" | $LOLCAT

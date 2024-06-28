@@ -1,0 +1,280 @@
+---
+- name: Provision web services
+  hosts: svc-lgb.ad.kittytel.net
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become: yes
+  become_method: sudo
+
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Deploy failsafe user account
+      import_tasks: tasks/provisioning/failsafe.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+    - name: Install base dependencies
+      package: 
+        name: 
+          - python3-firewall
+          - nfs-common
+        state: present
+    - name: create NextCloud NAS mountpoint
+      file:
+        path: /nxc-data/
+        state: directory
+        mode: '0755'
+    - name: create LibreNMS NAS mountpoint
+      file:
+        path: /nms-data/
+        state: directory
+        mode: '0755'
+    - name: Deploy ACME certificates
+      import_tasks: tasks/ssl/svc-lgb.yml
+  roles:
+    - monitoring-internal
+    - shell-niceties
+    - ad-member
+    - server-php-fpm
+    - server-nginx-gssapi
+    - secure-ssh
+
+  tasks:
+    - name: mount nextcloud NAS
+      mount:
+        src: nas-lgb:/nas2/nxc-data
+        path: /nxc-data
+        opts: rw,sync,hard
+        state: mounted
+        fstype: nfs4
+
+    - name: mount portal NAS
+      mount:
+        src: nas-lgb:/nas/portal
+        path: /var/www/portal
+        opts: rw,sync,hard
+        state: mounted
+        fstype: nfs4
+
+    - name: install php 8.2 for nextcloud
+      include_role:
+        name: server-php-fpm
+      vars:
+        php_version: "8.2"
+
+    - name: install php 8.1 for glpi
+      include_role:
+        name: server-php-fpm
+      vars:
+        php_version: "8.1"
+
+    #- name: Deploy NextCloud
+    #  import_tasks: tasks/provisioning/nextcloud.yml     
+
+    #- name: Generate iQuery HTTP kerberos keytab from AD
+    #  import_tasks: tasks/provisioning/keytab.yml
+    #  vars:
+    #    principal: HTTP/iquery.kittytel.net
+    #    ad_service_user: "{{ vault_ad_service_iquery_user }}"
+    #    password: "{{ vault_ad_service_iquery_pw }}"
+
+    #- name: Install iQuery kerberos keytab
+    #  copy:
+    #    src:  '/tmp/svc-lgb.keytab'
+    #    dest:  /etc/nginx/iquery.keytab
+    #    mode: '0640'
+    #    owner: root
+    #    group: nginx
+
+    #- name: remove temporary keytab
+    #  file:
+    #    src:  "/tmp/svc-lgb.keytab"
+    #    state: absent
+
+    - name: create /var/www/html
+      file:
+        path: /var/www/html
+        state: directory
+        owner: root
+        group: root
+
+    #- name: Deploy LibreNMS
+    #  import_tasks: tasks/provisioning/librenms.yml  
+
+    - name: create php-fpm user for iquery
+      import_tasks: tasks/provisioning/fpmuser.yml
+      vars:
+        fpm_name: iquery
+        php_version: "{{ default_php_version }}"
+
+    - name: create php-fpm user for portal
+      import_tasks: tasks/provisioning/fpmuser.yml
+      vars:
+        fpm_name: portal
+        php_version: "{{ default_php_version }}"
+
+    - name: create /var/www/iquery
+      file:
+        path: /var/www/iquery
+        state: directory
+        recurse: yes
+        owner: iquery
+        group: iquery
+
+    - name: create php-fpm user for glpi
+      import_tasks: tasks/provisioning/fpmuser.yml
+      vars:
+        fpm_name: glpi
+        php_version: 8.1
+
+    - name: Install root html files
+      copy:
+        src:  files/root_html/index.html
+        dest:  /var/www/html/index.html
+
+    - name: Install root html background
+      copy:
+        src:  files/root_html/background.jpg
+        dest:  /var/www/html/background.jpg
+
+    - name: Install kitty telecom root CA
+      copy:
+        src:  files/root-ca.crt
+        dest:  /var/www/html/root-ca.crt
+
+    - name: Install kitty telecom root CA CRL
+      copy:
+        src:  files/kt_ca.crl
+        dest:  /var/www/html/kt_ca.crl
+
+    - name: Install nginx configuration for default vhost
+      template:
+        src: provisioning/nginx-kittytel.conf.j2
+        dest: "/etc/nginx/sites-available/default"
+        mode: '0644'
+        owner: root
+        group: root
+      vars:
+        domain_name: kittytel.net
+        nginx_server_name: _
+        nginx_default_server: " default_server"
+
+    - name: "Install nginx configuration for {{ vault_private_domain }}"
+      template:
+        src: provisioning/nginx-kittytel.conf.j2
+        dest: "/etc/nginx/sites-available/{{ vault_private_domain }}"
+        mode: '0644'
+        owner: root
+        group: root
+      vars:
+        domain_name: "{{ vault_private_domain }}"
+        nginx_server_name: "{{ vault_private_domain }}"
+        nginx_default_server: ""
+
+    - name: Enable nginx configuration for default vhost
+      file:
+        src:  "/etc/nginx/sites-available/default"
+        dest:  "/etc/nginx/sites-enabled/default"
+        state: link
+
+    - name: "Enable nginx configuration for {{ vault_private_domain }} vhost"
+      file:
+        src:  "/etc/nginx/sites-available/{{ vault_private_domain }}"
+        dest:  "/etc/nginx/sites-enabled/{{ vault_private_domain }}"
+        state: link
+
+    #- name: correct nextcloud apps permissions
+    #  command: chown -R nxc:nxc /var/www/nxc/apps/
+
+    - name: Deploy site jacques.dog
+      import_tasks: tasks/provisioning/site-jacques.yml
+
+    - name: Enable nginx configuration for jacques.dog vhost
+      file:
+        src:  "/etc/nginx/sites-available/jacques.dog"
+        dest:  "/etc/nginx/sites-enabled/jacques.dog"
+        state: link
+
+    - name: Enable nginx configuration for monitor.kittytel.net vhost
+      file:
+        src:  "/etc/nginx/sites-available/librenms.conf"
+        dest:  "/etc/nginx/sites-enabled/monitor.kittytel.net"
+        state: link
+
+    - name: "Install nginx configuration for portal.kittytel.net"
+      template:
+        src: provisioning/nginx-portal.conf.j2
+        dest: "/etc/nginx/sites-available/portal.kittytel.net"
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Enable nginx configuration for portal.kittytel.net vhost
+      file:
+        src:  "/etc/nginx/sites-available/portal.kittytel.net"
+        dest:  "/etc/nginx/sites-enabled/portal.kittytel.net"
+        state: link
+
+    - name: "Install nginx configuration for lbc.kittytel.net"
+      template:
+        src: provisioning/nginx-site-lbc.conf.j2
+        dest: "/etc/nginx/sites-available/lbc.kittytel.net"
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Enable nginx configuration for lbc.kittytel.net vhost
+      file:
+        src:  "/etc/nginx/sites-available/lbc.kittytel.net"
+        dest:  "/etc/nginx/sites-enabled/lbc.kittytel.net"
+        state: link
+
+
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/provisioning/cat-ssh.yml  
+
+    - name: Ensure php-fpm is enabled and started
+      service:
+        name: "php{{ default_php_version }}-fpm"
+        state: started
+        enabled: yes
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+        enabled: yes
+
+    - name: restart php8.2-fpm
+      ansible.builtin.service:
+        name: php8.2-fpm
+        state: restarted
+        enabled: yes
+
+    - name: restart php8.1-fpm
+      ansible.builtin.service:
+        name: php8.1-fpm
+        state: restarted
+        enabled: yes
+    - name: restart snmpd
+      service:
+        name: snmpd
+        state: restarted
+        enabled: yes
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

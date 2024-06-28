@@ -1,0 +1,19 @@
+; This configuration is managed by Ansible (Site: LBC)
+; Last Update: {{ ansible_date_time.iso8601 }}
+; Do not make any manual edits they will be lost.
+
+[{{ fpm_name }}]
+listen = /run/php/{{ fpm_name }}.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+user = {{ fpm_name }}
+group = {{ fpm_name }}
+pm = dynamic
+pm.max_children = 10
+pm.start_servers = 1
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+pm.max_requests = 500
+chdir = /var/www/{{ fpm_name }}
+php_admin_value[open_basedir] = /var/www/{{ fpm_name }}/:/tmp
