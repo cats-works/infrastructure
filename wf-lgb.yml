@@ -77,6 +77,24 @@
         wf_proxy_domain: originull.org
         wf_proxy_target: "10.4.23.1"
 
+    - name: "Deploy Lets Encrypt for {{ wf_proxy_domain }}"
+      import_tasks: tasks/provisioning/letsencrypt.yml
+      vars:
+        requested_cloudflare_zone: originull.org
+        requested_letsencrypt_domain: depot.originull.org
+        requested_letsencrypt_san_list:
+          - "depot.originull.org"
+
+    - name: "Copy NGINX proxy template for {{ wf_proxy_domain }}"
+      template:
+        src: provisioning/wf-nginx.conf.j2
+        dest: "/etc/nginx/conf.d/proxy-{{ wf_proxy_domain }}.conf"
+        mode: '0644'
+        owner: root
+        group: root
+      vars:
+        wf_proxy_domain: depot.originull.org
+
     - name: Deploy proxy configuration for getgptassistant.com
       import_tasks: tasks/provisioning/wf-proxy.yml
       vars:
