@@ -1,0 +1,37 @@
+- name: "Check Processor Type (Intel)"
+  command: grep GenuineIntel /proc/cpuinfo
+  ignore_errors: true
+  register: cpu_is_intel
+
+- name: "Intel KVM passthrough enable"
+  block:
+    - name: "Check if nested VT is supported (Intel)"
+      command: "cat /sys/module/kvm_intel/parameters/nested"
+      ignore_errors: true
+      register: cpu_kvm_intel_nested_support
+
+    - name: "Enable KVM VT Passthrough (Intel)"
+      copy:
+        content: "options kvm_intel nested=1"
+        dest: "/etc/modprobe.d/kvm.conf"
+      when: "'Y' in cpu_kvm_intel_nested_support.stdout"
+  when: cpu_is_intel.rc == 0
+
+- name: "Check Processor Type (AMD)"
+  command: grep AuthenticAMD /proc/cpuinfo
+  ignore_errors: true
+  register: cpu_is_amd
+
+- name: "Intel KVM passthrough enable"
+  block:
+    - name: "Check if nested VT is supported (AMD)"
+      command: "cat /sys/module/kvm_amd/parameters/nested"
+      ignore_errors: true
+      register: cpu_kvm_amd_nested_support
+
+    - name: "Enable KVM VT Passthrough (AMD)"
+      copy:
+        content: "options kvm_amd nested=1"
+        dest: "/etc/modprobe.d/kvm.conf"
+      when: "'1' in cpu_kvm_amd_nested_support.stdout"
+  when: cpu_is_amd.rc == 0

@@ -1,0 +1,66 @@
+---
+
+- name: "Setup KVM VT-x/AMD-V passthrough"
+  include_tasks: vtpass.yml
+
+- name: Install base dependencies (Debian)
+  package: 
+    name: 
+      - libvirt-daemon
+      - libvirt-clients
+      - libvirt-daemon-system
+      - libvirt-daemon-system-systemd
+      - virt-v2v
+      - polkitd
+      - nfs-common
+      - bridge-utils
+      - python3-libvirt
+      - chrony
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install base dependencies (RedHat)
+  package: 
+    name: 
+      - libvirt-daemon
+      - libvirt-client
+      - libvirt-daemon
+      - libvirt-daemon-kvm
+      - virt-v2v
+      - polkit
+      - nfs-utils
+      - bridge-utils
+      - python3-libvirt
+      - chrony
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: "adding {{ vault_ansible_deployment_user }} to group libvirt"
+  user:
+    name: '{{ vault_ansible_deployment_user }}'
+    groups: libvirt
+    append: yes
+
+- name: ensure libvirtd is enabled
+  service:
+    name: libvirtd
+    state: started
+    enabled: yes
+
+- name: ensure libvirt-guests is enabled
+  service:
+    name: libvirt-guests
+    state: started
+    enabled: yes
+
+- name: ensure dbus is enabled
+  service:
+    name: dbus
+    state: started
+    enabled: yes
+
+- name: ensure polkit is enabled
+  service:
+    name: polkit
+    state: started
+    enabled: yes
