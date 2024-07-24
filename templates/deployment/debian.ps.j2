@@ -39,7 +39,7 @@ d-i apt-setup/non-free boolean true
 d-i apt-setup/contrib boolean true
 
 tasksel tasksel/first multiselect ssh-server
-d-i pkgsel/include string sudo nano
+d-i pkgsel/include string sudo nano python3
 in-target sh -c "mkdir -m 700 /home/{{ vault_ansible_deployment_user }}/.ssh ; echo \"{{ vault_ansible_deployment_sshkey }}\" > /home/{{ vault_ansible_deployment_user }}/.ssh/authorized_keys ; chmod 600 /home/{{ vault_ansible_deployment_user }}/.ssh/authorized_keys; "
 popularity-contest popularity-contest/participate boolean false
 
