@@ -16,38 +16,38 @@
           - "not no_ansible.stat.exists"
         success_msg: "We are able to run on this node"
         fail_msg: "/etc/no-ansible exists - skipping run on this node"
-#    - name: Deploy failsafe user account
-#      import_tasks: tasks/provisioning/failsafe.yml
-#    - name: Deploy kitty telecom root CA
-#      import_tasks: tasks/provisioning/root-ca.yml
-#    - name: Set Hostname
-#      hostname: 
-#        name: "{{ inventory_hostname }}"
-#    - name: Update all apt packages to their latest version
-#      apt:
-#        name: "*"
-#        state: latest
-#      when: ansible_os_family == "Debian"
-#    - name: Install base dependencies
-#      package: 
-#        name: 
-#          - python3-firewall
-#          - ansible-core
-#          - ansible-lint
-#          - python3-pip
-#          - nfs-common
-#          - nfs-kernel-server
-#          - samba
-#          - heimdal-clients
-#          - avahi-daemon
-#          - python3-requests-kerberos
-#          - python3-winrm
-#        state: present
+    - name: Deploy failsafe user account
+      import_tasks: tasks/provisioning/failsafe.yml
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+    - name: Update all apt packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "Debian"
+    - name: Install base dependencies
+      package: 
+        name: 
+          - python3-firewall
+          - ansible-core
+          - ansible-lint
+          - python3-pip
+          - nfs-common
+          - nfs-kernel-server
+          - samba
+          - heimdal-clients
+          - avahi-daemon
+          - python3-requests-kerberos
+          - python3-winrm
+        state: present
 
   roles:
-#    - monitoring-internal
-#    - shell-niceties
-#    - ad-member
+    - monitoring-internal
+    - shell-niceties
+    - ad-member
     - role: server-pxe
       vars:
         pxe_rocky_versions:
@@ -59,8 +59,10 @@
         pxe_distro:
           - alpine
           - debian
-          - rocky
           - fedora
+          - rocky
+          - opensuse
+          - ubuntu
           - windows
 
   tasks:
