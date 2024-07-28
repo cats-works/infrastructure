@@ -33,27 +33,37 @@
     owner: root
     group: root
 
-- name: Copy smb share configuration
-  template: 
-    src: smb.conf.j2
-    dest: /etc/samba/smb.conf
-    mode: '0644'
-    owner: root
-    group: root
-  notify: restart samba
-
-- name: include_tasks for alpine-stable
+- name: include_tasks for alpine
   include_tasks: alpine.yml
-  when: '"alpine-stable" in pxe_distro'
-- name: include_tasks for alpine-virt
-  include_tasks: alpine-virt.yml
-  when: '"alpine-virt" in pxe_distro'
-- name: include_tasks for debian-stable
+  when: '"alpine" in pxe_distro'
+- name: "include_tasks for Debian Bullseye"
   include_tasks: debian.yml
-  when: '"debian-stable" in pxe_distro'
-- name: include_tasks for rocky-stable
+  vars:
+    debian_codename: bullseye
+    debian_version: "{{ debian_bullseye_version }}"
+  when: '"debian" in pxe_distro and "bullseye" in pxe_debian_versions'
+- name: include_tasks for Debian Bookworm
+  include_tasks: debian.yml
+  vars:
+    debian_codename: bookworm
+    debian_version: "{{ debian_bookworm_version }}"
+  when: '"debian" in pxe_distro and "bookworm" in pxe_debian_versions'
+- name: "Include tasks for Rocky Linux 9"
   include_tasks: rocky.yml
-  when: '"rocky-stable" in pxe_distro'
+  vars:
+    rocky_linux_version: "{{ rocky_9_version }}"
+  when: '"rocky" in pxe_distro and 9 in pxe_rocky_versions'
+- name: "Include tasks for Rocky Linux 8"
+  include_tasks: rocky.yml
+  vars:
+    rocky_linux_version: "{{ rocky_8_version }}"
+  when: '"rocky" in pxe_distro and 8 in pxe_rocky_versions'
+- name: include_tasks for fedora
+  include_tasks: fedora.yml
+  when: '"fedora" in pxe_distro'
+- name: include_tasks for Ubuntu
+  include_tasks: ubuntu.yml
+  when: '"ubuntu" in pxe_distro'
 - name: include_tasks for windows
   include_tasks: windows.yml
   when: '"windows" in pxe_distro'

@@ -1,33 +1,31 @@
 ---
 # Ansible tasks to deploy a PXE configuration and unattend.xml file for Windows
-- name: "Include server-pxe-distro vars"
-  include_vars: roles/server-pxe/vars/main.yml
 - name: "Create winselect.ini Template"
   template:
-    src: templates/deployment/winselect.ini.j2
+    src: winselect.ini.j2
     dest: /srv/tftp/ks/{{ sys_mac_addr | replace(":","-") | upper }}.ini
     mode: 0644
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "{{ pxe_server_delegation }}"
   when: pxe_os == "windows" 
 - name: "Create Windows Server unattend.xml Template"
   template:
-    src: templates/deployment/server-unattend.xml.j2
+    src: server-unattend.xml.j2
     dest: /srv/tftp/ks/{{ sys_mac_addr | replace(":","-") | upper }}.xml
     mode: 0644
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "{{ pxe_server_delegation }}"
   when: pxe_os == "windows" and deploy_windows_version in win_deploy_server_versions
 - name: "Create Windows LTSC unattend.xml Template"
   template:
-    src: templates/deployment/ltsc-unattend.xml.j2
+    src: ltsc-unattend.xml.j2
     dest: /srv/tftp/ks/{{ sys_mac_addr | replace(":","-") | upper }}.xml
     mode: 0644
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "{{ pxe_server_delegation }}"
   when: pxe_os == "windows" and deploy_windows_version in win_deploy_ltsc_versions
   
 - name: Create iPXE boot for MAC address (WinPE)
   template:
-    src: templates/deployment/windows-pxe.cfg.j2
+    src: windows-pxe.cfg.j2
     dest: /srv/tftp/bymac/mac-{{ sys_mac_addr | replace(":","-") | lower }}.ipxe
     mode: 0644
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "{{ pxe_server_delegation }}"
   when: pxe_os == "windows" 

@@ -1,17 +1,57 @@
 ---
 # Playbook for Rocky Linux
 # ALL TASKS in this playbook MUST conclude with the
-#   when: pxe_distro == "rocky-stable"
+#   when: pxe_distro == "rocky-linux"
 
-- name: "Retrieve Rocky Linux Stable ISO"
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+  register: iso_exists
+  vars:
+    desired_arch: x86_64
+
+- name: "Retrieve Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO"
   get_url: 
-    url: '{{ pxeprov_rocky_stable_url }}'
-    dest: /srv/linux/rocky-stable-{{ pxeprov_rocky_stable_ver }}.iso
-  
-- name: Mount Rocky Linux {{ pxeprov_rocky_stable_ver }} ISO
+    url: '{{ rocky_iso_url }}'
+    dest: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+  vars:
+    desired_arch: x86_64
+  when: "not iso_exists.stat.exists"
+
+- name: Mount Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO
   mount:
-    path: /srv/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/
-    src: /srv/linux/rocky-stable-{{ pxeprov_rocky_stable_ver }}.iso
+    path: "/srv/distro/rocky-{{ rocky_linux_version }}-{{ desired_arch }}/"
+    src: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
     fstype: iso9660
     opts: ro,loop
     state: mounted
+  vars:
+    desired_arch: x86_64
+
+- name: "Download Rocky Linux {{ rocky_linux_version }} aarch64 images"
+  block:
+    - name: "Check if we have existing ISO"
+      stat:
+        path: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+      register: aaiso_exists
+      vars:
+        desired_arch: aarch64
+
+    - name: "Retrieve Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO"
+      get_url: 
+        url: '{{ rocky_iso_url }}'
+        dest: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+      vars:
+        desired_arch: aarch64
+      when: "not aaiso_exists.stat.exists"
+
+    - name: Mount Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO
+      mount:
+        path: /srv/distro/rocky-{{ rocky_linux_version }}-{{ desired_arch }}/
+        src: /srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso
+        fstype: iso9660
+        opts: ro,loop
+        state: mounted
+      vars:
+        desired_arch: aarch64
+  when: "pxeprov_enable_arm64 is true"

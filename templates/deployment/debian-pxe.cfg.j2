@@ -1,7 +1,0 @@
-#!ipxe
-
-echo Starting Debian GNU/Linux {{ pxeprov_debian_stable_ver }} ({{ pxeprov_debian_stable_cn }}) ${archl} pre-seeded installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/debian-installer/amd64/linux
-initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/debian-installer/amd64/initrd.gz
-imgargs linux auto=true fb=false vga=788 quiet auto auto=true url=http://{{ pxe_server_ip }}/tftp/ks/{{ vm_name }}.preseed.cfg priority=critical interface=auto debian-installer/allow_unauthenticated_ssl=true netcfg/dhcp_timeout=120 console-setup/layoutcode=us
-boot 

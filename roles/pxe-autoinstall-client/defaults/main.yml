@@ -1,0 +1,6 @@
+---
+deploy_rocky_version: 9
+deploy_debian_version: bookworm
+deploy_windows_version: server2019
+pxe_server_delegation: []
+deploy_system_arch: x86_64

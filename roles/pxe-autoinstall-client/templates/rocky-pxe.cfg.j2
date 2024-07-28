@@ -1,0 +1,25 @@
+#!ipxe
+
+{% if pxe_os == 'rocky' and deploy_rocky_version == 9 %}
+echo Starting Rocky Linux {{ rocky_9_version }} ${archl} installer
+kernel http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
+imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }}/ inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
+boot 
+{% endif %}
+
+{% if pxe_os == 'rocky' and deploy_rocky_version == 8 %}
+echo Starting Rocky Linux {{ rocky_8_version }} ${archl} installer
+kernel http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
+imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }}/ inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
+boot 
+{% endif %}
+
+{% if pxe_os == 'fedora' %}
+echo Starting Fedora Linux {{ fedora_current_version }} ${archl} installer
+kernel http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks devfs=nomount quiet inst.text
+boot 
+{% endif %}

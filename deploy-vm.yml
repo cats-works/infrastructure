@@ -16,16 +16,15 @@
     - name: Deployment Pre-Configuration
       include_tasks: tasks/deployment/pre-vm.yml
       when: vm_hypervisor is defined
-  tasks:
-    - name: Deploy PXE/Kickstart
-      include_tasks: tasks/deployment/kickstart.yml
-      when: pxe_os == "rocky-stable" and vm_hypervisor is defined and vm_exists is false
-    - name: Deploy PXE/Preseed
-      include_tasks: tasks/deployment/preseed.yml
-      when: pxe_os == "debian-stable" and vm_hypervisor is defined and vm_exists is false
-    - name: Deploy PXE/Unattended Windows
-      include_tasks: tasks/deployment/win-unattend.yml
-      when: pxe_os == "windows" and vm_hypervisor is defined and vm_exists is false
+    - name: Verify if VM exists
+      assert:
+        that:
+          - "vm_exists is false"
+        success_msg: "VM does not exist - proceeding"
+        fail_msg: "The VM Exists we can not proceed to deploy. Delete the VM and try again."
+  roles:
+    - pxe-autoinstall-client
+  post_tasks:
     - name: Define VM
       include_tasks: tasks/deployment/define-vm.yml
       when: vm_hypervisor is defined and vm_exists is false

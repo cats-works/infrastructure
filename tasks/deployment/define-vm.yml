@@ -23,8 +23,8 @@
     name: "{{ vm_name }}"
     state: running
   delegate_to: "{{ vm_hypervisor }}"
-- name: Pause 120sec for autoinstaller to process
+- name: Pause 180sec for autoinstaller to process
   pause:
-    seconds: 120
+    seconds: 180
   delegate_to: localhost
   become: no

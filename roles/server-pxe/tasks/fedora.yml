@@ -1,0 +1,29 @@
+---
+# Playbook for Fedora
+# ALL TASKS in this playbook MUST conclude with the
+#   when: pxe_distro == "fedora"
+
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso"
+  register: iso_exists
+  vars:
+    desired_arch: x86_64
+
+- name: "Retrieve Fedora {{ fedora_current_version }} {{ desired_arch }} ISO"
+  get_url: 
+    url: "{{ fedora_current_iso_url }}"
+    dest: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso"
+  vars:
+    desired_arch: "x86_64"
+  when: "not iso_exists.stat.exists"
+
+- name: "Mount Fedora {{ fedora_current_version }} {{ desired_arch }} ISO"
+  mount:
+    path: /srv/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-{{ desired_arch }}/
+    src: /srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso
+    fstype: iso9660
+    opts: ro,loop
+    state: mounted
+  vars:
+    desired_arch: "x86_64"

@@ -1,15 +1,58 @@
 ---
 # Playbook for Alpine Linux
 
-- name: Retrieve Alpine Linux {{ pxeprov_alpine_stable_ver }} ISO
-  get_url: 
-    url: '{{ pxeprov_alpine_stable_url }}'
-    dest: /srv/linux/alpine-stable-{{ pxeprov_alpine_stable_ver }}.iso
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+  register: iso_exists
+  vars:
+    alpine_flavor: standard
+    desired_arch: x86_64
 
-- name: Mount Alpine Linux {{ pxeprov_alpine_stable_ver }} ISO
+- name: Retrieve Alpine Linux {{ alpine_stable_version }} ISO
+  get_url: 
+    url: '{{ alpine_iso_url }}'
+    dest: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+  vars:
+    alpine_flavor: standard
+    desired_arch: x86_64
+  when: "not iso_exists.stat.exists"
+
+- name: Mount Alpine Linux {{ alpine_stable_version }} ISO
   mount:
-    path: /srv/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/
-    src: /srv/linux/alpine-stable-{{ pxeprov_alpine_stable_ver }}.iso
+    path: "/srv/distro/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}/"
+    src: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
     fstype: iso9660
     opts: ro,loop
     state: mounted
+  vars:
+    alpine_flavor: standard
+    desired_arch: x86_64
+
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+  register: iso_exists
+  vars:
+    alpine_flavor: virt
+    desired_arch: x86_64
+
+- name: "Retrieve Alpine Linux Virtual ISO"
+  get_url: 
+    url: '{{ alpine_iso_url }}'
+    dest: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+  vars:
+    alpine_flavor: virt
+    desired_arch: x86_64
+  when: "not iso_exists.stat.exists"
+
+- name: Mount Alpine Linux {{ alpine_stable_version }} Virtual ISO
+  mount:
+    path: "/srv/distro/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}/"
+    src: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+    fstype: iso9660
+    opts: ro,loop
+    state: mounted
+  vars:
+    alpine_flavor: virt
+    desired_arch: x86_64

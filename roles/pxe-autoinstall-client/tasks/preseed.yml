@@ -1,0 +1,17 @@
+---
+# Ansible tasks to deploy a PXE configuration and preseed file for Debian
+- name: "Create Preseed Template (Debian GNU/Linux)"
+  template:
+    src: debian.ps.j2
+    dest: /srv/tftp/ks/{{ inventory_hostname }}.preseed.cfg
+    mode: 0644
+  delegate_to: "{{ pxe_server_delegation }}"
+  when: pxe_os == "debian"
+  
+- name: Create iPXE boot for MAC address (Debian GNU/Linux EFI)
+  template:
+    src: debian-pxe.cfg.j2
+    dest: /srv/tftp/bymac/mac-{{ sys_mac_addr | replace(":","-") | lower }}.ipxe
+    mode: 0644
+  delegate_to: "{{ pxe_server_delegation }}"
+  when: pxe_os == "debian" 

@@ -1,0 +1,34 @@
+---
+# Playbook to deploy automatic installation
+- name: "Include server-pxe defaults"
+  include_vars: ../../server-pxe/defaults/main.yml
+
+- name: "Check Hypervisor for architecture"
+  command: "uname -m"
+  delegate_to: "{{ pxe_server_delegation }}"
+  register: hypervisor_uname_machine
+  when: vm_hypervisor is defined
+
+- name: "Update deploy_system_arch from hypervisor"
+  set_fact:
+    deploy_system_arch: " {{ hypervisor_uname_machine.stdout }}"
+  when: vm_hypervisor is defined
+
+- name: Deploy RHEL PXE/Kickstart
+  include_tasks: tasks/kickstart.yml
+  vars:
+    desired_arch: "{{ deploy_system_arch }}"
+  when: pxe_os == "rocky" or pxe_os == "fedora"
+- name: Deploy Debian PXE/Preseed (AMD64)
+  include_tasks: tasks/preseed.yml
+  vars:
+    desired_arch: "amd64"
+  when: "pxe_os == 'debian' and deploy_system_arch == 'x86_64'"
+- name: Deploy Debian PXE/Preseed (ARM64)
+  include_tasks: tasks/preseed.yml
+  vars:
+    desired_arch: "arm64"
+  when: "pxe_os == 'debian' and deploy_system_arch == 'aarch64'"
+- name: Deploy PXE/Unattended Windows
+  include_tasks: tasks/win-unattend.yml
+  when: pxe_os == "windows"

@@ -1,16 +1,2 @@
 ---
 # Playbook for Alpine Linux (Virtual)
-
-
-- name: "Retrieve Alpine Linux Virtual ISO"
-  get_url: 
-    url: '{{ pxeprov_alpine_virt_url }}'
-    dest: /srv/linux/alpine-virt-{{ pxeprov_alpine_stable_ver }}.iso
-
-- name: Mount Alpine Linux {{ pxeprov_alpine_stable_ver }} Virtual ISO
-  mount:
-    path: /srv/distro/alpine-virt-{{ pxeprov_alpine_stable_ver }}/
-    src: /srv/linux/alpine-virt-{{ pxeprov_alpine_stable_ver }}.iso
-    fstype: iso9660
-    opts: ro,loop
-    state: mounted
