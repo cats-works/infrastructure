@@ -1,0 +1,57 @@
+---
+# Playbook for OpenSUSE
+
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+  register: iso_exists
+  vars:
+    desired_arch: x86_64
+
+- name: Retrieve OpenSUSE {{ opensuse_leap_version }} ISO
+  get_url: 
+    url: '{{ opensuse_leap_iso_url }}'
+    dest: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+  vars:
+    desired_arch: x86_64
+  when: "not iso_exists.stat.exists"
+
+- name: Mount OpenSUSE {{ opensuse_leap_version }} ISO
+  mount:
+    path: "/srv/distro/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media/"
+    src: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+    fstype: iso9660
+    opts: ro,loop
+    state: mounted
+  vars:
+    desired_arch: x86_64
+
+- name: "Download OpenSUSE {{ rocky_linux_version }} aarch64 images"
+  block:
+    - name: "Check if we have existing ISO"
+      stat:
+        path: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+      register: iso_exists
+      vars:
+        desired_arch: aarch64
+
+    - name: "Retrieve OpenSUSE AARCH64 ISO"
+      get_url: 
+        url: '{{ opensuse_leap_iso_url }}'
+        dest: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+      vars:
+        desired_arch: aarch64
+      when: "not iso_exists.stat.exists"
+
+    - name: Mount OpenSUSE {{ opensuse_leap_version }} aa64 Virtual ISO
+      mount:
+        path: "/srv/distro/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media/"
+        src: "/srv/linux/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+        fstype: iso9660
+        opts: ro,loop
+        state: mounted
+      vars:
+        desired_arch: aarch64
+  when: "pxeprov_enable_arm64 is true"
+
+

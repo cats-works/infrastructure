@@ -133,15 +133,15 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 
 :alpine
 echo Starting Alpine Linux {{ alpine_stable_version }} ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
-initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
+kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
+initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
 imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
 :alpinevirt
 echo Starting Alpine Linux {{ alpine_stable_version }} VM ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
-initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
+kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
+initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
 imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
@@ -170,7 +170,7 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 echo Starting Debian GNU/Linux {{ debian_bookworm_version }} (bookworm) ${archl} installer
 kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bookworm-amd64/debian-installer/amd64/linux
 initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bookworm-amd64/debian-installer/amd64/initrd.gz
-imgargs linux auto=true fb=false vga=788 quiet
+imgargs linux fb=false vga=788 quiet
 boot || goto failed
 goto start
 {% endif %}
@@ -180,7 +180,7 @@ goto start
 echo Starting Debian GNU/Linux {{ debian_bullseye_version }} (bullseye) ${archl} installer
 kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bullseye-amd64/debian-installer/amd64/linux
 initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bullseye-amd64/debian-installer/amd64/initrd.gz
-imgargs linux auto=true fb=false vga=788 quiet
+imgargs linux fb=false vga=788 quiet
 boot || goto failed
 goto start
 {% endif %}

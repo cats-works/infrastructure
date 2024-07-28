@@ -61,6 +61,9 @@
 - name: include_tasks for fedora
   include_tasks: fedora.yml
   when: '"fedora" in pxe_distro'
+- name: include_tasks for opensuse
+  include_tasks: opensuse.yml
+  when: '"opensuse" in pxe_distro'
 - name: include_tasks for Ubuntu
   include_tasks: ubuntu.yml
   when: '"ubuntu" in pxe_distro'
