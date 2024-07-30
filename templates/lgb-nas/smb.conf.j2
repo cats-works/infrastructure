@@ -33,6 +33,13 @@ winbind enum groups = yes
 winbind enum users = yes
 server string = Lil NAS X
 allow insecure wide links = yes
+aio read size = 1
+aio write size = 1
+read raw = yes
+write raw = yes
+min receivefile size = 16384
+use sendfile = yes
+socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=65536 SO_SNDBUF=65536
 
 [cat]
 comment = cats data
@@ -55,7 +62,7 @@ vfs objects = fruit streams_xattr
 fruit:time machine = yes
 fruit:time machine max size = 1050G
 comment = Time Machine Backups
-path = /nas/tm
+path = /nas2/tm
 public = yes
 writable = yes
 guest ok = no
@@ -174,3 +181,10 @@ write list = "@domain admins"
 writeable = yes
 create mode = 0644
 directory mode = 0755
+
+[ISO]
+comment = PXE
+browseable = Yes
+path = /srv
+guest ok = yes
+read only = yes
