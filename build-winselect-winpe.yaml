@@ -1,0 +1,170 @@
+---
+- name: "Build WinPE based WinSelect ISO for PXE"
+  hosts: jumpbox.ad.kittytel.net
+  remote_user: '{{ ansible_user }}'
+  vars:
+    virtio_version: "0.1.248"
+  roles:
+  - msvc-toolchain
+  tasks:
+    # Tasks to handle building winselect
+    - name: "remove old winselect source"
+      win_file:
+        path: "{{ ansible_user_dir }}\\winselect"
+        state: absent
+    - name: "check out winselect source"
+      win_command:
+        cmd: "git clone https://github.com/kitsnotes/winselect.git"
+        chdir: "{{ ansible_user_dir }}"
+    - name: "configure build batchfile"
+      set_fact:
+        build_batch_amd64: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+          cd c:\Users\Ansible\winselect
+          msbuild /p:PlatformToolset=v143 /property:Configuration=Release
+    - name: "copy build batch file"
+      copy:
+        dest: "{{ ansible_user_dir }}\\winselect\\build-amd64.bat"
+        content: "{{ build_batch_amd64 }}"
+    - name: "build winselect (AMD64)"
+      win_shell: "{{ ansible_user_dir }}\\winselect\\build-amd64.bat"
+      args:
+        executable: cmd
+
+    # Get the VirtIO driver ISO
+    - name: "Check for VirtIO driver ISO"
+      win_stat:
+        path: "{{ ansible_user_dir }}\\virtio-win.iso"
+      register: has_virtio_iso
+    - name: "Download VirtIO driver ISO"
+      win_get_url:
+        url: "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-{{ virtio_version }}-1/virtio-win.iso"
+        dest: "{{ ansible_user_dir }}\\virtio-win.iso"
+      when: not has_virtio_iso.stat.exists
+
+    # Tasks to handle building WinPE
+    - name: "remove old WinPE (AMD64)"
+      win_file:
+        path: "{{ ansible_user_dir }}\\winpe_amd64"
+        state: absent
+    - name: "configure winpe batchfile"
+      set_fact:
+        winpe_batch_amd64: |
+          call "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\DandISetEnv.bat"
+          copype amd64 {{ ansible_user_dir }}\winpe_amd64
+    - name: "copy copype file"
+      copy:
+        dest: "{{ ansible_user_dir }}\\copype_amd64.bat"
+        content: "{{ winpe_batch_amd64 }}"
+    - name: "copype (AMD64)"
+      win_shell: "{{ ansible_user_dir }}\\copype_amd64.bat"
+      args:
+        executable: cmd
+    - name: "remove batch file"
+      win_file:
+        path: "{{ ansible_user_dir }}\\copype_amd64.bat"
+        state: absent
+    # Mount boot.wim
+    - name: "DISM mount boot.wim image"
+      win_command:
+        cmd: "Dism /Mount-Image /ImageFile:\"{{ ansible_user_dir }}\\winpe_amd64\\media\\sources\\boot.wim\" /index:1 /MountDir:\"{{ ansible_user_dir }}\\winpe_amd64\\mount\""
+    # Inject VirtIO drivers
+    - name: "Mount VirtIO driver ISO"
+      win_disk_image:
+        image_path: "{{ ansible_user_dir }}\\virtio-win.iso"
+        state: present
+      register: virtio_iso_mount
+    - name: "configure virtio driver batchfile"
+      set_fact:
+        virtio_batch_amd64: |
+          call "C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\DandISetEnv.bat"
+          dism /Remount-Wim /MountDir:"{{ ansible_user_dir }}\winpe_amd64\mount"
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}viostorage\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}NetKVM\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}baloon\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}smbus\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}qxldod\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}vioinput\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}viorng\w11\amd64" /Recurse
+          dism /Image:"{{ ansible_user_dir }}\winpe_amd64\mount" /Add-Driver /Driver:"{{ virtio_iso_mount.mount_paths[0] }}vioscsi\w11\amd64" /Recurse
+    - name: "copy virtio driver batchfile"
+      copy:
+        dest: "{{ ansible_user_dir }}\\virtio_drivers_amd64.bat"
+        content: "{{ virtio_batch_amd64 }}"
+    - name: "inject virtio drivers (AMD64)"
+      win_shell: "{{ ansible_user_dir }}\\virtio_drivers_amd64.bat"
+      args:
+        executable: cmd
+    - name: "remove batch file"
+      win_file:
+        path: "{{ ansible_user_dir }}\\virtio_drivers_amd64.bat"
+        state: absent
+    - name: "Unmount VirtIO driver ISO"
+      win_disk_image:
+        image_path: "{{ ansible_user_dir }}\\virtio-win.iso"
+        state: absent
+    # Install background JPEG
+    - name: "Take ownership of background JPEG"
+      win_command:
+        cmd: "takeown /A /F {{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winpe.jpg"
+    - name: "Grant administrators permission on background JPEG"
+      win_command:
+        cmd: "icacls {{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winpe.jpg /grant {{ ansible_user }}:F"
+    - name: win_acl Ansible User
+      ansible.windows.win_acl:
+        user: "{{ ansible_user }}"
+        path: "{{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winpe.jpg"
+        rights: FullControl
+        type: allow
+        state: present
+    - name: "copy background JPEG"
+      copy:
+        src: "files/winpe-pxe/bg.jpg"
+        dest: "{{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winpe.jpg"
+        force: true
+      ignore_errors: true
+   # Copy created winselect
+    - name: "copy winselect.exe"
+      copy:
+        src: "{{ ansible_user_dir }}\\winselect\\Output\\Release64\\winselect64.exe"
+        dest: "{{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winselect.exe"
+        remote_src: true
+    # Cofnigure winpeshl.ini
+    - name: "configure winpeshl.ini"
+      set_fact:
+        winpeshl_ini: |
+          [LaunchApps]
+          %SYSTEMDRIVE%\windows\system32\winselect.exe, \\{{ pxe_server_hostname }}\ISO
+    - name: "copy winpeshl.ini"
+      copy:
+        dest: "{{ ansible_user_dir }}\\winpe_amd64\\mount\\Windows\\System32\\winpeshl.ini"
+        content: "{{ winpeshl_ini }}"
+    # Copy & Cleanup
+    - name: "DISM unmount boot.wim image"
+      win_command:
+        cmd: "dism /Unmount-Image /MountDir:\"{{ ansible_user_dir }}\\winpe_amd64\\mount\" /commit"
+    - name: "copy boot.wim to PXE server"
+      win_copy:
+        src: "{{ ansible_user_dir }}\\winpe_amd64\\media\\sources\\boot.wim"
+        dest: "\\\\{{ pxe_server_hostname }}\\Software\\osboot\\winpeboot\\AMD64\\boot.wim"
+        remote_src: true
+        force: true
+    - name: "copy bootmgr to PXE server"
+      win_copy:
+        src: "{{ ansible_user_dir }}\\winpe_amd64\\media\\bootmgr"
+        dest: "\\\\{{ pxe_server_hostname }}\\Software\\osboot\\winpeboot\\AMD64\\bootmgr"
+        remote_src: true
+    - name: "copy bootmgr.efi to PXE server"
+      win_copy:
+        src: "{{ ansible_user_dir }}\\winpe_amd64\\media\\bootmgr.efi"
+        dest: "\\\\{{ pxe_server_hostname }}\\Software\\osboot\\winpeboot\\AMD64\\bootmgr.efi"
+        remote_src: true
+    - name: "copy Boot directory to PXE server"
+      win_copy:
+        src: "{{ ansible_user_dir }}\\winpe_amd64\\media\\Boot"
+        dest: "\\\\{{ pxe_server_hostname }}\\Software\\osboot\\winpeboot\\AMD64\\Boot"
+        remote_src: true
+    - name: "remove old WinPE (AMD64)"
+      win_file:
+        path: "{{ ansible_user_dir }}\\winpe_amd64"
+        state: absent

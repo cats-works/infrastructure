@@ -1,0 +1,17 @@
+---
+
+msvc_install_version: 2022
+msvc_include_mfc: false
+msvc_include_atl: false
+msvc_include_arm64: false
+
+msvc_toolchain_install_git: true
+git_download_version: "2.46.0"
+elligable_msvc_versions:
+  - 2022
+  - 2019
+  - 2017
+
+python3_version: "3.12.4"
+
+ansible_user_dir: "C:\\Users\\ansible\\"

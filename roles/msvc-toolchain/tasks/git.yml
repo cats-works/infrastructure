@@ -1,0 +1,19 @@
+---
+- name: "Check if Git {{ git_download_version }} is installed"
+  win_stat: path='C:/Program Files/Git/bin/git.exe'
+  register: git_installed
+
+- name: "Download Git {{ git_download_version }} installer"
+  win_get_url:
+    url: "https://github.com/git-for-windows/git/releases/download/v{{ git_download_version }}.windows.1/Git-{{ git_download_version }}-64-bit.exe"
+    dest: "{{ ansible_user_dir }}\\Downloads\\Git-{{ git_download_version }}-64-bit.exe"
+  when: not git_installed.stat.exists
+
+- name: "Install Git {{ git_download_version }}"
+  raw: "{{ ansible_user_dir }}\\Downloads\\Git-{{ git_download_version }}-64-bit.exe /SILENT /COMPONENTS=\"icons,ext\\reg\\shellhere,assoc,assoc_sh\""
+  when: not git_installed.stat.exists
+
+- name: "Ensure that C:/Program Files/Git/bin is on path"
+  ansible.windows.win_path:
+    elements: "C:\\Program Files\\Git\\bin"
+    scope: user

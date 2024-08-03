@@ -1,0 +1,15 @@
+---
+
+- name: Install Python3
+  include_tasks: python3.yml
+
+- name: "Set ansible_python_interpreter"
+  set_fact:
+    ansible_python_interpreter: "C:\\Program Files\\Python{{ (python3_version.split('.') | map('trim'))[:-1] | join('') }}\\python.exe"
+    
+- name: Install git
+  include_tasks: git.yml
+  when: "msvc_toolchain_install_git == true"
+
+- name: Install MSVC Toolchain
+  include_tasks: msvc.yml

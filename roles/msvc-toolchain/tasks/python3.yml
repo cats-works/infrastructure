@@ -1,0 +1,14 @@
+---
+- name: "Check if Python {{ python3_version }} is installed"
+  win_stat: path='C:/Program Files/Python{{ (python3_version.split('.') | map('trim'))[:-1] | join('') }}/python.exe'
+  register: py3_installed
+
+- name: "Download Python {{ python3_version }} installer"
+  win_get_url:
+    url: "https://www.python.org/ftp/python/{{ python3_version }}/python-{{ python3_version }}-amd64.exe"
+    dest: "{{ ansible_user_dir }}\\Downloads\\python-{{ python3_version }}-amd64.exe"
+  when: not py3_installed.stat.exists
+
+- name: "Install Python {{ python3_version }}"
+  raw: "{{ ansible_user_dir }}\\Downloads\\python-{{ python3_version }}-amd64.exe /quiet InstallAllUsers=1 PrependPath=1"
+  when: not py3_installed.stat.exists

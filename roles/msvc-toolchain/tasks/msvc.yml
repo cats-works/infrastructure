@@ -1,0 +1,32 @@
+---
+- name: Verify VC++ toolchain version (2022)
+  set_fact:
+    vc_inc_ver: 17
+    cacheable: true
+  when: "msvc_install_version == 2022"
+
+- name: Verify VC++ toolchain version (2019)
+  set_fact:
+    vc_inc_ver: 16
+    cacheable: true
+  when: "msvc_install_version == 2019"
+
+- name: Verify VC++ toolchain version (2017)
+  set_fact:
+    vc_inc_ver: 15
+    cacheable: true
+  when: "msvc_install_version == 2017"
+
+- name: "Check if Visual Studio {{ msvc_install_version }} Build Tools are installed"
+  win_stat: path='C:/Program Files (x86)/Microsoft Visual Studio/{{ msvc_install_version }}/BuildTools/VC/Auxiliary/Build/vcvarsall.bat'
+  register: vs_installed
+
+- name: "Download the Visual Studio {{ msvc_install_version }} Build Tools installer"
+  win_get_url:
+    url: "https://aka.ms/vs/{{ vc_inc_ver }}/release/vs_buildtools.exe"
+    dest: "{{ ansible_user_dir }}\\Downloads\\vs_buildtools-{{ msvc_install_version }}.exe"
+  when: not vs_installed.stat.exists
+
+- name: "Install Visual Studio {{ msvc_install_version }} Build Tools"
+  raw: "{{ ansible_user_dir }}\\Downloads\\vs_buildtools-{{ msvc_install_version }}.exe --quiet --wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+  when: not vs_installed.stat.exists
