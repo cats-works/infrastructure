@@ -6,9 +6,10 @@ d-i netcfg/get_domain string unassigned-domain
 
 d-i netcfg/wireless_wep string
 
-d-i mirror/country string manual
-d-i mirror/http/hostname string http.us.debian.org
+d-i mirror/protocol string http
+d-i mirror/http/hostname string mirrors.edge.kernel.org
 d-i mirror/http/directory string /debian
+d-i mirror/country string manual
 d-i mirror/http/proxy string
 
 d-i passwd/root-login boolean false

@@ -255,20 +255,20 @@ goto start
 {% if "windows" in pxe_distro %}
 :windows
 echo Starting Microsoft Windows ${arch} installer
-kernel http://{{ vault_lgb_pxe_ip }}/wimboot
-initrd ${win-base-url}/bootmgr                     bootmgr
-initrd ${win-base-url}/Boot/BCD                    BCD
-initrd ${win-base-url}/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
-initrd ${win-base-url}/Boot/Fonts/segoe_slboot.ttf segoe_slboot.ttf
-initrd ${win-base-url}/Boot/Fonts/wgl4_boot.ttf    wgl4_boot.ttf
-initrd ${win-base-url}/Boot/boot.sdi               boot.sdi
-initrd ${win-base-url}/boot.wim                    boot.wim
+kernel http://{{ vault_lgb_pxe_ip }}/winpeboot/AMD64/wimboot
+initrd ${win-base-url}/AMD64/bootmgr                     bootmgr
+initrd ${win-base-url}/AMD64/Boot/BCD                    BCD
+initrd ${win-base-url}/AMD64/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
+initrd ${win-base-url}/AMD64/Boot/Fonts/segoe_slboot.ttf segoe_slboot.ttf
+initrd ${win-base-url}/AMD64/Boot/Fonts/wgl4_boot.ttf    wgl4_boot.ttf
+initrd ${win-base-url}/AMD64/Boot/boot.sdi               boot.sdi
+initrd ${win-base-url}/AMD64/boot.wim                    boot.wim
 boot || goto failed
 goto start
 
 :dart
 echo Starting Microsoft Diagnostics and Recovery Toolkit (${arch})
-kernel http://{{ vault_lgb_pxe_ip }}/wimboot
+kernel http://{{ vault_lgb_pxe_ip }}/winpeboot/AMD64/wimboot
 initrd ${dart-base-url}/bootmgr                     bootmgr
 initrd ${dart-base-url}/Boot/BCD                    BCD
 initrd ${dart-base-url}/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf

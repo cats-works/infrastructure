@@ -92,8 +92,12 @@
                 <OSImage>
                     <InstallFrom>
                         <MetaData wcm:action="add">
+                             {% if deploy_windows_version == 'win11ltsc2021' %}
+                            <Key>/IMAGE/INDEX</Key>
+                            <Value>1</Value>
+                            {% endif %}
+                            {% if deploy_windows_version == 'ltsc2021' %}
                             <Key>/IMAGE/NAME</Key>
-                             {% if deploy_windows_version == 'ltsc2021' %}
                             <Value>Windows 10 Enterprise LTSC 2021</Value>
                             {% endif %}
                         </MetaData>
@@ -106,6 +110,9 @@
             </ImageInstall>
             <UserData>
                 <ProductKey>
+                {% if deploy_windows_version == 'win11ltsc2021' %}
+                    <Key>{{ win_deploy_ltsc_11_2021_key }}</Key>
+                {% endif %}
                 {% if deploy_windows_version == 'ltsc2021' or deploy_windows_version == 'ltsc2019' %}
                     <Key>{{ win_deploy_ltsc_2019_key }}</Key>
                 {% endif %}
@@ -124,6 +131,28 @@
                 <FullName>{{ win_deploy_reg_user }}</FullName>
                 <Organization>{{ win_deploy_reg_org }}</Organization>
             </UserData>
+            <RunSynchronous>
+                {% if deploy_windows_version == 'win11ltsc2021' %}
+                <RunSynchronousCommand wcm:action="add">
+                <Order>1</Order>
+                <Path>
+                reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f
+                </Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                <Order>2</Order>
+                <Path>
+                reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f
+                </Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                <Order>3</Order>
+                <Path>
+                reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f
+                </Path>
+                </RunSynchronousCommand>
+                {% endif %}
+            </RunSynchronous>
         </component>
     </settings>
     <settings pass="specialize">
@@ -131,7 +160,7 @@
             <OEMInformation>
                 <HelpCustomized>false</HelpCustomized>
             </OEMInformation>
-            <ComputerName>{{ short_host }}</ComputerName>
+            <ComputerName>{{ inventory_hostname_short }}</ComputerName>
             <TimeZone>{{ win_deploy_timezone }}</TimeZone>
             <RegisteredOwner/>
         </component>
