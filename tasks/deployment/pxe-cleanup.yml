@@ -4,24 +4,24 @@
   file:
     path: /srv/tftp/ks/{{ vm_name }}.ks
     state: absent
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove PXE preseed file
   file:
     path: /srv/tftp/ks/{{ vm_name }}.preseed.cfg
     state: absent
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove PXE winselect
   file:
     path: /srv/tftp/ks/{{ sys_mac_addr | replace(":","-") | upper }}.ini
     state: absent
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove PXE unattend
   file:
     path: /srv/tftp/ks/{{ sys_mac_addr | replace(":","-") | upper }}.xml
     state: absent
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove iPXE bymac boot file
   file:
     path: /srv/tftp/bymac/mac-{{ sys_mac_addr | replace(":","-") | lower }}.ipxe
     state: absent
-  delegate_to: "pxe-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+  delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"

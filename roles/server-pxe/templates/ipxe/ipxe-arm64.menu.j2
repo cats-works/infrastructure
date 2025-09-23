@@ -1,0 +1,170 @@
+#!ipxe
+
+# This configuration is managed by Ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+# Variables are specified in boot.ipxe.cfg
+
+# Some menu defaults
+set menu-timeout 5000
+set submenu-timeout ${menu-timeout}
+isset ${menu-default} || set menu-default exit
+
+###################### MAIN MENU ####################################
+:start
+goto startefi
+
+:startefi
+menu Kitty Telecom Boot Services (ARM64 UEFI)
+item --key x exit         Continue normal boot...
+item --gap --             ------------------------- System installers ------------------------------
+{% if "alpine-stable" in pxe_distro %}
+item --key a alpine       Install Alpine Linux {{ pxeprov_alpine_stable_ver }}
+{% endif %}
+{% if "alpine-virt" in pxe_distro %}
+item --key a alpinev     Install Alpine Linux (Virtual Machine Kernel) {{ pxeprov_alpine_stable_ver }}
+{% endif %}
+{% if "debian-stable" in pxe_distro %}
+item --key d debian       Install Debian GNU/Linux {{ pxeprov_debian_stable_ver }} ({{ pxeprov_debian_stable_cn }})
+{% endif %}
+{% if "fedora" in pxe_distro %}
+item --key f fedora        Install Fedora Linux {{ fedora_current_ver }}
+{% endif %}
+{% if "rocky-stable" in pxe_distro %}
+item --key r rocky        Install Rocky Linux {{ pxeprov_rocky_stable_ver }}
+{% endif %}
+{% if "rocky-8" in pxe_distro %}
+item rocky-8        Install Rocky Linux {{ pxeprov_rocky_8_ver }}
+{% endif %}
+{% if "windows" in pxe_distro %}
+item --key w windows      Install Windows (10-11)
+{% endif %}
+item --gap --             ------------------------- Advanced options -------------------------------
+item memtest              Memory Test
+item efishell             EFI Shell
+item --key c config       Configure settings
+item shell                Drop to iPXE shell
+item reboot               Reboot computer
+item
+
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+set menu-timeout 0
+goto ${selected}
+
+{% if "alpine-stable" in pxe_distro %}
+:alpine
+echo Starting Alpine Linux {{ pxeprov_alpine_stable_ver }} ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/vmlinuz-lts
+initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/initramfs-lts
+imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/modloop-lts apkovl=http:// quiet
+boot || goto failed
+goto start
+{% endif %}
+
+{% if "alpine-virt" in pxe_distro %}
+:alpinev
+echo Starting Alpine Linux {{ pxeprov_alpine_stable_ver }} VM ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/vmlinuz-virt
+initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/initramfs-virt
+imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-stable-{{ pxeprov_alpine_stable_ver }}/boot/modloop-lts quiet
+boot || goto failed
+goto start
+{% endif %}
+
+{% if "debian-stable" in pxe_distro %}
+:debian
+echo Starting Debian GNU/Linux {{ pxeprov_debian_stable_ver }} ({{ pxeprov_debian_stable_cn }}) ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/debian-installer/amd64/linux
+initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-{{ pxeprov_debian_stable_cn }}/debian-installer/amd64/initrd.gz
+imgargs linux auto=true fb=false vga=788 quiet
+boot || goto failed
+goto start
+{% endif %}
+
+{% if "fedora" in pxe_distro %}
+:fedora
+echo Starting Fedora {{ fedora_current_ver }} ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-x86_64/images/pxeboot/vmlinuz
+initrd http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-x86_64/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-x86_64 devfs=nomount quiet inst.text
+boot || goto failed
+goto start
+{% endif %}
+
+{% if "rocky-stable" in pxe_distro %}
+:rocky
+echo Starting Rocky Linux {{ pxeprov_rocky_stable_ver }} ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/images/pxeboot/vmlinuz
+initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-stable-{{ pxeprov_rocky_stable_ver }} devfs=nomount quiet inst.text
+boot || goto failed
+goto start
+{% endif %}
+
+{% if "rocky-8" in pxe_distro %}
+:rocky8
+echo Starting Rocky Linux {{ pxeprov_rocky_8_ver }} ${archl} installer
+kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-8-{{ pxeprov_rocky_8_ver }}/images/pxeboot/vmlinuz
+initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-8-{{ pxeprov_rocky_8_ver }}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-8-{{ pxeprov_rocky_stable_ver }} devfs=nomount quiet inst.text
+boot || goto failed
+goto start
+{% endif %}
+
+
+:memtest
+chain http://{{ vault_lgb_pxe_ip }}/tools/MEMTESTAA64.EFI
+boot || goto failed
+goto start
+
+:efishell
+chain http://{{ vault_lgb_pxe_ip }}/tools/SHELLAA64.EFI
+boot || goto failed
+goto start
+
+{% if "windows" in pxe_distro %}
+:windows
+echo Starting Microsoft Windows ${arch} installer
+kernel http://{{ vault_lgb_pxe_ip }}/wimboot
+initrd ${win-base-url}/bootmgr                     bootmgr
+initrd ${win-base-url}/Boot/BCD                    BCD
+initrd ${win-base-url}/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
+initrd ${win-base-url}/Boot/Fonts/segoe_slboot.ttf segoe_slboot.ttf
+initrd ${win-base-url}/Boot/Fonts/wgl4_boot.ttf    wgl4_boot.ttf
+initrd ${win-base-url}/Boot/boot.sdi               boot.sdi
+initrd ${win-base-url}/boot.wim                    boot.wim
+boot || goto failed
+goto start
+
+:cancel
+echo You cancelled the menu, dropping you to a shell
+
+:shell
+echo Type 'exit' to get the back to the menu
+shell
+set menu-timeout 0
+set submenu-timeout 0
+goto start
+
+:failed
+echo Booting failed, dropping to shell
+goto shell
+
+:reboot
+reboot
+
+:exit
+exit
+
+:config
+config
+goto start
+
+:back
+set submenu-timeout 0
+clear submenu-default
+goto start
+
+:menu-install-timed
+choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start

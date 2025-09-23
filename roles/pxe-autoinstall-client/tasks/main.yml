@@ -1,7 +1,11 @@
 ---
 # Playbook to deploy automatic installation
 - name: "Include server-pxe defaults"
-  include_vars: ../../server-pxe/defaults/main.yml
+  include_vars: roles/server-pxe/defaults/main.yml
+
+- name: Show value of pxe_server_delegation
+  debug:
+    msg: "pxe_server_delegation = {{ pxe_server_delegation }}"
 
 - name: "Check Hypervisor for architecture"
   command: "uname -m"
