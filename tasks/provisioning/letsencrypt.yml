@@ -61,13 +61,20 @@
     path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
     size: 4096
 
-- name: "Generate Let's Encrypt {{ requested_letsencrypt_domain }} CSR"
+- name: "Generate Let's Encrypt {{ requested_letsencrypt_domain }} CSR (with SAN)"
   openssl_csr:
     path: "{{ letsencrypt_csrs_dir }}/{{ requested_letsencrypt_domain }}.csr"
     privatekey_path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
     common_name: "{{ requested_letsencrypt_domain }}"
     subject_alt_name: "DNS:{{ requested_letsencrypt_san_list | join(',DNS:') }}"
+  when: requested_letsencrypt_san_list is defined
 
+- name: "Generate Let's Encrypt {{ requested_letsencrypt_domain }} CSR (without SAN)"
+  openssl_csr:
+    path: "{{ letsencrypt_csrs_dir }}/{{ requested_letsencrypt_domain }}.csr"
+    privatekey_path: "{{ letsencrypt_keys_dir }}/{{ requested_letsencrypt_domain }}.key"
+    common_name: "{{ requested_letsencrypt_domain }}"
+  when: requested_letsencrypt_san_list is undefined
 
 - name: "Begin Let's Encrypt {{ requested_letsencrypt_domain }} challenges"
   acme_certificate:
