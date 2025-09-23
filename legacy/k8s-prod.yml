@@ -1,0 +1,46 @@
+---
+- name: Provision Kubernetes production
+  hosts: "k8s-lgb-prod.ad.kittytel.net"
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become: yes
+  become_method: sudo
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+    - name: Deploy kitty telecom root CA
+      import_tasks: tasks/provisioning/root-ca.yml
+    - name: Set Hostname
+      hostname: 
+        name: "{{ inventory_hostname }}"
+
+  roles:
+    - shell-niceties
+    - monitoring-internal
+    - ad-member
+    - k8s
+
+  tasks:
+    - name: "Untaint control node to allow pods to execute"
+      command: "kubectl taint node {{ inventory_hostname }} node-role.kubernetes.io/control-plane:NoSchedule-"
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      retries: 5
+      delay: 30
+      register: result
+      until: result.rc == 0
+  post_tasks:
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

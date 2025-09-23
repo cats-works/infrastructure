@@ -23,11 +23,6 @@
     - name: Set Hostname
       hostname: 
         name: "{{ inventory_hostname }}"
-    - name: Update all apt packages to their latest version
-      apt:
-        name: "*"
-        state: latest
-      when: ansible_os_family == "Debian"
     - name: Install base dependencies
       package: 
         name: 
@@ -52,7 +47,7 @@
   tasks:
     - name: mount mailstore NAS
       mount:
-        src: nas-lgb:/nas/mailspools
+        src: nas-lgb:/nas2/mailspools
         path: /mail-data
         opts: rw,sync,hard,noatime
         state: mounted
