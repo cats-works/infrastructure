@@ -1,3 +1,0 @@
-{% for domain in vault_mail_domains %}
-default._domainkey.{{ domain }} {{ domain }}:default:/etc/opendkim/keys/{{ domain }}/default.private
-{% endfor %}

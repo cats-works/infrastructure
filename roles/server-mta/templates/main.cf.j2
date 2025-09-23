@@ -35,7 +35,7 @@ smtpd_sasl_path = private/auth
 virtual_alias_maps = hash:/etc/postfix/virtual
 
 milter_default_action = accept
-smtpd_milters = local:/opendkim/opendkim.sock, local:/opendkim/opendmarc.sock
+smtpd_milters = local:/opendkim/opendkim.sock, local:/opendmarc/opendmarc.sock
 non_smtpd_milters = local:/opendkim/opendkim.sock
 policyd-spf_time_limit = 3600
 spamassassin_destination_recipient_limit = 1

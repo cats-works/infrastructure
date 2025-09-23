@@ -91,19 +91,6 @@
     group: opendkim
   loop: "{{ vault_mail_domains|flatten(levels=1) }}"
 
-- name: Generate opendkim keys for each new domain {{ regenerate_dkim_keys_domains }}
-  shell:
-    cmd: opendkim-genkey -r -d {{ item }} -D /etc/opendkim/keys/{{ item }} -s default -v
-  loop: "{{ regenerate_dkim_keys_domains|flatten(levels=1) }}"
-
-- name: Make opendkim the owner of dkim all keys
-  file:
-    path: /etc/opendkim/keys/{{ item }}/default.private
-    state: file
-    owner: opendkim
-    group: opendkim
-  loop: "{{ regenerate_dkim_keys_domains|flatten(levels=1) }}"
-
 - name: Install OpenDKIM trusted hosts file
   template:
     src: templates/opendkim-trusted-hosts.j2
@@ -141,6 +128,18 @@
     state: directory
     owner: opendmarc
     group: opendmarc
+
+- name: adding postfix user to opendkim group
+  user:
+    name: postfix
+    groups: opendkim
+    append: yes
+
+- name: adding postfix user to opendmarc group
+  user:
+    name: postfix
+    groups: opendmarc
+    append: yes
 
 - name: Install clamad-milter.conf
   template:
