@@ -1,0 +1,4 @@
+---
+k3s_use_csi_nfs: false
+metallb_ip_range_start: 10.4.100.120
+metallb_ip_range_end: 10.4.100.120

@@ -1,0 +1,44 @@
+---
+- name: Provision Oracle VM
+  hosts: armvm-sjc.kittytel.net
+  become: yes
+  remote_user: cat
+  become_method: sudo
+
+  pre_tasks:
+    - name: Check if ansible cannot be run here
+      stat:
+        path: /etc/no-ansible
+      register: no_ansible
+    - name: Verify if we can run ansible
+      assert:
+        that:
+          - "not no_ansible.stat.exists"
+        success_msg: "We are able to run on this node"
+        fail_msg: "/etc/no-ansible exists - skipping run on this node"
+  roles:
+    - k3s-single-node
+  tasks:
+    - name: Setup MetalLB address pool
+      kubernetes.core.k8s:
+        state: present
+        template: 'k3s-armvm/metallb.yaml'
+        wait: true
+    - name: Setup local retained storage class
+      kubernetes.core.k8s:
+        state: present
+        template: 'k3s-armvm/local-storage-retained.yaml'
+        wait: true
+    - name: re-configure ingress-nginx controller to be shared
+      kubernetes.core.k8s:
+        state: present
+        template: 'k3s-armvm/ingress-nginx.yaml'
+        wait: true
+  post_tasks:
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root
