@@ -1,4 +1,5 @@
 ---
+rocky_10_version: "10.0"
 rocky_9_version: 9.4
 rocky_8_version: "8.10"
 debian_bookworm_version: "12.6.0"

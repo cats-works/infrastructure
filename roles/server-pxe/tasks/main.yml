@@ -48,6 +48,11 @@
     debian_codename: bookworm
     debian_version: "{{ debian_bookworm_version }}"
   when: '"debian" in pxe_distro and "bookworm" in pxe_debian_versions'
+- name: "Include tasks for Rocky Linux 10"
+  include_tasks: rocky.yml
+  vars:
+    rocky_linux_version: "{{ rocky_10_version }}"
+  when: '"rocky" in pxe_distro and 10 in pxe_rocky_versions'
 - name: "Include tasks for Rocky Linux 9"
   include_tasks: rocky.yml
   vars:
