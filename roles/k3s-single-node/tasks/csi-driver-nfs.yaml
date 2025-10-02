@@ -1,0 +1,18 @@
+---
+- name: Add NFS CSI driver helm chart repo
+  kubernetes.core.helm_repository:
+    name: csi-driver-nfs
+    repo_url: "https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts"
+- name: Update helm repos
+  kubernetes.core.helm:
+    name: dummy
+    namespace: kube-system
+    state: absent
+    update_repo_cache: true
+- name: Deploy csi-driver-nfs
+  kubernetes.core.helm:
+    name: csi-driver-nfs
+    chart_version: "{{ k3s_csi_nfs_chart_version }}"
+    chart_ref: csi-driver-nfs/csi-driver-nfs
+    release_namespace: kube-system
+    wait: true

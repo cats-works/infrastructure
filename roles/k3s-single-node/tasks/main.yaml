@@ -1,0 +1,17 @@
+---
+- name: Install K3S
+  include_tasks: install-k3s.yaml
+- name: Install Helm
+  include_tasks: helm.yaml
+- name: Install MetalLB
+  include_tasks: metallb.yaml
+  when: k3s_use_metallb is true
+- name: Install ingress-nginx
+  include_tasks: nginx-ingress.yaml
+  when: k3s_use_ingress_nginx is true
+- name: Install CSI NFS Driver
+  include_tasks: csi-driver-nfs.yaml
+  when: k3s_use_csi_nfs is true
+- name: Install cert-manager
+  include_tasks: cert-manager.yaml
+  when: k3s_use_cert_manager is true
