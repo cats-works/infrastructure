@@ -1,56 +1,50 @@
 ---
 all:
     children:
+        production:
+            hosts:
+                hv-lgb.ad.kittytel.net:
+                dc-lgb.ad.kittytel.net:
+                nas-lgb.ad.kittytel.net:
+                winbox.ad.kittytel.net:
+                playrunner.ad.kittytel.net:
+                k3s.ad.kittytel.net:
+        testing:
+            hosts:
+                hv2-lgb.ad.kittytel.net:
+                k3stest.ad.kittytel.net:
         managed_vms:
             hosts:
-                db-lgb.ad.kittytel.net:
-                svc-lgb.ad.kittytel.net:
-                unifi-lgb.ad.kittytel.net:
-                jumpbox.ad.kittytel.net:
-                winkvmdeploy.ad.kittytel.net:
+                winbox.ad.kittytel.net:
                 playrunner.ad.kittytel.net:
-                lgbshell2.ad.kittytel.net:
-                wf-lgb.infra.kittytel.net:
-                win10ltsctest.ad.kittytel.net:
-                snorlax.originull.org:
+                k3s.ad.kittytel.net:
+                k3stest.ad.kittytel.net:
         pxe_boot:
             hosts:
-                testvm.ad.kittytel.net:
-                test22.ad.kittytel.net:
+                hv2-lgb.ad.kittytel.net:
         pxe_server:
             hosts:
-                pxe-lgb.ad.kittytel.net:
-        unifi:
+                nas-lgb.ad.kittytel.net:
+        k3s_prod_lgb:
             hosts:
-                unifi-lgb.ad.kittytel.net:
-        dns:
+                k3s.ad.kittytel.net:
+        k3s_test_lgb:
             hosts:
-                dns-lgb.ad.kittytel.net:
+                k3stest.ad.kittytel.net:
+        hypervisors:
+            hosts:
+                hv2-lgb.ad.kittytel.net:
         windows:
             hosts:
                 dc-lgb.ad.kittytel.net:
-                jumpbox.ad.kittytel.net:
-                win10ltsctest.ad.kittytel.net:
-                winkvmdeploy.ad.kittytel.net:
-                kvmtestvm4.ad.kittytel.net:
+                winbox.ad.kittytel.net:
+        sjc:
+            hosts:
+                armvm-sjc.kittytel.net:
         lgb:
             hosts:
                 dc-lgb.ad.kittytel.net:
-                db-lgb.ad.kittytel.net:
-                svc-lgb.ad.kittytel.net:
-                mx-lgb.ad.kittytel.net:
                 nas-lgb.ad.kittytel.net:
-                pxe-lgb.ad.kittytel.net:
                 hv-lgb.ad.kittytel.net:
-                dns-lgb.ad.kittytel.net:
-                unifi-lgb.ad.kittytel.net:
-                playrunner.ad.kittytel.net:
-                jumpbox.ad.kittytel.net:
-                zapados.ad.kittytel.net:
-                testvm.ad.kittytel.net:
-                winkvmdeploy.ad.kittytel.net:
-                kvmtestvm4.ad.kittytel.net:
-                lgbshell2.ad.kittytel.net:
-                wf-lgb.infra.kittytel.net:
-                win10ltsctest.ad.kittytel.net:
-                snorlax.originull.org:
+                k3s.ad.kittytel.net:
+                k3stest.ad.kittytel.net:
