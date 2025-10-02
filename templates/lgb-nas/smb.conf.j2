@@ -19,7 +19,7 @@ fruit:metadata = stream
 load printers = no
 cups options = raw
 printcap name = /dev/null
-realm = {{ vault_krb5_realm }}
+realm = AD.KITTYTEL.NET
 template homedir = /home/%U
 workgroup = KITTYTEL
 template shell = /bin/bash
@@ -78,7 +78,7 @@ directory mode = 0755
 
 [Software]
 comment = Software
-path = /nas/Software
+path = /nas2/Software
 public = yes
 writable = yes
 guest ok = yes
@@ -90,36 +90,6 @@ create mode = 0755
 directory mode = 0755
 follow symlinks = yes
 wide links = yes
-
-[VirtualBox VMs]
-comment = VirtualBox VMs
-path = /nas/vbox
-public = yes
-writable = yes
-guest ok = no
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0754
-
-[Legacy]
-comment = Legacy Shares
-path = /nas/smb1
-public = yes
-writable = yes
-guest ok = no
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0755
 
 [UTM VMs]
 comment = UTM VMs
@@ -138,38 +108,7 @@ directory mode = 0755
 
 [Media]
 comment = Media Library
-path = /nas/media
-public = yes
-writable = yes
-guest ok = yes
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0755
-
-[portal]
-comment = portal site
-path = /nas/portal
-public = yes
-writable = yes
-guest ok = no
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-valid users = "@domain admins"
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0755
-
-[munki]
-comment = Mac Software Distribution
-path = /nas/munki
+path = /nas2/media
 public = yes
 writable = yes
 guest ok = yes
