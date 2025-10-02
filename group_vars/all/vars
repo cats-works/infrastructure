@@ -22,10 +22,13 @@ region_suffix: lgb
 # Universal SSL settings for daemons
 preferred_ssl_ciphers: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS"
 
+vm_use_tpm: false
+
 nextcloud_db_user: nextcloud
 librenms_db_user: librenms
 glpi_db_user: inventory
 pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
+pxe_server_hostname: nas-lgb.ad.kittytel.net
 vm_new_random_mac: "{{ '52:54:00' | random_mac }}"
 vm_cpu_mode: host-model
 vm_machine: q35
@@ -40,6 +43,7 @@ letsencrypt_csrs_dir: /etc/letsencrypt/csrs
 letsencrypt_certs_dir: /etc/letsencrypt/certs
 letsencrypt_account_key: /etc/letsencrypt/account/account.key
 default_cloudflare_zone: kittytel.net
+
 libvirt_vm_default_console_log_dir: "/var/log/libvirt-consoles/"
 libvirt_vm_default_uuid_deterministic: False
 libvirt_volume_default_images_path: '/var/lib/libvirt/images'

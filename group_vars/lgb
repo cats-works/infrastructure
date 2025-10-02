@@ -3,13 +3,24 @@ region_suffix: lgb
 int_dns_primary: "{{ vault_lgb_ad_ip }}"
 int_dns_secondary: "{{ vault_lgb_pihole_ip }}"
 pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
+pxe_server_delegation: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 snmp_location: Long Beach, CA
 timezone: America/Los_Angeles
 win_deploy_timezone: "Pacific Standard Time"
 
-rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky/
+k8s_cluster_name: kt_k8s_prod
+k8s_service_cidr: "10.101.0.0/24"
+k8s_controller_ip: "10.4.24.1"
+k8s_pod_cidr: "10.100.0.0/24"
+k8s_token: "{{ vault_lgb_k8s_prod_token }}"
+k8s_controller_dns: lgb-kubectl.k8s.kittytel.net
+
+rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
+
 vm_pool_directory: default
 vm_local_bridge: adbr0
+vm_domain_bridge: adbr0
+vm_default_hypervisor: hv-lgb
 vm_libvirt_vm_engine: kvm
 vm_libvirt_vm_arch: x86_64
 vm_enable_spice: yes
@@ -17,3 +28,4 @@ vm_use_efi: true
 vm_console_log_enabled: false
 vm_autostart: false
 
+                  
