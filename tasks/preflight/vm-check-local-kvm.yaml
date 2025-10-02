@@ -1,0 +1,30 @@
+---
+- name: Pre-Flight checks for KVM libvirt local hypervisor VM
+  include_tasks: tasks/deployment/pre-vm.yml
+  when: vm_hypervisor is defined
+- name: Provision PXE for autoinstall
+  include_role:
+    name: pxe-autoinstall-client
+  when: vm_hypervisor is defined and vm_exists is false
+- name: Define VM
+  include_tasks: tasks/deployment/define-vm.yml
+  when: vm_hypervisor is defined and vm_exists is false
+- name: Cleanup PXE
+  include_tasks: tasks/deployment/pxe-cleanup.yml
+  when: vm_hypervisor is defined and vm_exists is false
+- name: Pause 5 minutes for PXE autoinstallation
+  pause:
+    minutes: 5
+  when: vm_hypervisor is defined and vm_exists is false
+- name: Wait for SSH to respond (retry up to 30 times)
+  wait_for:
+    port: 22
+    host: "{{ inventory_hostname }}"
+    timeout: 5
+  register: ssh_check
+  retries: 30
+  delay: 120
+  until: ssh_check is succeeded
+  when: vm_hypervisor is defined and vm_exists is false
+
+- ansible.builtin.meta: clear_host_errors
