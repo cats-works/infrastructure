@@ -4,7 +4,6 @@ ks_use_disk: vda
 vm_name: jumpbox
 short_host: "{{ vm_name }}"
 sys_mac_addr: "52:54:BE:EF:CA:FE"
-ip_use_dhcp: true
 deploy_windows_version: "server2022"
 vm_hypervisor: hv-lgb
 vm_vcpus: 2
