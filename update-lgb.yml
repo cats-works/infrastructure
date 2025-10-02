@@ -24,8 +24,4 @@
     win_updates:
       category_names: '*'
       reboot: true
-    become_method: runas
-    remote_user: "{{ vault_ad_netbios }}\\{{ vault_ad_deploy_user }}"
-    become_user: "{{ vault_ad_netbios }}\\{{ vault_ad_deploy_user }}"
-    become: yes
     when: ansible_os_family == "Windows"
