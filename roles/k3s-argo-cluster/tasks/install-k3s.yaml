@@ -1,0 +1,66 @@
+---
+- name: Install K3s main node
+  block:
+    - name: "Install dependencies for K3S"
+      package:
+        name:
+        - nfs-utils
+        - openssl
+        state: present
+      become: yes
+    - name: Check if k3s binary exists
+      stat:
+        path: /usr/local/bin/k3s
+      register: k3s_stat
+    - name: Download k3s install script
+      get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: '0755'
+      when: not k3s_stat.stat.exists
+    - name: Run k3s install script
+      command: /tmp/k3s-install.sh
+      args:
+        creates: /usr/local/bin/k3s
+      environment:
+        K3S_KUBECONFIG_MODE: "644"
+        INSTALL_K3S_EXEC: " server {{ k3s_setup_parameters }}"
+      when: not k3s_stat.stat.exists
+    - name: Get K3s node token
+      shell: cat /var/lib/rancher/k3s/server/node-token
+      register: node_token
+    - name: Set join token as a fact
+      set_fact:
+        k3s_join_token: "{{ node_token.stdout }}"
+      delegate_facts: true
+    - name: Ensure .kube directory exists
+      file:
+        path: /root/.kube
+        state: directory
+    - name: Copy k3s config to /root/.kube/config
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /root/.kube/config
+        remote_src: true
+  when: inventory_hostname in groups['k8s_main_node']|default([])
+
+- name: Install K3s additional nodes
+  block:
+    - name: Get join token from master
+      set_fact:
+        k3s_join_token: "{{ hostvars[k3s_server_host].k3s_join_token }}"
+        k3s_server_ip: "{{ hostvars[k3s_server_host].ansible_host }}"
+    - name: Download k3s install script
+      get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: '0755'
+      when: not k3s_stat.stat.exists
+    - name: Run k3s agent install script
+      command: /tmp/k3s-install.sh
+      environment:
+        K3S_URL: "https://{{ k3s_server_ip }}:6443"
+        K3S_TOKEN: "{{ k3s_join_token }}"
+      args:
+        creates: /usr/local/bin/k3s-agent
+  when: inventory_hostname in groups['k8s_additional_nodes']|default([])

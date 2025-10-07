@@ -1,0 +1,21 @@
+---
+- name: Install ingress-nginx
+  block:
+  - name: Add nginx-ingress helm chart repo
+    kubernetes.core.helm_repository:
+      name: ingress-nginx
+      repo_url: "https://kubernetes.github.io/ingress-nginx"
+  - name: Update helm repos
+    kubernetes.core.helm:
+      name: dummy
+      namespace: kube-system
+      state: absent
+      update_repo_cache: true
+  - name: Deploy nginx-ingress
+    kubernetes.core.helm:
+      name: nginx
+      chart_version: "{{ k3s_ingress_nginx_chart_version }}"
+      chart_ref: ingress-nginx/ingress-nginx
+      release_namespace: kube-system
+      wait: true
+  when: inventory_hostname in groups['k8s_main_node']|default([])

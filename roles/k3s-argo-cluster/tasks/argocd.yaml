@@ -1,0 +1,43 @@
+---
+- name: Install ArgoCD
+  block:
+  - name: Add ArgoCD helm chart repo
+    kubernetes.core.helm_repository:
+      name: argo-cd
+      repo_url: "https://argoproj.github.io/argo-helm"
+  - name: Update helm repos
+    kubernetes.core.helm:
+      name: dummy
+      namespace: kube-system
+      state: absent
+      update_repo_cache: true
+  - name: Deploy argo-cd
+    kubernetes.core.helm:
+      name: argo-cd
+      chart_version: "{{ k3s_argo_cd_chart_version }}"
+      chart_ref: argo-cd/argo-cd
+      release_namespace: argo-cd
+      create_namespace: true
+      values:
+        global:
+          domain: "{{ argocd_ingress_host }}"
+        configs:
+          params:
+            server.insecure: true
+        server:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-dns"
+              nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+              nginx.ingress.kubernetes.io/service-upstream: "true"
+            hosts:
+              - "{{ argocd_ingress_host }}"
+            extraTls:
+              - secretName: argocd-tls
+                hosts:
+                  - "{{ argocd_ingress_host }}"
+      wait: true
+  when: inventory_hostname in groups['k8s_main_node']|default([])

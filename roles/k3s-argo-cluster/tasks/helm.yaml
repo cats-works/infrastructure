@@ -1,0 +1,37 @@
+---
+- name: Install Helm
+  block:
+  - name: "Install dependencies for Helm"
+    package:
+      name:
+      - git
+      - tar
+      - python3-pyyaml
+      - python3-kubernetes
+      state: present
+    become: yes
+  - name: Check if helm binary exists
+    stat:
+      path: /usr/local/bin/helm
+    register: helm_stat
+  - name: Download helm install script
+    get_url:
+      url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+      dest: /tmp/helm-install.sh
+      mode: '0755'
+      checksum: "sha512:{{ k3s_helm_sha512 }}"
+    when: not helm_stat.stat.exists
+  - name: Run helm install script
+    command: /tmp/helm-install.sh
+    args:
+      creates: /usr/local/bin/helm
+    environment:
+      PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+    when: not helm_stat.stat.exists
+  - name: Symlink helm into /usr/local/sbin
+    file:
+      src: /usr/local/bin/helm
+      dest: /usr/local/sbin/helm
+      state: link
+      force: yes
+  when: inventory_hostname in groups['k8s_main_node']|default([])

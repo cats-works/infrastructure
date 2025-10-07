@@ -1,0 +1,47 @@
+---
+- name: Create default wildcard ingress certificate
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: wildcard-ingress-default
+        namespace: kube-system
+      spec:
+        secretName: wildcard-ingress-default-tls
+        issuerRef:
+          name: letsencrypt-dns
+          kind: ClusterIssuer
+        commonName: "*.k8s.kittytel.net"
+        dnsNames:
+        - "*.k8s.kittytel.net"
+        - "k8s.kittytel.net"
+- name: Create default ingress
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: default-ingress
+        namespace: kube-system
+        annotations:
+      spec:
+        ingressClassName: nginx
+        tls:
+        - hosts:
+          - "k8s.kittytel.net"
+          - "*.k8s.kittytel.net"
+          secretName: wildcard-ingress-default-tls
+        rules:
+        - host: "k8s.kittytel.net"
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: my-service
+                  port:
+                    number: 80

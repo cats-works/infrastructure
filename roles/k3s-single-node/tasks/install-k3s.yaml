@@ -1,4 +1,9 @@
 ---
+- name: Install K3s server
+  hosts: k8s_main_node
+  become: yes
+  tasks:
+
 - name: "Install dependencies for K3S"
   package:
     name:
@@ -23,13 +28,6 @@
     K3S_KUBECONFIG_MODE: "644"
     INSTALL_K3S_EXEC: " server {{ k3s_setup_parameters }}"
   when: not k3s_stat.stat.exists
-- name: Ensure KUBECONFIG is set in /etc/profile
-  lineinfile:
-    path: /etc/profile
-    regexp: '^export KUBECONFIG='
-    line: 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml'
-    state: present
-    create: yes
 - name: Ensure .kube directory exists
   file:
     path: /root/.kube

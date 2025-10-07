@@ -1,0 +1,15 @@
+---
+- name: Install K3S
+  include_tasks: install-k3s.yaml
+- name: Install Helm
+  include_tasks: helm.yaml
+- name: Install MetalLB
+  include_tasks: metallb.yaml
+- name: Install cert-manager
+  include_tasks: cert-manager.yaml
+- name: Install Lets Encrypt cluster issuer
+  include_tasks: clusterissuer-lets-encrypt-dns.yaml
+- name: Install ingress-nginx
+  include_tasks: nginx-ingress.yaml
+- name: Install ArgoCD
+  include_tasks: argocd.yaml
