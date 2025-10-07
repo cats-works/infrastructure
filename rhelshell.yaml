@@ -1,0 +1,42 @@
+---
+- name: Provision RHEL shell
+  hosts: rhelshell.ad.kittytel.net
+  become: yes
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become_method: sudo
+  pre_tasks:
+    - name: Standard pre-flight tasks
+      import_tasks: tasks/preflight/main.yaml
+  roles:
+    - monitoring-internal
+    - shell-niceties
+    - secure-ssh
+    - ad-member
+  tasks:
+    - name: Install base requirements
+      package: 
+        name: 
+          - openssl
+          - epel-release
+          - python3-firewall
+          - samba
+          - ansible-core
+          - python3-pip
+          - nfs-utils
+        state: present
+    
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/provisioning/cat-ssh.yml  
+    - name: restart smb
+      service:
+        name: smb
+        state: restarted
+        enabled: yes
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

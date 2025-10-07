@@ -1,0 +1,26 @@
+---
+pxe_os: rocky
+deploy_rocky_version: 10
+ks_use_disk: vda
+vm_name: rhelshell
+short_host: "{{ vm_name }}"
+sys_mac_addr: "52:54:00:01:DE:17"
+vm_hypervisor: hv-lgb
+vm_vcpus: 2
+vm_memory_mb: 5120
+ip_use_dhcp: true
+vm_internal: yes
+vm_use_efi: true
+vm_autostart: true
+vm_volumes:
+- name: '{{ vm_name }}-disk'
+  device: 'disk'
+  format: 'qcow2'
+  capacity: 65000M
+  type: file
+  pool: "{{ vm_pool_directory }}"
+vm_interfaces:
+- type: 'bridge'
+  mac: "{{ sys_mac_addr }}"
+  source:
+    dev: "{{ vm_local_bridge }}"
