@@ -43,7 +43,23 @@ socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=65536 SO_SNDBUF=65536
 
 [cat]
 comment = cats data
-path = /nas2/cat_data
+path = /nas/cat_data
+public = yes
+writable = yes
+guest ok = no
+create mask = 660
+directory mask = 770
+browseable = Yes
+read only = no
+valid users = "@domain admins"
+write list = "@domain admins"
+writeable = yes
+create mode = 0644
+directory mode = 0755
+
+[ansible]
+comment = ansible
+path = /nas/ansible
 public = yes
 writable = yes
 guest ok = no
@@ -62,7 +78,7 @@ vfs objects = fruit streams_xattr
 fruit:time machine = yes
 fruit:time machine max size = 1050G
 comment = Time Machine Backups
-path = /nas2/tm
+path = /nas/tm
 public = yes
 writable = yes
 guest ok = no
@@ -78,7 +94,7 @@ directory mode = 0755
 
 [Software]
 comment = Software
-path = /nas2/Software
+path = /nas/Software
 public = yes
 writable = yes
 guest ok = yes
@@ -108,7 +124,7 @@ directory mode = 0755
 
 [Media]
 comment = Media Library
-path = /nas2/media
+path = /nas/media
 public = yes
 writable = yes
 guest ok = yes
