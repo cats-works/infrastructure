@@ -15,7 +15,8 @@ k8s_pod_cidr: "10.100.0.0/24"
 k8s_token: "{{ vault_lgb_k8s_prod_token }}"
 k8s_controller_dns: lgb-kubectl.k8s.kittytel.net
 
-rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
+#rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
+rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
 
 vm_pool_directory: default
 vm_local_bridge: adbr0
