@@ -7,32 +7,64 @@
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml
+    - name: Ensure /etc/ansible directory exists
+      ansible.builtin.file:
+        path: /etc/ansible
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Mount NFS share
+      ansible.builtin.mount:
+        path: /etc/ansible
+        src: nas-lgb.ad.kittytel.net:/nas/ansible
+        fstype: nfs
+        opts: rw,sync,noatime,nodiratime,rsize=1048576,wsize=1048576,hard,intr,vers=4.2
+        state: mounted
   roles:
     - monitoring-internal
     - shell-niceties
     - secure-ssh
     - ad-member
   tasks:
-    - name: Install base requirements
+    - name: Configure Kubernetes repository
+      ansible.builtin.yum_repository:
+        name: kubernetes
+        description: Kubernetes
+        baseurl: https://pkgs.k8s.io/core:/stable:/v1.34/rpm/
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://pkgs.k8s.io/core:/stable:/v1.34/rpm/repodata/repomd.xml.key
+        state: present
+    - name: Install required RPM packages
       package: 
         name: 
-          - openssl
-          - epel-release
-          - python3-firewall
-          - samba
           - ansible-core
-          - python3-pip
+          - ansible-collection-community-general
+          - ansible-collection-ansible-posix
+          - ansible-test
+          - epel-release
+          - gcc
+          - krb5-devel
+          - kubectl
+          - make
           - nfs-utils
+          - openssl
+          - python3-devel
+          - python3-firewall
+          - python3-gssapi
+          - python3-krb5
+          - python3-pip
+          - python3-requests-kerberos
+          - python3-winrm
         state: present
-    
+    - name: "PIP install pywinrm[kerberos]"
+      ansible.builtin.pip:
+        name: "pywinrm[kerberos]"
+        executable: pip3
   post_tasks:
     - name: Install cat's SSH keys
       import_tasks: tasks/provisioning/cat-ssh.yml  
-    - name: restart smb
-      service:
-        name: smb
-        state: restarted
-        enabled: yes
     - name: Touching run file that ansible has ran here
       file:
         path: /var/log/ansible.run
