@@ -7,17 +7,9 @@ pxe_server_delegation: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 snmp_location: Long Beach, CA
 timezone: America/Los_Angeles
 win_deploy_timezone: "Pacific Standard Time"
-
-k8s_cluster_name: kt_k8s_prod
-k8s_service_cidr: "10.101.0.0/24"
-k8s_controller_ip: "10.4.24.1"
-k8s_pod_cidr: "10.100.0.0/24"
-k8s_token: "{{ vault_lgb_k8s_prod_token }}"
-k8s_controller_dns: lgb-kubectl.k8s.kittytel.net
-
+internal_dns_controller: "dc-lgb.ad.kittytel.net"
 #rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
 rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
-
 vm_pool_directory: default
 vm_local_bridge: adbr0
 vm_domain_bridge: adbr0
