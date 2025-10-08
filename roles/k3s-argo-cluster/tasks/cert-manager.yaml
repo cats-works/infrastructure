@@ -16,7 +16,8 @@
       name: cert-manager
       chart_version: "{{ k3s_cert_manager_chart_version }}"
       chart_ref: jetstack/cert-manager
-      release_namespace: kube-system
+      release_namespace: cert-manager
+      create_namespace: true
       values:
         dns01RecursiveNameserversOnly: true
         dns01RecursiveNameservers: "9.9.9.9:53,1.1.1.1:53"

@@ -17,6 +17,7 @@
         dnsNames:
         - "*.k8s.kittytel.net"
         - "k8s.kittytel.net"
+  when: inventory_hostname in groups['k8s_main_node']|default([])
 - name: Create default ingress
   kubernetes.core.k8s:
     state: present
@@ -45,3 +46,4 @@
                   name: my-service
                   port:
                     number: 80
+  when: inventory_hostname in groups['k8s_main_node']|default([])

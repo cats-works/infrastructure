@@ -7,6 +7,8 @@
   include_tasks: metallb.yaml
 - name: Install cert-manager
   include_tasks: cert-manager.yaml
+- name: Install Lets Encrypt CloudFlare API token secret
+  include_tasks: lets-encrypt-cloudflare-dns.yaml
 - name: Install Lets Encrypt cluster issuer
   include_tasks: clusterissuer-lets-encrypt-dns.yaml
 - name: Install ingress-nginx

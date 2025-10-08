@@ -1,5 +1,5 @@
 ---
-- name: Create CloudFlare API secret token
+- name: Create default wildcard ingress certificate
   kubernetes.core.k8s:
     state: present
     definition:
@@ -7,12 +7,12 @@
       kind: Secret
       metadata:
         name: cloudflare-api-token-secret
-        namespace: kube-system
+        namespace: cert-manager
       type: Opaque
       stringData:
         api-token: "{{ vault_cloudflare_dns_api_token }}"
   when: inventory_hostname in groups['k8s_main_node']|default([])
-- name: Create the ClusterIssuer letsencrypt-dns
+- name: Create default wildcard ingress certificate
   kubernetes.core.k8s:
     state: present
     definition:
@@ -20,7 +20,6 @@
       kind: ClusterIssuer
       metadata:
         name: letsencrypt-dns
-        namespace: kube-system
       spec:
         acme:
           server: https://acme-v02.api.letsencrypt.org/directory

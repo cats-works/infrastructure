@@ -18,4 +18,25 @@
       chart_ref: metallb/metallb
       release_namespace: kube-system
       wait: true
+  - name: Create default wildcard ingress certificate
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: default-address-pool
+          namespace: kube-system
+        spec:
+          addresses:
+          - "{{ metallb_ip_range_start }}-{{ metallb_ip_range_end }}"
+  - name: Create default wildcard ingress certificate
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: l2adv
+          namespace: kube-system
   when: inventory_hostname in groups['k8s_main_node']|default([])
