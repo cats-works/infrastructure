@@ -7,8 +7,10 @@ all:
                 dc-lgb.ad.kittytel.net:
                 nas-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
-                playrunner.ad.kittytel.net:
                 k3s.ad.kittytel.net:
+                node-a.k8s.kittytel.net:
+                node-b.k8s.kittytel.net:
+                rhelshell.ad.kittytel.net:
         testing:
             hosts:
                 hv2-lgb.ad.kittytel.net:
@@ -16,9 +18,11 @@ all:
         managed_vms:
             hosts:
                 winbox.ad.kittytel.net:
-                playrunner.ad.kittytel.net:
                 k3s.ad.kittytel.net:
                 k3stest.ad.kittytel.net:
+                node-a.k8s.kittytel.net:
+                node-b.k8s.kittytel.net:
+                rhelshell.ad.kittytel.net:
         pxe_boot:
             hosts:
                 hv2-lgb.ad.kittytel.net:
@@ -28,9 +32,16 @@ all:
         k3s_prod_lgb:
             hosts:
                 k3s.ad.kittytel.net:
-        k3s_test_lgb:
+        k8s_prod:
             hosts:
-                k3stest.ad.kittytel.net:
+                node-a.k8s.kittytel.net:
+                node-b.k8s.kittytel.net:
+        k8s_main_node:
+            hosts:
+                node-a.k8s.kittytel.net:
+        k8s_additional_nodes:
+            hosts:
+                node-b.k8s.kittytel.net:
         hypervisors:
             hosts:
                 hv2-lgb.ad.kittytel.net:
@@ -49,4 +60,6 @@ all:
                 k3s.ad.kittytel.net:
                 k3stest.ad.kittytel.net:
                 winbox.ad.kittytel.net:
-                playrunner.ad.kittytel.net:
+                node-a.k8s.kittytel.net:
+                node-b.k8s.kittytel.net:
+                rhelshell.ad.kittytel.net:
