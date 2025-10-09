@@ -4,3 +4,4 @@ collections:
 - community.windows
 - kubernetes.core
 - ansible.posix
+- community.routeros
