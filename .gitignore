@@ -8,4 +8,4 @@ group_vars/*/vault
 files/*.pem
 files/catdoor_key
 files/cat_authorized_keys
-
+files/argocd-github-ssh.key
