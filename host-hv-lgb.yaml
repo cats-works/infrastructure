@@ -44,7 +44,7 @@
         owner: root
         group: root
     - name: Install smartmontools and snmp configuration
-      import_tasks: tasks/postflight/snmp-smart.yml  
+      import_tasks: tasks/postflight/snmp-smart.yaml  
   post_tasks:
     - name: Install SSH authorized keys
       import_tasks: tasks/postflight/ssh-keys.yaml  
