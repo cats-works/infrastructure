@@ -6,6 +6,7 @@
         name:
         - nfs-utils
         - openssl
+        - nfsv4-client-utils
         state: present
       become: yes
     - name: Check if k3s binary exists

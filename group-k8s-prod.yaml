@@ -1,0 +1,42 @@
+---
+- name: "KittyTel Kubernetes Cluster (Production)"
+  hosts: k8s_prod
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  become: yes
+  become_method: sudo
+  pre_tasks:
+    - name: Standard pre-flight tasks
+      import_tasks: tasks/preflight/main.yaml
+  roles:
+    - monitoring-internal
+    - ad-member
+    - k3s-argo-cluster
+  tasks:
+    - name: Configure Ingress DNS record
+      ansible.windows.win_dns_record:
+        name: ingress
+        type: A
+        zone: "{{ k8s_cluster_dns_host }}"
+        value: "{{ metallb_ip_range_start }}"
+        state: present
+      delegate_to: "{{ internal_dns_controller }}"
+      become: no
+      run_once: true
+    - name: Configure ArgoCD DNS record
+      ansible.windows.win_dns_record:
+        name: argocd
+        type: CNAME
+        zone: kittytel.net
+        value: "ingress.{{ k8s_cluster_dns_host }}"
+        state: present
+      delegate_to: "{{ internal_dns_controller }}"
+      become: no
+      run_once: true
+  post_tasks:
+    - name: Touching run file that ansible has ran here
+      file:
+        path: /var/log/ansible.run
+        state: touch
+        mode: '0644'
+        owner: root
+        group: root

@@ -1,0 +1,12 @@
+---
+vm_interfaces:
+- type: 'bridge'
+  mac: "{{ sys_mac_addr }}"
+  source:
+    dev: "k8sbr0"
+k3s_metallb_address_pool: "10.4.24.30-10.4.24.149"
+metallb_ip_range_start: 10.4.24.30
+metallb_ip_range_end: 10.4.24.149
+argocd_ingress_host: argocd.kittytel.net
+k8s_cluster_dns_host: k8s.kittytel.net
+argocd_admin_password: "{{ vault_argocd_admin_password }}"
