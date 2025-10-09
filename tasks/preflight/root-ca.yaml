@@ -1,0 +1,33 @@
+---
+# Playbook to install Kitty Telecom Root CA
+- name: Install Root CA (Debian)
+  block:
+  - name: Make sure /usr/local/share/ca-certificates exists
+    file:
+      path: /usr/local/share/ca-certificates
+      state: directory
+  - name: Copy the certificate
+    copy:
+      src: files/root-ca.crt
+      dest: /usr/local/share/ca-certificates/kittytel-root.crt
+    register: result
+  - name: Update CA Trust
+    command: update-ca-certificates
+    when: result is changed
+  when: ansible_os_family == "Debian"
+
+- name: Install Root CA (RedHat)
+  block:
+  - name: Make sure /etc/pki/ca-trust/source/anchors exists
+    file:
+      path: /etc/pki/ca-trust/source/anchors
+      state: directory
+  - name: Copy the certificate
+    copy:
+      src: files/root-ca.crt
+      dest: /etc/pki/ca-trust/source/anchors/kittytel-root.crt
+    register: result
+  - name: Update CA Trust
+    command: update-ca-trust extract
+    when: result is changed
+  when: ansible_os_family == "RedHat"

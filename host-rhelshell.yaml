@@ -26,6 +26,7 @@
     - shell-niceties
     - secure-ssh
     - ad-member
+    - argo-cd-cli
   tasks:
     - name: Configure Kubernetes repository
       ansible.builtin.yum_repository:
@@ -62,6 +63,14 @@
       ansible.builtin.pip:
         name: "pywinrm[kerberos]"
         executable: pip3
+    - name: Import OpenBao RPM GPG key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://github.com/openbao/openbao/releases/download/v2.4.1/bao_2.4.1_linux_amd64.rpm.gpgsig
+    - name: Install OpenBao RPM package
+      ansible.builtin.yum:
+        name: https://github.com/openbao/openbao/releases/download/v2.4.1/bao_2.4.1_linux_amd64.rpm
+        state: present
   post_tasks:
     - name: Install cat's SSH keys
       import_tasks: tasks/provisioning/cat-ssh.yml  

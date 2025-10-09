@@ -1,0 +1,33 @@
+- name: Determine root device type and boolean flag
+  command: findmnt -n -o SOURCE /
+  register: root_device
+
+- name: Extract root device basename
+  set_fact:
+    root_basename: "{{ root_device.stdout | basename }}"
+
+- name: Check if root is LVM
+  set_fact:
+    root_is_lvm: "{{ 'mapper' in root_device.stdout }}"
+
+- name: Get underlying physical volumes if LVM
+  command: "pvs --noheadings -o pv_name"
+  register: root_pvs
+  when: root_is_lvm
+  changed_when: false
+
+- name: Check if any PV is on vda or nvme
+  set_fact:
+    is_virtio_or_nvme: >-
+      {% if root_is_lvm %}
+        {{ root_pvs.stdout_lines | select('search', 'vd|nvme') | list | length > 0 }}
+      {% else %}
+        {{ root_device.stdout | basename is search('^vd|^nvme') }}
+      {% endif %}
+
+- name: "remount root with discard"
+  ansible.posix.mount:
+    path: /
+    state: remounted
+    opts: discard
+  when: is_virtio_or_nvme

@@ -4,3 +4,5 @@
   when: vm_hypervisor is defined
 - name: Standard pre-flight tasks
   include_tasks: tasks/preflight/standard-preflight.yaml
+- name: re-mount discard if required
+  include_tasks: tasks/preflight/discard-mount.yaml

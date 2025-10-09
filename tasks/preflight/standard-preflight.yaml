@@ -10,12 +10,7 @@
     success_msg: "We are able to run on this node"
     fail_msg: "/etc/no-ansible exists - skipping run on this node"
 - name: Deploy kitty telecom root CA
-  import_tasks: tasks/provisioning/root-ca.yml
+  import_tasks: tasks/preflight/root-ca.yaml
 - name: Set Hostname
   hostname: 
     name: "{{ inventory_hostname }}"
-- name: "Remount / with discard"
-  ansible.posix.mount:
-    path: /
-    state: remounted
-    opts: discard
