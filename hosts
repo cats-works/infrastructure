@@ -3,11 +3,11 @@ all:
     children:
         production:
             hosts:
+                armvm-sjc.kittytel.net:
                 hv-lgb.ad.kittytel.net:
                 dc-lgb.ad.kittytel.net:
                 nas-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
-                k3s.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
@@ -18,8 +18,6 @@ all:
         managed_vms:
             hosts:
                 winbox.ad.kittytel.net:
-                k3s.ad.kittytel.net:
-                k3stest.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
@@ -29,9 +27,6 @@ all:
         pxe_server:
             hosts:
                 nas-lgb.ad.kittytel.net:
-        k3s_prod_lgb:
-            hosts:
-                k3s.ad.kittytel.net:
         k8s_prod:
             hosts:
                 node-a.k8s.kittytel.net:
@@ -57,8 +52,6 @@ all:
                 dc-lgb.ad.kittytel.net:
                 nas-lgb.ad.kittytel.net:
                 hv-lgb.ad.kittytel.net:
-                k3s.ad.kittytel.net:
-                k3stest.ad.kittytel.net:
                 winbox.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:

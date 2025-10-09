@@ -1,3 +1,0 @@
----
-k3s_metallb_address_pool: "10.4.20.200-10.4.20.220"
-k3s_openbao_chart_version: "0.18.1"
