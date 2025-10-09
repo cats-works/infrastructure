@@ -23,12 +23,11 @@ Bender
 
 EOF
 		touch /etc/degraded.services
-		at now+10 minutes -f /usr/libexec/degrade-services
+		#at now+10 minutes -f /usr/libexec/degrade-services
                 ;;
         ONLINE)
                 logger -t upsmon "Edison power restored" "Restoring all services"
 		rm /etc/degraded.services
-		/usr/libexec/restore-services
 		SUBJECT="[ALERT] Edison power restored at Long Beach"
                 cat -v << EOF | /usr/sbin/sendmail -t -i
 From: Bender <$FROM_ADMIN>

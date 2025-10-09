@@ -36,6 +36,14 @@
     owner: root
     group: root
 
+- name: install upsmon-exec script
+  copy:
+    src: files/hv-lgb/scripts/upsmon-exec.sh 
+    dest: /usr/libexec/upsmon-exec.sh
+    mode: '0755'
+    owner: root
+    group: root
+
 - name: restart nut-server
   service:
     name: nut-server
@@ -50,7 +58,7 @@
 
 - name: install librenms ups-nut script
   copy:
-    src: files/scripts/ups-nut.sh 
+    src: files/hv-lgb/scripts/ups-nut.sh 
     dest: /etc/snmp/ups-nut.sh
     mode: '0755'
     owner: root

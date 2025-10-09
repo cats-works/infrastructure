@@ -37,7 +37,7 @@
       import_tasks: tasks/provisioning/snmp-smart.yml  
 
     - name: Install NUT UPS configuration
-      import_tasks: tasks/hv-lgb/nut-ups.yaml  
+      import_tasks: tasks/hv-lgb/nut-ups.yaml
 
     - name: install chronyd gps time config
       template:
