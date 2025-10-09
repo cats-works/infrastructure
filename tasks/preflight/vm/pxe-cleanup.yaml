@@ -2,12 +2,12 @@
 # Tasks to clean up auto-boot files from PXE
 - name: Remove PXE kickstart file
   file:
-    path: /srv/tftp/ks/{{ vm_name }}.ks
+    path: /srv/tftp/ks/{{ inventory_hostname }}.ks
     state: absent
   delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove PXE preseed file
   file:
-    path: /srv/tftp/ks/{{ vm_name }}.preseed.cfg
+    path: /srv/tftp/ks/{{ inventory_hostname }}.preseed.cfg
     state: absent
   delegate_to: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
 - name: Remove PXE winselect

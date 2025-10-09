@@ -1,17 +1,18 @@
 ---
 # Task to define our VM on libvirt
 - name: Create our VM Disk(s)
-  script: virt_volume.sh -n {{ item.name }}.{{ item.format }} -p {{ item.pool | default('default') }} -c {{ item.capacity }}
+  script: virt_volume.sh -n {{ item.name | default(libvirt_volume_default_file_name) }}.{{ item.format | default('qcow2') }} -p {{ item.pool | default('default') }} -c {{ item.capacity }}
   delegate_to: "{{ vm_hypervisor }}"
   with_items: "{{ vm_volumes }}"
 - name: Correct VM Disk Permissions
   file: 
-    path: "{{ libvirt_volume_default_images_path }}/{{ item.name }}.{{ item.format }}"
+    path: "{{ libvirt_volume_default_images_path }}/{{ item.name | default(libvirt_volume_default_file_name) }}.{{ item.format | default('qcow2') }}"
     owner: libvirt-qemu
     group: libvirt-qemu
     mode: '0600'
   delegate_to: "{{ vm_hypervisor }}"
   with_items: "{{ vm_volumes }}"
+
 - name: Setup Virtual Machine
   virt:
     command: define

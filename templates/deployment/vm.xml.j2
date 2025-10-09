@@ -43,7 +43,7 @@
     <disk type='{{ volume.type | default(libvirt_volume_default_type) }}' device='{{ volume.device | default(libvirt_volume_default_device) }}'>
       <driver name='qemu' type='{{ volume.format | default(libvirt_volume_default_format) }}'/>
       {% if volume.type | default(libvirt_volume_default_type) == 'file' %}
-      <source file='{{ volume.file_path |default(libvirt_volume_default_images_path) }}/{{ volume.name }}.{{ volume.format }}'/>
+      <source file='{{ volume.file_path |default(libvirt_volume_default_images_path) }}/{{ volume.name | default(libvirt_volume_default_file_name) }}.{{ volume.format | default(libvirt_volume_default_format) }}'/>
       {% endif %}
       {% if volume.target is undefined %}
       <target dev='vd{{ 'abcdefghijklmnopqrstuvwxyz'[loop.index - 1] }}' {% if volume.device | default(libvirt_volume_default_device) == 'cdrom' %}bus='sata'{% endif %}/>

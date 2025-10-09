@@ -2,6 +2,9 @@
 - name: VM provision pre-flight check
   include_tasks: tasks/preflight/vm-check-local-kvm.yaml
   when: vm_hypervisor is defined
+- name: Gather facts
+  ansible.builtin.setup:
+  ignore_errors: no
 - name: Standard pre-flight tasks
   include_tasks: tasks/preflight/standard-preflight.yaml
 - name: re-mount discard if required

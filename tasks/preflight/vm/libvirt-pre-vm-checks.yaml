@@ -21,10 +21,22 @@
 - name: "Set DNS suffix host fact"
   set_fact:
     dns_suffix: "{{ vault_internal_host_dns }}"
-- name: "Set MAC Address Fact (Random)"
+- name: Ensure ks_use_disk fact is defined
   set_fact:
-      pxe_mac_address: "{{ vm_new_random_mac }}"
-  when: "sys_mac_addr is not defined"
+    sys_mac_addr: "vda"
+  when: ks_use_disk is not defined
+- name: Ensure sys_mac_addr fact is defined
+  set_fact:
+    sys_mac_addr: "{{ '52:54:00' | random_mac }}"
+  when: sys_mac_addr is not defined
+- name: Ensure vm_interfaces is defined
+  set_fact:
+    vm_interfaces:
+    - type: 'bridge'
+      mac: "{{ sys_mac_addr }}"
+      source:
+        dev: "{{ vm_local_bridge | default(default_vm_bridge) }}"
+  when: vm_interfaces is not defined
 - name: "Set MAC Address Fact (Defined)"
   set_fact:
       pxe_mac_address: "{{ sys_mac_addr }}"

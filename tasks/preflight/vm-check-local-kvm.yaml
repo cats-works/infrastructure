@@ -1,16 +1,16 @@
 ---
 - name: Pre-Flight checks for KVM libvirt local hypervisor VM
-  include_tasks: tasks/deployment/pre-vm.yml
+  include_tasks: tasks/preflight/vm/libvirt-pre-vm-checks.yaml
   when: vm_hypervisor is defined
 - name: Provision PXE for autoinstall
   include_role:
     name: pxe-autoinstall-client
   when: vm_hypervisor is defined and vm_exists is false
 - name: Define VM
-  include_tasks: tasks/deployment/define-vm.yml
+  include_tasks: tasks/preflight/vm/libvirt-define-vm.yaml
   when: vm_hypervisor is defined and vm_exists is false
 - name: Cleanup PXE
-  include_tasks: tasks/deployment/pxe-cleanup.yml
+  include_tasks: tasks/preflight/vm/pxe-cleanup.yaml
   when: vm_hypervisor is defined and vm_exists is false
 - name: Pause 5 minutes for PXE autoinstallation
   pause:
