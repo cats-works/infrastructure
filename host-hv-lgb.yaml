@@ -39,9 +39,6 @@
     - name: Install NUT UPS configuration
       import_tasks: tasks/hv-lgb/nut-ups.yaml  
 
-    - name: Install libvirt helper scripts
-      import_tasks: tasks/hv-lgb/scripts.yaml  
-
     - name: install chronyd gps time config
       template:
         src: templates/hv-lgb/chrony.conf.j2
