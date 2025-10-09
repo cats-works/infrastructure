@@ -1,0 +1,20 @@
+---
+- name: Ensure curl is installed
+  package:
+    name: curl
+    state: present
+- name: Download ArgoCD CLI binary (x86_64)
+  get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_install_version }}/argocd-linux-amd64"
+    dest: /usr/local/bin/argocd
+    mode: '0755'
+    checksum: "sha256:{{ argocd_amd64_checksum }}"
+  when: ansible_architecture == "x86_64"
+- name: Download ArgoCD CLI binary (ARM64)
+  get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_install_version }}/argocd-linux-arm64"
+    dest: /usr/local/bin/argocd
+    mode: '0755'
+    checksum: "sha256:{{ argocd_arm64_checksum }}"
+  when: ansible_architecture == "aarch64"
+

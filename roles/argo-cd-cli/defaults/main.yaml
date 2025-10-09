@@ -1,0 +1,4 @@
+---
+argocd_install_version: "3.1.8"
+argocd_amd64_checksum: bfc45149df6dc8408cee3c1c66e865adde1439d8f419657513b56704d73f1e4d
+argocd_arm64_checksum: c7993dac72edb79c036cf1a62f6ea888af4726cd0ff9aa4c1ed904419f2d992a
