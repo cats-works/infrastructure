@@ -51,8 +51,8 @@
         group: root
 
   post_tasks:
-    - name: Install cat's SSH keys
-      import_tasks: tasks/provisioning/cat-ssh.yml  
+    - name: Install SSH authorized keys
+      import_tasks: tasks/postflight/ssh-keys.yaml  
     - name: ensure libvirtd is enabled
       service:
         name: libvirtd

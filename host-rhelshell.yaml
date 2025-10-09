@@ -73,7 +73,7 @@
         state: present
   post_tasks:
     - name: Install cat's SSH keys
-      import_tasks: tasks/provisioning/cat-ssh.yml  
+      import_tasks: tasks/postflight/ssh-keys.yaml  
     - name: Touching run file that ansible has ran here
       file:
         path: /var/log/ansible.run
