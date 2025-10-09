@@ -11,14 +11,14 @@ internal_dns_controller: "dc-lgb.ad.kittytel.net"
 #rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
 rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
 vm_pool_directory: default
+default_vm_bridge: adbr0
 vm_local_bridge: adbr0
-vm_domain_bridge: adbr0
-vm_default_hypervisor: hv-lgb
-vm_libvirt_vm_engine: kvm
-vm_libvirt_vm_arch: x86_64
-vm_enable_spice: yes
+#vm_domain_bridge: adbr0
+vm_default_hypervisor: hv-lgb.ad.kittytel.net
 vm_use_efi: true
 vm_console_log_enabled: false
 vm_autostart: false
-
-                  
+ip_use_dhcp: true
+vm_internal: yes
+ks_use_disk: vda
+become: yes
