@@ -33,9 +33,6 @@
         owner: root
         group: root
 
-    - name: Install smartmontools and snmp configuration
-      import_tasks: tasks/provisioning/snmp-smart.yml  
-
     - name: Install NUT UPS configuration
       import_tasks: tasks/hv-lgb/nut-ups.yaml
 
@@ -46,7 +43,8 @@
         mode: '0644'
         owner: root
         group: root
-
+    - name: Install smartmontools and snmp configuration
+      import_tasks: tasks/postflight/snmp-smart.yml  
   post_tasks:
     - name: Install SSH authorized keys
       import_tasks: tasks/postflight/ssh-keys.yaml  

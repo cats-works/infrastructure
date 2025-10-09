@@ -110,7 +110,7 @@
       command: exportfs -r
 
     - name: Install smartmontools and snmp configuration
-      import_tasks: tasks/provisioning/snmp-smart.yml  
+      import_tasks: tasks/postflight/snmp-smart.yaml 
     - name: Install ntpd stats to snmpd.conf
       lineinfile:
         path: /etc/snmp/snmpd.conf
