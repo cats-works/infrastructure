@@ -24,8 +24,11 @@ template homedir = /home/%U
 workgroup = KITTYTEL
 template shell = /bin/bash
 idmap backend = tdb
-idmap config * : backend = tdb
-idmap config * : range = 10000-20000
+idmap config KITTYTEL : backend = ad
+idmap config KITTYTEL : range = 10000-999999
+idmap config KITTYTEL : schema_mode = rfc2307
+
+winbind nss info = rfc2307
 winbind use default domain = yes
 winbind refresh tickets = yes
 winbind offline logon = yes
