@@ -4,8 +4,12 @@
     min protocol = SMB2
     encrypt passwords = true
     security = ads
-    idmap config * : backend = tdb
-    idmap config * : range = 10000-20000
+    idmap backend = tdb
+    idmap config KITTYTEL : backend = ad
+    idmap config KITTYTEL : range = 10000-999999
+    idmap config KITTYTEL : schema_mode = rfc2307
+
+    winbind nss info = rfc2307
     winbind refresh tickets = Yes
     winbind enum users = yes
     winbind enum groups = yes

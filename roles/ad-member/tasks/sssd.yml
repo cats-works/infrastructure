@@ -52,17 +52,19 @@
 
 - name: Join system to AD and put the computer object in the Linux OU
   expect:
-    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" --os-name="Red Hat Linux" --os-version="`cat /etc/redhat-release`" {{ vault_krb5_realm }}"
+    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" {{ vault_krb5_realm }}"
     responses:
       Password for *: "{{ vault_ad_deploy_pass }}"
   when: realmd_bound is failed and ansible_os_family == "RedHat"
+  no_log: true
 
 - name: Join system to AD and put the computer object in the Linux OU
   expect:
-    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" --os-name="Debian Linux" --os-version="`cat /etc/debian_version`" {{ vault_krb5_realm }}"
+    command: /bin/bash -c "/usr/sbin/realm join -U {{ vault_ad_deploy_user }} --computer-ou "{{ ad_linux_server_ou }}" {{ vault_krb5_realm }}"
     responses:
       Password for *: "{{ vault_ad_deploy_pass }}"
   when: realmd_bound is failed and ansible_os_family == "Debian"
+  no_log: true
 
 - name: Copy SSSD configuration
   template:
@@ -113,7 +115,7 @@
     state: restarted
   when: realmd_bound is failed
 
-- name: Restrict access based on Shell Enabled AD group
+- name: Restrict access based on Domain Admins AD group
   command: /bin/bash -c "/usr/sbin/realm permit -g Domain\ Admins@{{ vault_krb5_realm }}"
   when: realmd_bound is failed
 

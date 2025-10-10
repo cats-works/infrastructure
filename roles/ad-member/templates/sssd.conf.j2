@@ -4,7 +4,7 @@ use_fully_qualified_names=False
 full_name_format = %1$s
 domains = {{ vault_krb5_realm }}
 config_file_version = 2
-services = nss, pam, ssh
+services = nss, pam, ssh, sudo
 
 [domain/{{ vault_krb5_realm|lower }}]
 default_shell = /bin/bash
@@ -14,7 +14,9 @@ krb5_realm = {{ vault_krb5_realm }}
 realmd_tags = manages-system joined-with-adcli
 id_provider = ad
 ad_domain = {{ vault_krb5_realm|lower }}
-ldap_id_mapping = True
+ldap_id_mapping = False
+fallback_homedir = /home/%u
+default_shell = /bin/bash
 access_provider = ad
 ldap_user_extra_attrs = altSecurityIdentities
 ldap_user_ssh_public_key = altSecurityIdentities
