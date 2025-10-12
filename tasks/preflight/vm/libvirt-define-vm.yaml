@@ -1,5 +1,3 @@
----
-# Task to define our VM on libvirt
 - name: Create our VM Disk(s)
   script: virt_volume.sh -n {{ item.name | default(libvirt_volume_default_file_name) }}.{{ item.format | default('qcow2') }} -p {{ item.pool | default('default') }} -c {{ item.capacity }}
   delegate_to: "{{ vm_hypervisor }}"
@@ -24,8 +22,8 @@
     name: "{{ vm_name }}"
     state: running
   delegate_to: "{{ vm_hypervisor }}"
-- name: Pause 180sec for autoinstaller to process
+- name: Pause 80 seconds for autoinstaller to bootstrap
   pause:
-    seconds: 180
+    seconds: 80
   delegate_to: localhost
   become: no
