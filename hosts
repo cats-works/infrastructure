@@ -7,20 +7,23 @@ all:
                 hv-lgb.ad.kittytel.net:
                 dc-lgb.ad.kittytel.net:
                 nas-lgb.ad.kittytel.net:
-                winbox.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
+                route-lgb.ad.kittytel.net:
+                winbox.ad.kittytel.net:
         testing:
             hosts:
                 hv2-lgb.ad.kittytel.net:
                 k3stest.ad.kittytel.net:
+                testvm.ad.kittytel.net:
         managed_vms:
             hosts:
                 winbox.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
+                testvm.ad.kittytel.net:
         pxe_boot:
             hosts:
                 hv2-lgb.ad.kittytel.net:
@@ -30,15 +33,21 @@ all:
         k8s_prod:
             hosts:
                 node-a.k8s.kittytel.net:
-                node-b.k8s.kittytel.net:
         k8s_main_node:
             hosts:
                 node-a.k8s.kittytel.net:
         k8s_additional_nodes:
             hosts:
                 node-b.k8s.kittytel.net:
+        routers:
+            hosts:
+                route-lgb.ad.kittytel.net:
+        mikrotik:
+            hosts:
+                route-lgb.ad.kittytel.net:
         hypervisors:
             hosts:
+                hv-lgb.ad.kittytel.net:
                 hv2-lgb.ad.kittytel.net:
         windows:
             hosts:
@@ -50,9 +59,11 @@ all:
         lgb:
             hosts:
                 dc-lgb.ad.kittytel.net:
-                nas-lgb.ad.kittytel.net:
                 hv-lgb.ad.kittytel.net:
-                winbox.ad.kittytel.net:
+                nas-lgb.ad.kittytel.net:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
+                route-lgb.ad.kittytel.net:
+                winbox.ad.kittytel.net:
+                testvm.ad.kittytel.net:
