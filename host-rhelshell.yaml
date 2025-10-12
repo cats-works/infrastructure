@@ -52,6 +52,7 @@
           - nfs-utils
           - openssl
           - python3-devel
+          - python3-dns
           - python3-firewall
           - python3-gssapi
           - python3-krb5
@@ -72,7 +73,7 @@
         name: https://github.com/openbao/openbao/releases/download/v2.4.1/bao_2.4.1_linux_amd64.rpm
         state: present
   post_tasks:
-    - name: Install cat's SSH keys
+    - name: Install SSH authorized keys
       import_tasks: tasks/postflight/ssh-keys.yaml  
     - name: Touching run file that ansible has ran here
       file:
