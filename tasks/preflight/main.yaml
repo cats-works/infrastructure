@@ -2,6 +2,9 @@
 - name: VM provision pre-flight check
   include_tasks: tasks/preflight/vm-check-local-kvm.yaml
   when: vm_hypervisor is defined
+- name: DNS A record preflight check
+  include_tasks: tasks/preflight/dhcp-query-create-hostname.yaml
+- ansible.builtin.meta: clear_host_errors
 - name: Gather facts
   ansible.builtin.setup:
   ignore_errors: no
