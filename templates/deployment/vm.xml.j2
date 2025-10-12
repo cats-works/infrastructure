@@ -93,12 +93,12 @@
       <target type='serial' port='0'/>
     </console>
 {% endif %}
-{% if vm_use_tpm | bool %}
+{% if vm_use_tpm | bool  %}
   <tpm model="tpm-crb">
     <backend type="emulator" version="2.0"/>
   </tpm>
 {% endif %}
-{% if vm_enable_spice |bool %}
+{% if vm_enable_spice | bool  %}
     <graphics type='spice' autoport='yes'>
       <listen type='address'/>
     </graphics>

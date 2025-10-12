@@ -3,10 +3,6 @@
 - name: "Include server-pxe defaults"
   include_vars: roles/server-pxe/defaults/main.yml
 
-- name: Show value of pxe_server_delegation
-  debug:
-    msg: "pxe_server_delegation = {{ pxe_server_delegation }}"
-
 - name: "Check Hypervisor for architecture"
   command: "uname -m"
   delegate_to: "{{ pxe_server_delegation }}"

@@ -26,5 +26,3 @@
   delay: 120
   until: ssh_check is succeeded
   when: vm_hypervisor is defined and vm_exists is false
-
-- ansible.builtin.meta: clear_host_errors
