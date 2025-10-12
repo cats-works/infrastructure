@@ -4,7 +4,6 @@
   become: yes
   remote_user: "{{ vault_ansible_deployment_user }}"
   become_method: sudo
-
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml
@@ -19,23 +18,24 @@
           - nut-client
           - lm-sensors
         state: present
-
   roles:
     - monitoring-internal
     - shell-niceties
-
   tasks:
-    - name: install motd
-      template:
-        src: templates/hv-lgb/motd.tail.j2
-        dest: /etc/motd
-        mode: '0644'
-        owner: root
-        group: root
-
+    - name: Setup Networking
+      block:
+      - name: Define WAN interface
+        template:
+          src: hv-lgb/network/wifi-wan.conf.j2
+          dest: "/etc/network/interfaces.d/00-wifi-wan.conf"
+      - name: Define VLAN bridges
+        template:
+          src: hv-lgb/network/lan-bridge.conf.j2
+          dest: "/etc/network/interfaces.d/01-vlan{{ item.value.id }}-{{ item.key }}.conf"
+        loop: "{{ vlans | dict2items }}"
+      notify: restart networking
     - name: Install NUT UPS configuration
       import_tasks: tasks/hv-lgb/nut-ups.yaml
-
     - name: install chronyd gps time config
       template:
         src: templates/hv-lgb/chrony.conf.j2
