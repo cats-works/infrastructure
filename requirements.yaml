@@ -1,7 +1,8 @@
 ---
 collections:
+- ansible.posix
+- community.dns
 - community.libvirt
+- community.routeros
 - community.windows
 - kubernetes.core
-- ansible.posix
-- community.routeros
