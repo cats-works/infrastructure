@@ -3,7 +3,6 @@ pxe_os: rocky
 deploy_rocky_version: 10
 ks_use_disk: vda
 vm_name: node-a
-short_host: "{{ vm_name }}"
 sys_mac_addr: "52:54:00:d7:f0:a9"
 vm_hypervisor: hv-lgb
 vm_vcpus: 2
