@@ -1,24 +1,79 @@
 ---
 region_suffix: lgb
-int_dns_primary: "{{ vault_lgb_ad_ip }}"
-int_dns_secondary: "{{ vault_lgb_pihole_ip }}"
-pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
-pxe_server_delegation: "nas-{{ region_suffix }}.{{ vault_internal_host_dns }}"
+directory_type: ad
+int_dns_primary: 10.4.20.2
+int_dns_secondary: 10.4.24.31
+pxe_server_ip: 10.4.20.9
+pxe_server_delegation: "{{ pxe_server_hostname }}"
+dhcp_server: route-lgb.ad.kittytel.net
 snmp_location: Long Beach, CA
 timezone: America/Los_Angeles
 win_deploy_timezone: "Pacific Standard Time"
-internal_dns_controller: "dc-lgb.ad.kittytel.net"
 #rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
 rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
 vm_pool_directory: default
-default_vm_bridge: adbr0
-vm_local_bridge: adbr0
-#vm_domain_bridge: adbr0
-vm_default_hypervisor: hv-lgb.ad.kittytel.net
+default_vlan: domain
 vm_use_efi: true
 vm_console_log_enabled: false
 vm_autostart: false
 ip_use_dhcp: true
 vm_internal: yes
 ks_use_disk: vda
-become: yes
+
+vlans:
+  management:
+    id: 1
+    bridge: mgmtbr0
+    dhcp: mgmt_dhcp
+    iface:
+      hv-lgb.ad.kittytel.net: eno2
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.21.1
+    cidr: 10.4.21.0/27
+  domain:
+    id: 2
+    bridge: adbr0
+    dhcp: ad_dhcp
+    iface:
+      hv-lgb.ad.kittytel.net: eno2.2
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.20.250
+    cidr: 10.4.20.0/24
+  originull:
+    id: 3
+    bridge: orgbr0
+    dhcp: org_dhcp
+    iface:
+      hv-lgb.ad.kittytel.net: eno2.3
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.23.250
+    cidr: 10.4.23.0/24
+  k8s:
+    id: 4
+    bridge: k8sbr0
+    dhcp: k8s_dhcp
+    iface:
+      hv-lgb.ad.kittytel.net: eno2.4
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.24.250
+    cidr: 10.4.24.0/24
+  nt:
+    id: 5
+    bridge: lgbr0
+    dhcp: nt_dhcp
+    iface:
+      hv-lgb.ad.kittytel.net: eno2.5
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.25.250
+    cidr: 10.4.25.0/24
+  dmz:
+    id: 60
+    bridge: dmzbr0
+    dhcp: 
+    iface:
+      hv-lgb.ad.kittytel.net: eno2.6
+    address:
+      hv-lgb.ad.kittytel.net: 10.4.21.35
+    cidr: 10.4.21.32/29
+
+default_vm_bridge: "{{ vlans[default_vlan].bridge}}"

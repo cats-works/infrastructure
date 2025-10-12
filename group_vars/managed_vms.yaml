@@ -4,6 +4,8 @@ vm_libvirt_vm_engine: kvm
 vm_libvirt_vm_arch: x86_64
 vm_enable_spice: yes
 
+default_vm_bridge: "{{ vlans[default_vlan].bridge }}"
+
 libvirt_vm_default_console_log_dir: "/var/log/libvirt-consoles/"
 libvirt_vm_default_uuid_deterministic: False
 libvirt_volume_default_images_path: '/var/lib/libvirt/images'
@@ -24,6 +26,7 @@ libvirt_image_cache_path: "/tmp/"
 vm_new_random_mac: "{{ '52:54:00' | random_mac }}"
 vm_cpu_mode: host-model
 vm_machine: q35
+vm_use_tpm: false
 vm_libvirt_vm_emulator: /usr/bin/qemu-system-x86_64
 
 

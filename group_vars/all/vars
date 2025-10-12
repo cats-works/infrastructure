@@ -1,46 +1,21 @@
 ---
-default_iface: '{{ ansible_default_ipv4.interface }}'
-regenerate_dkim_keys_domains: []
-
-server_mta_banner: "$myhostname ESMTP $mail_name (Kitty Telecom)"
-snmp_contact: Cat <snmp@kittytel.net>
-
-spf_record: "v=spf1 mx a -all"
-dmarc_record: "v=DMARC1; p=quarantine; rua=mailto:dmarc@kittytel.net; ruf=mailto:dmarc@kittytel.net; fo=1; ri=432000; adkim=s; aspf=s"
-nginx_version: 1.23.3
-nextcloud_version: 26.0.1
-default_php_version: 8.2
-primary_ad_dc: dc-lgb.ad.kittytel.net
-
-ad_linux_server_ou: "OU=Linux,OU=Servers,OU=KittyTel"
-ip_use_dhcp: true
-
-netbios_name: "{{ vm_name }}"
-ad_domain: "{{ vault_internal_host_dns }}"
-# default region suffix:
 region_suffix: lgb
+default_iface: '{{ ansible_default_ipv4.interface }}'
+snmp_contact: Cat <snmp@kittytel.net>
+ad_domain: ad.kittytel.net
+primary_ad_dc: dc-lgb.ad.kittytel.net
+ad_linux_server_ou: "OU=Linux,OU=Servers,OU=KittyTel"
+vm_default_hypervisor: hv-lgb.ad.kittytel.net
+directory_server: dc-lgb.ad.kittytel.net
+dnsfilter: dnsfilter.k8s.kittytel.net
+pxe_server_hostname: nas-lgb.ad.kittytel.net
+pxe_server_ip: "{{ lookup('community.general.dig', pxe_server_hostname, 'A')[0] }}"
+internal_dns_controller: "{{ directory_server }}"
+
+# default region suffix:
 # Universal SSL settings for daemons
 preferred_ssl_ciphers: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS"
-
-vm_use_tpm: false
 vm_name: "{{ inventory_hostname.split('.')[0] }}"
 
-nextcloud_db_user: nextcloud
-librenms_db_user: librenms
-glpi_db_user: inventory
-pxe_server_ip: "{{ vault_lgb_pxe_ip }}"
-pxe_server_hostname: nas-lgb.ad.kittytel.net
-
-
-webserver_default_http_dir: /var/www/default
-acme_challenge_type: dns-01
-acme_directory: https://acme-v02.api.letsencrypt.org/directory
-acme_version: 2
-letsencrypt_dir: /etc/letsencrypt
-letsencrypt_keys_dir: /etc/letsencrypt/keys
-letsencrypt_csrs_dir: /etc/letsencrypt/csrs
-letsencrypt_certs_dir: /etc/letsencrypt/certs
-letsencrypt_account_key: /etc/letsencrypt/account/account.key
 default_cloudflare_zone: kittytel.net
 
-# libvirt_: borrowed defaults from stackhpc/ansible-role-libvirt-vm
