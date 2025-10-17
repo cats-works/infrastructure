@@ -1,0 +1,62 @@
+---
+# Playbook for Debian GNU/Linux
+# ALL TASKS in this playbook MUST conclude with the
+#   when: pxe_distro == "debian"
+
+- name: "Setup Debian for {{ desired_arch }} architecture"
+  block:
+  - name: "Check if we have existing ISO"
+    stat:
+      path: "/srv/linux/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso"
+    register: iso_exists
+  - name: "Get the Debian {{ debian_codename }} ISO"
+    block:
+      - name: "Retrieve Debian GNU/Linux {{ debian_codename }} {{ desired_arch }} ISO (from current)"
+        get_url: 
+          url: '{{ debian_iso_url }}'
+          dest: /srv/linux/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso
+    rescue:
+      - name: "Retrieve Debian GNU/Linux {{ debian_codename }} {{ desired_arch }} ISO (from archive)"
+        get_url: 
+          url: '{{ debian_archive_iso_url }}'
+          dest: /srv/linux/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso
+    when: "not iso_exists.stat.exists"
+  - name: "Create folder for debian-{{ debian_version }}-{{desired_arch}} ISO mount"
+    file:
+      path: "/srv/distro/debian-{{ debian_version }}-{{desired_arch}}/"
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+    ignore_errors: true
+  - name: "Mount Debian GNU/Linux {{ debian_version }} {{ desired_arch }} ISO"
+    mount:
+      path: /srv/distro/debian-{{ debian_version }}-{{ desired_arch }}/
+      src: /srv/linux/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso
+      fstype: iso9660
+      opts: ro,loop
+      state: present
+  - name: "Check if we have existing netinstall kernel"
+    stat:
+      path: "/srv/distro/debian-netinst-{{ debian_codename }}-{{desired_arch}}/debian-installer/{{desired_arch}}/linux"
+    register: netinst_kernel_exists
+  - name: "Get Debian netinstall"
+    block:    
+    - name: "Delete old debian-netinst-{{ debian_codename }}-{{ desired_arch }} folder"
+      file:
+        state: absent
+        path: "/srv/distro/debian-netinst-{{ debian_codename }}-{{desired_arch}}/"
+    - name: "Create folder for debian-netinst-{{ debian_codename }}-{{desired_arch}}"
+      file:
+        path: "/srv/distro/debian-netinst-{{ debian_codename }}-{{desired_arch}}/"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+    - name: Unarchive debian netinst tarball
+      unarchive:
+        src: "{{ debian_netinst_url }}"
+        dest: "/srv/distro/debian-netinst-{{ debian_codename }}-{{desired_arch}}/"
+        remote_src: yes
+    when: "not netinst_kernel_exists.stat.exists"
+

@@ -1,0 +1,9 @@
+- name: Set composed Debian version variable
+  set_fact:
+    debian_version: "{{ vars['debian_' + debian_codename + '_version'] }}"
+- name: "include_tasks for Debian {{ debian_codename}}"
+  include_tasks: debian-release.yaml
+  when: '"debian" in pxe_distro and "trixie" in pxe_debian_versions'
+  loop: "{{ pxe_debian_arch }}"
+  loop_control:
+    loop_var: desired_arch

@@ -1,15 +1,30 @@
----
+pxe_rocky_versions:
+  - 10
+  - 9
+  - 8
+pxe_debian_versions:
+  - trixie
+  - bullseye
+  - bookworm
 rocky_10_version: "10.0"
-rocky_9_version: 9.4
+rocky_9_version: "9.4"
 rocky_8_version: "8.10"
-debian_bookworm_version: "12.6.0"
-debian_bullseye_version: "11.10.0"
+debian_trixie_version: "13.1.0"
+debian_bookworm_version: "12.12.0"
+debian_bullseye_version: "11.11.0"
 alpine_stable_version: 3.20.2
 fedora_current_version: 40
 fedora_current_release: 1.14
 ubuntu_lts_version: "24.04"
 opensuse_leap_version: "15.6"
 opensuse_leap_build: "710.3"
+
+pxe_debian_arch:
+  - amd64
+  - arm64
+pxe_linux_arch:
+  - x86_64
+  - aarch64
 
 #rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky
 #ubuntu_linux_mirror: https://releases.ubuntu.com/

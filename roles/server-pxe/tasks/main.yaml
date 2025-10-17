@@ -36,18 +36,14 @@
 - name: include_tasks for alpine
   include_tasks: alpine.yml
   when: '"alpine" in pxe_distro'
-- name: "include_tasks for Debian Bullseye"
-  include_tasks: debian.yml
-  vars:
-    debian_codename: bullseye
-    debian_version: "{{ debian_bullseye_version }}"
-  when: '"debian" in pxe_distro and "bullseye" in pxe_debian_versions'
-- name: include_tasks for Debian Bookworm
-  include_tasks: debian.yml
-  vars:
-    debian_codename: bookworm
-    debian_version: "{{ debian_bookworm_version }}"
-  when: '"debian" in pxe_distro and "bookworm" in pxe_debian_versions'
+
+- name: "include_tasks for Debian {{ debian_codename }}"
+  include_tasks: debian-main.yaml
+  when: '"debian" in pxe_distro'
+  loop: "{{ pxe_debian_versions }}"
+  loop_control:
+    loop_var: debian_codename
+
 - name: "Include tasks for Rocky Linux 10"
   include_tasks: rocky.yml
   vars:

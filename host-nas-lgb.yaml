@@ -30,13 +30,6 @@
     - ad-member
     - role: server-pxe
       vars:
-        pxe_rocky_versions:
-          - 10
-          - 9
-          - 8
-        pxe_debian_versions:
-          - bullseye
-          - bookworm
         pxe_distro:
           - alpine
           - debian
