@@ -95,9 +95,9 @@ writeable = yes
 create mode = 0644
 directory mode = 0755
 
-[Software]
-comment = Software
-path = /nas/Software
+[Library]
+comment = Library
+path = /nas/Library
 public = yes
 writable = yes
 guest ok = yes
@@ -109,36 +109,6 @@ create mode = 0755
 directory mode = 0755
 follow symlinks = yes
 wide links = yes
-
-[UTM VMs]
-comment = UTM VMs
-path = /nas/utm
-public = yes
-writable = yes
-guest ok = no
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0755
-
-[Media]
-comment = Media Library
-path = /nas/media
-public = yes
-writable = yes
-guest ok = yes
-create mask = 660
-directory mask = 770
-browseable = Yes
-read only = no
-write list = "@domain admins"
-writeable = yes
-create mode = 0644
-directory mode = 0755
 
 [ISO]
 comment = PXE

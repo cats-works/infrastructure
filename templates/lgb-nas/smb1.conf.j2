@@ -24,30 +24,11 @@ unix extensions = no
 allow insecure wide links = yes
 server string = Lil NAS X Legacy
 
-[Swsh]
-path = /nas/Software
+[Library]
+path = /nas/Library
 read only = yes
 guest ok = yes
 guest only = yes
-create mode = 0755
-directory mode = 0755
 follow symlinks = yes
 wide links = yes
-comment=Software
-
-[Scratch]
-path = /nas/scratch
-read only = no
-guest ok = yes
-guest only = yes
-create mode = 0755
-directory mode = 0755
-comment=Scratch
-force user = nobody
-force group = nogroup
-
-[LJM401]
-path = /var/tmp/
-printable = yes
-printer name = LJ_M401n
-guest ok = yes
+comment=Library
