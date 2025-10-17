@@ -26,6 +26,14 @@ pxe_linux_arch:
   - x86_64
   - aarch64
 
+pxe_distro:
+  - alpine
+  - debian
+  - fedora
+  - rocky
+  - opensuse
+  - ubuntu
+  
 #rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky
 #ubuntu_linux_mirror: https://releases.ubuntu.com/
 #opensuse_mirror: https://mirror.sfo12.us.leaseweb.net/opensuse

@@ -29,41 +29,45 @@
     owner: root
     group: root
     mode: 0644
-    
-- name: compile ipxe UNDI
-  become: yes
-  shell: make bin/undionly.kpxe EMBED=/tmp/embed.ipxe
-  args:
-    chdir: "/usr/src/ipxe/src/"
 
-- name: compile ipxe EFI
-  become: yes
-  shell: make bin-x86_64-efi/ipxe.efi EMBED=/tmp/embed.ipxe
-  args:
-    chdir: "/usr/src/ipxe/src/"
+- name: "Check if we have existing UDNI IPXE"
+  stat:
+    path: "/srv/tftp/undionly.kpxe"
+  register: undi_exists
+- name: "Compile and load UNDI iPXE"
+  block:
+  - name: compile ipxe UNDI
+    become: yes
+    shell: make bin/undionly.kpxe EMBED=/tmp/embed.ipxe
+    args:
+      chdir: "/usr/src/ipxe/src/"
+  - name: copy our built ipxe UNDI
+    become: yes
+    copy:
+      src: /usr/src/ipxe/src/bin/undionly.kpxe
+      dest: /srv/tftp/undionly.kpxe
+      remote_src: true
+  when: "not undi_exists.stat.exists"
 
-- name: copy our built ipxe UNDI
-  become: yes
-  copy:
-    src: /usr/src/ipxe/src/bin/undionly.kpxe
-    dest: /srv/tftp/undionly.kpxe
-    remote_src: true
+- name: "Check if we have existing AMD64 UEFI IPXE"
+  stat:
+    path: "/srv/tftp/ipxex64.efi"
+  register: amd64_ipxe_exists
+- name: "Compile and load AMD64 EFI iPXE"
+  block:
+  - name: compile ipxe EFI
+    become: yes
+    shell: make bin-x86_64-efi/ipxe.efi EMBED=/tmp/embed.ipxe
+    args:
+      chdir: "/usr/src/ipxe/src/"
+  - name: copy our built ipxe EFI
+    become: yes
+    copy:
+      src: /usr/src/ipxe/src/bin-x86_64-efi/ipxe.efi
+      dest: /srv/tftp/ipxex64.efi
+      remote_src: true
+  when: "not amd64_ipxe_exists.stat.exists"
 
-- name: copy our built ipxe EFI
-  become: yes
-  copy:
-    src: /usr/src/ipxe/src/bin-x86_64-efi/ipxe.efi
-    dest: /srv/tftp/ipxe.efi
-    remote_src: true
-
-#- name: Install boot.ipxe
-#  template:
-#    src: ipxe/boot.ipxe.j2
-#    dest: /srv/boot.ipxe
-#    owner: root
-#    group: root
-#    mode: 0644
-    
 - name: Install boot.ipxe
   template:
     src: ipxe/boot.ipxe.j2
