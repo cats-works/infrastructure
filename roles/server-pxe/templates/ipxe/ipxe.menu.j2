@@ -133,56 +133,44 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 
 :alpine
 echo Starting Alpine Linux {{ alpine_stable_version }} ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
-initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
+kernel http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
+initrd http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
 imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
 :alpinevirt
 echo Starting Alpine Linux {{ alpine_stable_version }} VM ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
-initrd http://{{ vault_lgb_pxe_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
+kernel http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
+initrd http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
 imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
 {% endif %}
 
-###################### DEBIAN MENU ####################################
 {% if "debian" in pxe_distro %}
+###################### DEBIAN MENU ####################################
 :menu-debian
 menu Debian GNU/Linux
-{% if "debian" in pxe_distro and "bookworm" in pxe_debian_versions %}
-item --key d debianbookworm       Install Debian GNU/Linux {{ debian_bookworm_version }} (bookworm)
-{% endif %}
-{% if "debian" in pxe_distro and "bullseye" in pxe_debian_versions %}
-item debianbullseye       Install Debian GNU/Linux {{ debian_bullseye_version }} (bullseye)
-{% endif %}
+{% for version in pxe_debian_versions %}
+item debian{{ version }}       Install Debian GNU/Linux {{ vars['debian_' + version + '_version'] }} ({{ version }})
+{% endfor %}
 item
 item --key 0x08 back <-- Back to the main menu
 iseq ${menu-default} menu-debian && isset ${submenu-default} && goto menu-debian-timed ||
 choose selected && goto ${selected} || goto start
 :menu-debian-timed
 choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
-{% endif %}
 
-{% if "debian" in pxe_distro and "bookworm" in pxe_debian_versions %}
-:debianbookworm
-echo Starting Debian GNU/Linux {{ debian_bookworm_version }} (bookworm) ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bookworm-amd64/debian-installer/amd64/linux
-initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bookworm-amd64/debian-installer/amd64/initrd.gz
+{% for version in pxe_debian_versions %}
+item debian{{ version }}       Install Debian GNU/Linux {{ vars['debian_' + version + '_version'] }} ({{ version }})
+:debian{{ version }}
+echo Starting Debian GNU/Linux {{ vars['debian_' + version + '_version'] }} ({{ version }}) ${archl} installer
+kernel http://{{ pxe_http_ip }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/linux
+initrd http://{{ pxe_http_ip }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/initrd.gz
 imgargs linux fb=false vga=788 quiet
 boot || goto failed
 goto start
-{% endif %}
-
-{% if "debian" in pxe_distro and "bullseye" in pxe_debian_versions %}
-:debianbullseye
-echo Starting Debian GNU/Linux {{ debian_bullseye_version }} (bullseye) ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bullseye-amd64/debian-installer/amd64/linux
-initrd http://{{ vault_lgb_pxe_ip }}/distro/debian-netinst-bullseye-amd64/debian-installer/amd64/initrd.gz
-imgargs linux fb=false vga=788 quiet
-boot || goto failed
-goto start
+{% endfor %}
 {% endif %}
 
 ###################### ROCKY MENU ####################################
@@ -207,17 +195,17 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 {% if "rocky" in pxe_distro and 9 in pxe_rocky_versions %}
 :rocky
 echo Starting Rocky Linux {{ rocky_9_version }} ${archl} text installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet inst.text
+kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
+initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet inst.text
 boot || goto failed
 goto start
 
 :rockygui
 echo Starting Rocky Linux {{ rocky_9_version }} ${archl} GUI installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet
+kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
+initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet
 boot || goto failed
 goto start
 {% endif %}
@@ -225,9 +213,9 @@ goto start
 {% if "rocky" in pxe_distro and 8 in pxe_rocky_versions %}
 :rocky8
 echo Starting Rocky Linux {{ rocky_8_version }} ${archl} text installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64 devfs=nomount quiet inst.text
+kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/vmlinuz
+initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64 devfs=nomount quiet inst.text
 boot || goto failed
 goto start
 
