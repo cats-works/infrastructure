@@ -33,8 +33,8 @@
     owner: root
     group: root
 
-- name: include_tasks for alpine
-  include_tasks: alpine.yml
+- name: "Setup Alpine Linux PXE"
+  include_tasks: alpine-main.yaml
   when: '"alpine" in pxe_distro'
 
 - name: "Setup Debian GNU/Linux PXE"

@@ -28,7 +28,7 @@ rocky_10_version: "10.0"
 rocky_9_version: "9.5"
 rocky_8_version: "8.10"
 
-alpine_stable_version: 3.20.2
+alpine_stable_version: "3.22.2"
 ubuntu_lts_version: "24.04.3"
 ubuntu_std_version: "25.10"
 opensuse_leap_version: "15.6"
@@ -53,6 +53,7 @@ pxe_server_hostname: netboot.local
 pxe_http_ip: '{{ ansible_default_ipv4.address }}'
 
 alpine_iso_url: "https://dl-cdn.alpinelinux.org/alpine/v{{ alpine_stable_version | regex_search('^([0-9]*\\.[0-9]*)') }}/releases/{{ desired_arch }}/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+alpine_netboot_url: "https://dl-cdn.alpinelinux.org/alpine/v{{ alpine_stable_version | regex_search('^([0-9]*\\.[0-9]*)') }}/releases/{{ desired_arch }}/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}.tar.gz"
 debian_iso_url: "https://cdimage.debian.org/debian-cd/current/{{ desired_arch }}/iso-cd/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso"
 debian_archive_iso_url: "https://cdimage.debian.org/mirror/cdimage/archive/{{ debian_version}}/{{ desired_arch }}/iso-cd/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso"
 debian_netinst_url: "https://deb.debian.org/debian/dists/{{ debian_codename }}/main/installer-{{ desired_arch }}/current/images/netboot/netboot.tar.gz"

@@ -90,17 +90,17 @@ choose selected && goto ${selected} || goto start
 choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
 
 :alpine
-echo Starting Alpine Linux {{ alpine_stable_version }} ${archl} installer
-kernel http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
-initrd http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
-imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
+echo Starting Alpine Linux {{ alpine_stable_version }} ${archrh} installer
+kernel http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/vmlinuz-lts
+initrd http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/initramfs-lts
+imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-${archrh}/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/modloop-lts quiet
 boot || goto failed
 goto start
 :alpinevirt
-echo Starting Alpine Linux {{ alpine_stable_version }} VM ${archl} installer
-kernel http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
-initrd http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
-imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
+echo Starting Alpine Linux {{ alpine_stable_version }} VM ${archrh} installer
+kernel http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/vmlinuz-virt
+initrd http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/initramfs-virt
+imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-${archrh}/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-netboot-{{ alpine_stable_version }}-${archrh}/boot/modloop-virt quiet
 boot || goto failed
 goto start
 {% endif %}

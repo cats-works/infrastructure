@@ -1,0 +1,14 @@
+- name: "include_tasks for Alpine {{ alpine_stable_version }} (standard)"
+  include_tasks: alpine-release.yaml
+  vars:
+    alpine_flavor: standard
+  loop: "{{ pxe_linux_arch }}"
+  loop_control:
+    loop_var: desired_arch
+- name: "include_tasks for Alpine {{ alpine_stable_version }} (virt)"
+  include_tasks: alpine-release.yaml
+  vars:
+    alpine_flavor: virt
+  loop: "{{ pxe_linux_arch }}"
+  loop_control:
+    loop_var: desired_arch

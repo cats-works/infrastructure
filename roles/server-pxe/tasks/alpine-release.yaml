@@ -1,0 +1,62 @@
+---
+# Playbook for Alpine Linux
+
+- name: "Download Alpine Linux {{ alpine_flavor }}"
+  block:
+  - name: "Check if we have existing ISO"
+    stat:
+      path: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+    register: iso_exists
+  - name: Retrieve Alpine Linux {{ alpine_stable_version }} {{ alpine_flavor }} ISO
+    get_url: 
+      url: '{{ alpine_iso_url }}'
+      dest: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+    when: "not iso_exists.stat.exists"
+  - name: "Create folder for alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }} ISO mount"
+    file:
+      path: "/srv/distro/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}/"
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+    ignore_errors: true
+  - name: Mount Alpine Linux {{ alpine_stable_version }} {{ alpine_flavor }} ISO
+    mount:
+      path: "/srv/distro/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}/"
+      src: "/srv/linux/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
+      fstype: iso9660
+      opts: ro,loop,nofail
+      state: mounted
+  - name: "Check if we have existing netinstall kernel"
+    stat:
+      path: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/boot/vmlinuz-lts"
+    register: netboot_kernel_exists
+  - name: "Get Alpine netboot"
+    block:    
+    - name: "Delete old alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }} folder"
+      file:
+        state: absent
+        path: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/"
+    - name: "Create folder for alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}"
+      file:
+        path: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+    - name: Unarchive alpine netboot tarball
+      unarchive:
+        src: "{{ alpine_netboot_url }}"
+        dest: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/"
+        remote_src: yes
+    - name: "Fix initramfs-lts permissions"
+      file:
+        path: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/boot/initramfs-lts"
+        state: touch
+        mode: '0644'
+    - name: "Fix initramfs-virt permissions"
+      file:
+        path: "/srv/distro/alpine-netboot-{{ alpine_stable_version }}-{{ desired_arch }}/boot/initramfs-virt"
+        state: touch
+        mode: '0644'
+    when: "not netboot_kernel_exists.stat.exists and alpine_flavor == 'standard'"
