@@ -4,13 +4,29 @@
 # Last Update: {{ ansible_date_time.iso8601 }}
 # Do not make any manual edits they will be lost.
 
+iseq ${buildarch} x86_64 && set archefi X64 || 
+iseq ${buildarch} x86_64 && set archl amd64 || 
+iseq ${buildarch} x86_64 && set archrh x86_64 || 
+iseq ${buildarch} x86_64 && set archdisp AMD64 || 
+iseq ${buildarch} x86_64 && set winver 8.1-11 || 
+iseq ${buildarch} arm64 && set archefi AA64 || 
+iseq ${buildarch} arm64 && set archl arm64 || 
+iseq ${buildarch} arm64 && set archrh aarch64 || 
+iseq ${buildarch} arm64 && set archdisp ARM64 || 
+iseq ${buildarch} arm64 && set winver 10-11 || 
+iseq ${buildarch} i386 && set archefi X86 || 
+iseq ${buildarch} i386 && set archl i686 || 
+iseq ${buildarch} i386 && set archrh i686 || 
+iseq ${buildarch} i386 && set archdisp IA32 || 
+iseq ${buildarch} i386 && set winver 8.1-11 || 
+
 set nfs-server {{ vault_lgb_nas_ip }}
-set pxe-server {{ vault_lgb_pxe_ip }}
+set pxe-server {{ pxe_server_hostname }}
 set nfs-root /nas/osboot/
 set boot-url http://${pxe-server}/
 set sanboot-url http:/${pxe-server}/
 set boot-dir boot/
 set mac-config-dir bymac/
 set menu-url tftp://${pxe-server}/menu.ipxe
-set win-base-url http://{{ vault_lgb_pxe_ip }}/winpeboot
-set dart-base-url http://{{ vault_lgb_pxe_ip }}/dartboot
+set win-base-url http://{{ pxe_server_hostname }}/winpeboot
+set dart-base-url http://{{ pxe_server_hostname }}/dartboot

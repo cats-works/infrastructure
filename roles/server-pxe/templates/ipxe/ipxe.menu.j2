@@ -11,14 +11,42 @@ set menu-timeout 5000
 set submenu-timeout ${menu-timeout}
 isset ${menu-default} || set menu-default exit
 
-# Figure out if client is 64-bit capable
-cpuid --ext 29 && set arch x64 || set arch x86
-cpuid --ext 29 && set archl amd64 || set archl i386
-
 ###################### MAIN MENU ####################################
 :start
-iseq ${platform} efi && goto startefi || goto startbios
+menu Kitty Telecom Boot Services (${archdisp} ${platform})
+item --key x exit         Continue normal boot...
+item --gap --             ------------------------- System installers ------------------------------
+{% if "alpine" in pxe_distro %}
+item --key a menu-alpine       Alpine Linux -->
+{% endif %}
+{% if "debian" in pxe_distro  %}
+item --key d menu-debian        Debian GNU/Linux -->
+{% endif %}
+{% if "fedora" in pxe_distro %}
+item --key f menu-fedora        Fedora Linux -->
+{% endif %}
+{% if "rocky" in pxe_distro  %}
+item --key r menu-rocky        Rocky Linux -->
+{% endif %}
+{% if "windows" in pxe_distro %}
+item --key w windows      Windows (${winver})
+{% endif %}
+item --gap --             ------------------------- Advanced options -------------------------------
+{% if "windows" in pxe_distro %}
+item dart                 Windows DaRT
+{% endif %}
+iseq ${platform} efi && item memtest              Memory Test || 
+iseq ${platform} efi && item efishell             EFI Shell || 
 
+item --key c config       Configure settings
+item shell                Drop to iPXE shell
+item reboot               Reboot computer
+
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+set menu-timeout 0
+goto ${selected}
+
+###################### HELPERS !! ####################################
 :cancel
 echo You cancelled the menu, dropping you to a shell
 
@@ -48,76 +76,6 @@ set submenu-timeout 0
 clear submenu-default
 goto start
 
-###################### BIOS MENU ####################################
-
-:startbios
-menu Kitty Telecom Boot Services (x86 BIOS)
-item --key x exit         Continue normal boot...
-item --gap --             ------------------------- System installers ------------------------------
-{% if "alpine" in pxe_distro %}
-item --key a menu-alpine       Alpine Linux -->
-{% endif %}
-{% if "debian" in pxe_distro  %}
-item --key r menu-debian        Debian GNU/Linux -->
-{% endif %}
-{% if "fedora" in pxe_distro %}
-item --key f fedora        Install Fedora Linux {{ fedora_current_version }}
-{% endif %}
-{% if "rocky" in pxe_distro  %}
-item --key r menu-rocky        Rocky Linux -->
-{% endif %}
-{% if "windows" in pxe_distro %}
-item --key w windows      Install Windows (7-11)
-{% endif %}
-item --gap --             ------------------------- Advanced options -------------------------------
-{% if "windows" in pxe_distro %}
-item dart                 Windows DaRT
-{% endif %}
-item --key c config       Configure settings
-item shell                Drop to iPXE shell
-item reboot               Reboot computer
-item
-
-choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
-set menu-timeout 0
-goto ${selected}
-
-###################### EFI MENU ####################################
-
-:startefi
-menu Kitty Telecom Boot Services (AMD64 EFI)
-item --key x exit         Continue normal boot...
-item --gap --             ------------------------- System installers ------------------------------
-{% if "alpine" in pxe_distro %}
-item --key a menu-alpine       Alpine Linux -->
-{% endif %}
-{% if "debian" in pxe_distro  %}
-item --key r menu-debian        Debian GNU/Linux -->
-{% endif %}
-{% if "fedora" in pxe_distro %}
-item --key f fedora        Install Fedora {{ fedora_current_version }}
-{% endif %}
-{% if "rocky" in pxe_distro  %}
-item --key r menu-rocky        Rocky Linux -->
-{% endif %}
-{% if "windows" in pxe_distro %}
-item --key w windows      Install Windows (8.1-11)
-{% endif %}
-item --gap --             ------------------------- Advanced options -------------------------------
-{% if "windows" in pxe_distro %}
-item dart                 Windows DaRT
-{% endif %}
-item memtest              Memory Test
-item efishell             EFI Shell
-item --key c config       Configure settings
-item shell                Drop to iPXE shell
-item reboot               Reboot computer
-item
-
-choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
-set menu-timeout 0
-goto ${selected}
-
 ###################### ALPINE MENU ####################################
 {% if "alpine" in pxe_distro %}
 :menu-alpine
@@ -133,16 +91,16 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 
 :alpine
 echo Starting Alpine Linux {{ alpine_stable_version }} ${archl} installer
-kernel http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
-initrd http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
-imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
+kernel http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-lts
+initrd http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/initramfs-lts
+imgargs vmlinuz-lts ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-standard-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
 :alpinevirt
 echo Starting Alpine Linux {{ alpine_stable_version }} VM ${archl} installer
-kernel http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
-initrd http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
-imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_http_ip }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
+kernel http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/vmlinuz-virt
+initrd http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/initramfs-virt
+imgargs vmlinuz-virt ip=dhcp modules=loop,squashfs,sd-mod,usb-storage alpine_repo=http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/apks/ modloop=http://{{ pxe_server_hostname }}/distro/alpine-virt-{{ alpine_stable_version }}-x86_64/boot/modloop-lts quiet
 boot || goto failed
 goto start
 {% endif %}
@@ -162,29 +120,24 @@ choose selected && goto ${selected} || goto start
 choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
 
 {% for version in pxe_debian_versions %}
-item debian{{ version }}       Install Debian GNU/Linux {{ vars['debian_' + version + '_version'] }} ({{ version }})
 :debian{{ version }}
 echo Starting Debian GNU/Linux {{ vars['debian_' + version + '_version'] }} ({{ version }}) ${archl} installer
-kernel http://{{ pxe_http_ip }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/linux
-initrd http://{{ pxe_http_ip }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/initrd.gz
+kernel http://{{ pxe_server_hostname }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/linux
+initrd http://{{ pxe_server_hostname }}/distro/debian-netinst-bookworm-${archl}/debian-installer/${archl}/initrd.gz
 imgargs linux fb=false vga=788 quiet
 boot || goto failed
 goto start
 {% endfor %}
 {% endif %}
 
+{% if "rocky" in pxe_distro %}
 ###################### ROCKY MENU ####################################
-
 :menu-rocky
 menu Rocky Linux
-{% if "rocky" in pxe_distro and 9 in pxe_rocky_versions %}
-item --key r rocky        Install Rocky Linux {{ rocky_9_version }} (text mode)
-item --key r rockygui        Install Rocky Linux {{ rocky_9_version }} (GUI)
-{% endif %}
-{% if "rocky" in pxe_distro and 8 in pxe_rocky_versions %}
-item rocky8        Install Rocky Linux {{ rocky_8_version }} (text mode)
-item rocky8gui        Install Rocky Linux {{ rocky_8_version }} (GUI)
-{% endif %}
+{% for version in pxe_rocky_versions %}
+item rocky{{ version }}        Install Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} (text mode)
+item rocky{{ version }}gui     Install Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} (GUI)
+{% endfor %}
 item
 item --key 0x08 back <-- Back to the main menu
 iseq ${menu-default} menu-rocky && isset ${submenu-default} && goto menu-rocky-timed ||
@@ -192,50 +145,33 @@ choose selected && goto ${selected} || goto start
 :menu-rocky-timed
 choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
 
-{% if "rocky" in pxe_distro and 9 in pxe_rocky_versions %}
-:rocky
-echo Starting Rocky Linux {{ rocky_9_version }} ${archl} text installer
-kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet inst.text
+{% for version in pxe_rocky_versions %}
+:rocky{{ version }}
+echo Starting Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} ${archrh} text installer
+kernel http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh} devfs=nomount quiet inst.text
 boot || goto failed
 goto start
+:rockygui{{ version }}
+echo Starting Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} ${archrh} GUI installer
+kernel http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + version|string + '_version'] }}-${archrh} devfs=nomount quiet
+boot || goto failed
+goto start
+{% endfor %}
 
-:rockygui
-echo Starting Rocky Linux {{ rocky_9_version }} ${archl} GUI installer
-kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_9_version }}-x86_64 devfs=nomount quiet
-boot || goto failed
-goto start
-{% endif %}
-
-{% if "rocky" in pxe_distro and 8 in pxe_rocky_versions %}
-:rocky8
-echo Starting Rocky Linux {{ rocky_8_version }} ${archl} text installer
-kernel http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_http_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64 devfs=nomount quiet inst.text
-boot || goto failed
-goto start
-
-:rocky8gui
-echo Starting Rocky Linux {{ rocky_8_version }} ${archl} text installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/rocky-{{ rocky_8_version }}-x86_64 devfs=nomount quiet
-boot || goto failed
-goto start
 {% endif %}
 
 ###################### OTHER DISTROS ####################################
 
 {% if "fedora" in pxe_distro %}
 :fedora
-echo Starting Fedora {{ fedora_current_version }} ${archl} installer
-kernel http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-x86_64/images/pxeboot/vmlinuz
-initrd http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-x86_64/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ vault_lgb_pxe_ip }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-x86_64 devfs=nomount quiet
+echo Starting Fedora {{ fedora_current_version }} ${archrh} installer
+kernel http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh} devfs=nomount quiet
 boot || goto failed
 goto start
 {% endif %}
@@ -243,7 +179,7 @@ goto start
 {% if "windows" in pxe_distro %}
 :windows
 echo Starting Microsoft Windows ${arch} installer
-kernel http://{{ vault_lgb_pxe_ip }}/winpeboot/AMD64/wimboot
+kernel http://{{ pxe_server_hostname }}/winpeboot/AMD64/wimboot
 initrd ${win-base-url}/AMD64/bootmgr                     bootmgr
 initrd ${win-base-url}/AMD64/Boot/BCD                    BCD
 initrd ${win-base-url}/AMD64/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
@@ -256,7 +192,7 @@ goto start
 
 :dart
 echo Starting Microsoft Diagnostics and Recovery Toolkit (${arch})
-kernel http://{{ vault_lgb_pxe_ip }}/winpeboot/AMD64/wimboot
+kernel http://{{ pxe_server_hostname }}/winpeboot/AMD64/wimboot
 initrd ${dart-base-url}/bootmgr                     bootmgr
 initrd ${dart-base-url}/Boot/BCD                    BCD
 initrd ${dart-base-url}/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
@@ -268,15 +204,13 @@ boot || goto failed
 goto start
 {% endif %}
 
-
-
 :memtest
-chain http://{{ vault_lgb_pxe_ip }}/tools/MEMTESTX64.EFI
+chain http://{{ pxe_server_hostname }}/tools/MEMTEST${archefi}.EFI
 boot || goto failed
 goto start
 
 :efishell
-chain http://{{ vault_lgb_pxe_ip }}/tools/SHELLX64.EFI
+chain http://{{ pxe_server_hostname }}/tools/SHELL${archefi}.EFI
 boot || goto failed
 goto start
 

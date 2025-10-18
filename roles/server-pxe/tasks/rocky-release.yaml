@@ -1,0 +1,39 @@
+---
+# Playbook for Rocky Linux
+# ALL TASKS in this playbook MUST conclude with the
+#   when: pxe_distro == "rocky-linux"
+
+
+- name: "Setup Rocky Linux for {{ desired_arch }} architecture"
+  block:
+  - name: "Check if we have existing ISO"
+    stat:
+      path: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+    register: iso_exists
+  - name: "Retrieve Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO"
+    block:
+      - name: "Get Rocky Linux ISO"
+        get_url:
+          url: '{{ rocky_iso_url }}'
+          dest: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+    rescue:
+      - name: "Get Rocky Linux Vault ISO"
+        get_url: 
+          url: '{{ rocky_vault_iso_url }}'
+          dest: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+    when: "not iso_exists.stat.exists"
+  - name: "Create folder for rocky-{{ rocky_linux_version }}-{{desired_arch}} ISO mount"
+    file:
+      path: "/srv/distro/rocky-{{ rocky_linux_version }}-{{ desired_arch }}/"
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+    ignore_errors: true
+  - name: Mount Rocky Linux {{ rocky_linux_version }} {{ desired_arch }} ISO
+    mount:
+      path: "/srv/distro/rocky-{{ rocky_linux_version }}-{{ desired_arch }}/"
+      src: "/srv/linux/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+      fstype: iso9660
+      opts: ro,loop
+      state: mounted

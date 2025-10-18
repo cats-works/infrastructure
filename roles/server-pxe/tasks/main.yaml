@@ -33,32 +33,24 @@
     owner: root
     group: root
 
-- name: include_tasks for alpine
-  include_tasks: alpine.yml
-  when: '"alpine" in pxe_distro'
+#- name: include_tasks for alpine
+#  include_tasks: alpine.yml
+#  when: '"alpine" in pxe_distro'
 
-- name: "include_tasks for Debian {{ debian_codename }}"
-  include_tasks: debian-main.yaml
-  when: '"debian" in pxe_distro'
-  loop: "{{ pxe_debian_versions }}"
-  loop_control:
-    loop_var: debian_codename
+#- name: "Setup Debian GNU/Linux PXE"
+#  include_tasks: debian-main.yaml
+#  when: '"debian" in pxe_distro'
+#  loop: "{{ pxe_debian_versions }}"
+#  loop_control:
+#    loop_var: debian_codename
 
-- name: "Include tasks for Rocky Linux 10"
-  include_tasks: rocky.yml
-  vars:
-    rocky_linux_version: "{{ rocky_10_version }}"
-  when: '"rocky" in pxe_distro and 10 in pxe_rocky_versions'
-- name: "Include tasks for Rocky Linux 9"
-  include_tasks: rocky.yml
-  vars:
-    rocky_linux_version: "{{ rocky_9_version }}"
-  when: '"rocky" in pxe_distro and 9 in pxe_rocky_versions'
-- name: "Include tasks for Rocky Linux 8"
-  include_tasks: rocky.yml
-  vars:
-    rocky_linux_version: "{{ rocky_8_version }}"
-  when: '"rocky" in pxe_distro and 8 in pxe_rocky_versions'
+#- name: "Setup Rocky Linux PXE"
+#  include_tasks: rocky-main.yaml
+#  when: '"rocky" in pxe_distro'
+#  loop: "{{ pxe_rocky_versions }}"
+#  loop_control:
+#    loop_var: rocky_version
+
 - name: include_tasks for fedora
   include_tasks: fedora.yml
   when: '"fedora" in pxe_distro'
@@ -73,7 +65,7 @@
   when: '"windows" in pxe_distro'
 
 - name: install iPXE
-  include_tasks: ipxe.yml
+  include_tasks: ipxe.yaml
 
 - name: Ensure nginx is running
   service:

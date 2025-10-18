@@ -4,10 +4,10 @@ pxe_rocky_versions:
   - 8
 pxe_debian_versions:
   - trixie
-  - bullseye
   - bookworm
+  - bullseye
 rocky_10_version: "10.0"
-rocky_9_version: "9.4"
+rocky_9_version: "9.5"
 rocky_8_version: "8.10"
 debian_trixie_version: "13.1.0"
 debian_bookworm_version: "12.12.0"
@@ -15,7 +15,8 @@ debian_bullseye_version: "11.11.0"
 alpine_stable_version: 3.20.2
 fedora_current_version: 40
 fedora_current_release: 1.14
-ubuntu_lts_version: "24.04"
+ubuntu_lts_version: "24.04.3"
+ubuntu_std_version: "25.10"
 opensuse_leap_version: "15.6"
 opensuse_leap_build: "710.3"
 
@@ -40,6 +41,7 @@ pxe_distro:
 ipxe_version: "v1.21.1"
 pxeprov_enable_arm64: false
 deploy_pxe_wds: false
+pxe_server_hostname: netboot.local
 pxe_http_ip: '{{ ansible_default_ipv4.address }}'
 
 alpine_iso_url: "https://dl-cdn.alpinelinux.org/alpine/v{{ alpine_stable_version | regex_search('^([0-9]*\\.[0-9]*)') }}/releases/{{ desired_arch }}/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
@@ -49,5 +51,6 @@ debian_netinst_url: "https://deb.debian.org/debian/dists/{{ debian_codename }}/m
 fedora_current_iso_url: "https://ftp-nyc.osuosl.org/pub/fedora/linux/releases/{{ fedora_current_ver }}/Everything/{{ desired_arch }}/iso/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_ver }}-{{ fedora_current_release }}.iso"
 opensuse_leap_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_leap_version }}/iso/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
 
-rocky_iso_url: "{{ rocky_linux_mirror }}/{{ rocky_linux_version|string|split('.')|first }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+rocky_iso_url: "https://dl.rockylinux.org/pub/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
+rocky_vault_iso_url: "https://dl.rockylinux.org/vault/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
 ubuntu_lts_url: "{{ ubuntu_linux_mirror }}/{{ ubuntu_lts_version }}/ubuntu-{{ ubuntu_lts_version }}-netboot-{{ desired_arch }}.iso"
