@@ -1,0 +1,8 @@
+- name: Set composed Fedora Linux version variable
+  set_fact:
+    fedora_release_version: "{{ vars['fedora_' + fedora_version|string + '_version'] }}"
+- name: "include_tasks for Fedora {{ fedora_version }}"
+  include_tasks: fedora-release.yaml
+  loop: "{{ pxe_linux_arch }}"
+  loop_control:
+    loop_var: desired_arch

@@ -3,27 +3,36 @@
 # ALL TASKS in this playbook MUST conclude with the
 #   when: pxe_distro == "fedora"
 
-- name: "Check if we have existing ISO"
-  stat:
-    path: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso"
-  register: iso_exists
-  vars:
-    desired_arch: x86_64
-
-- name: "Retrieve Fedora {{ fedora_current_version }} {{ desired_arch }} ISO"
-  get_url: 
-    url: "{{ fedora_current_iso_url }}"
-    dest: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso"
-  vars:
-    desired_arch: "x86_64"
-  when: "not iso_exists.stat.exists"
-
-- name: "Mount Fedora {{ fedora_current_version }} {{ desired_arch }} ISO"
-  mount:
-    path: /srv/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-{{ desired_arch }}/
-    src: /srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_current_version }}-{{ fedora_current_release }}.iso
-    fstype: iso9660
-    opts: ro,loop
-    state: mounted
-  vars:
-    desired_arch: "x86_64"
+- name: "Setup Fedora Linux for {{ desired_arch }} architecture"
+  block:
+  - name: "Check if we have existing ISO"
+    stat:
+      path: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
+    register: iso_exists
+  - name: "Retrieve Fedora Linux {{ fedora_version }} {{ desired_arch }} ISO"
+    block:
+      - name: "Get Fedora Linux ISO"
+        get_url:
+          url: '{{ fedora_iso_url }}'
+          dest: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
+    rescue:
+      - name: "Get Fedora Linux Archive ISO"
+        get_url: 
+          url: '{{ fedora_archive_iso_url }}'
+          dest: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
+    when: "not iso_exists.stat.exists"
+  - name: "Create folder for fedora-{{ fedora_version }}-{{desired_arch}} ISO mount"
+    file:
+      path: "/srv/distro/fedora-{{ fedora_version }}-{{ desired_arch }}/"
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+    ignore_errors: true
+  - name: Mount Fedora Linux {{ fedora_version }} {{ desired_arch }} ISO
+    mount:
+      path: "/srv/distro/fedora-{{ fedora_version }}-{{ desired_arch }}/"
+      src: "/srv/linux/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
+      fstype: iso9660
+      opts: ro,loop,nofail
+      state: mounted

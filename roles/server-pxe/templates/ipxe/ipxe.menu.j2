@@ -164,17 +164,41 @@ goto start
 
 {% endif %}
 
-###################### OTHER DISTROS ####################################
-
 {% if "fedora" in pxe_distro %}
-:fedora
-echo Starting Fedora {{ fedora_current_version }} ${archrh} installer
-kernel http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh}/images/pxeboot/vmlinuz
-initrd http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh}/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/fedora-current-{{ fedora_current_version }}-{{ fedora_current_release }}-${archrh} devfs=nomount quiet
+###################### FEDORA MENU ####################################
+:menu-fedora
+menu Fedora Linux
+{% for version in pxe_fedora_versions %}
+item fedora{{ version }}        Install Fedora Linux {{ version }} (text mode)
+item fedoragui{{ version }}     Install Fedora Linux {{ version }} (GUI)
+{% endfor %}
+item
+item --key 0x08 back <-- Back to the main menu
+iseq ${menu-default} menu-fedora && isset ${submenu-default} && goto menu-fedora-timed ||
+choose selected && goto ${selected} || goto start
+:menu-fedora-timed
+choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
+
+{% for version in pxe_fedora_versions %}
+:fedora{{ version }}
+echo Starting Fedora Linux {{ version }} ${archrh} text installer
+kernel http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh} devfs=nomount quiet inst.text
 boot || goto failed
 goto start
+:fedoragui{{ version }}
+echo Starting Fedora Linux {{ version }} ${archrh} GUI installer
+kernel http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh}/images/pxeboot/initrd.img
+imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/distro/fedora-{{ version }}-${archrh} devfs=nomount quiet
+boot || goto failed
+goto start
+{% endfor %}
+
 {% endif %}
+
+###################### OTHER DISTROS ####################################
 
 {% if "windows" in pxe_distro %}
 :windows

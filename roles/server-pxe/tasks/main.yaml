@@ -51,9 +51,13 @@
   loop_control:
     loop_var: rocky_version
 
-- name: include_tasks for fedora
-  include_tasks: fedora.yml
+- name: "Setup Fedora Linux PXE"
+  include_tasks: fedora-main.yaml
   when: '"fedora" in pxe_distro'
+  loop: "{{ pxe_fedora_versions }}"
+  loop_control:
+    loop_var: fedora_version
+
 - name: include_tasks for opensuse
   include_tasks: opensuse.yml
   when: '"opensuse" in pxe_distro'
