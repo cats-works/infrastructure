@@ -1,10 +1,12 @@
 ---
-- name: Install build-essential and deps for building iPXE
+- name: Install dependencies for building iPXE
   package: 
     name: 
       - build-essential
       - mtools
       - binutils
+      - gcc-aarch64-linux-gnu
+      - binutils-aarch64-linux-gnu
       - git
       - gnu-efi
       - liblzma-dev
@@ -67,6 +69,25 @@
       dest: /srv/tftp/ipxex64.efi
       remote_src: true
   when: "not amd64_ipxe_exists.stat.exists"
+
+- name: "Check if we have existing ARM64 UEFI IPXE"
+  stat:
+    path: "/srv/tftp/ipxeaa64.efi"
+  register: arm64_ipxe_exists
+- name: "Compile and load ARM64 EFI iPXE"
+  block:
+  - name: compile ipxe EFI
+    become: yes
+    shell: make CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 bin-arm64-efi/ipxe.efi EMBED=/tmp/embed.ipxe
+    args:
+      chdir: "/usr/src/ipxe/src/"
+  - name: copy our built ipxe EFI
+    become: yes
+    copy:
+      src: /usr/src/ipxe/src/bin-arm64-efi/ipxe.efi
+      dest: /srv/tftp/ipxeaa64.efi
+      remote_src: true
+  when: "not arm64_ipxe_exists.stat.exists"
 
 - name: Install boot.ipxe
   template:
