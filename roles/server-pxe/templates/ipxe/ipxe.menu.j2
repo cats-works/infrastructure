@@ -136,7 +136,7 @@ goto start
 menu Rocky Linux
 {% for version in pxe_rocky_versions %}
 item rocky{{ version }}        Install Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} (text mode)
-item rocky{{ version }}gui     Install Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} (GUI)
+item rockygui{{ version }}     Install Rocky Linux {{ vars['rocky_' + version|string + '_version'] }} (GUI)
 {% endfor %}
 item
 item --key 0x08 back <-- Back to the main menu
