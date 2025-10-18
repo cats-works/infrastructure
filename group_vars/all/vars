@@ -8,7 +8,7 @@ ad_linux_server_ou: "OU=Linux,OU=Servers,OU=KittyTel"
 vm_default_hypervisor: hv-lgb.ad.kittytel.net
 directory_server: dc-lgb.ad.kittytel.net
 dnsfilter: dnsfilter.k8s.kittytel.net
-pxe_server_hostname: nas-lgb.ad.kittytel.net
+pxe_server_hostname: netboot.kittytel.net
 pxe_server_ip: "{{ lookup('community.general.dig', pxe_server_hostname, 'A')[0] }}"
 internal_dns_controller: "{{ directory_server }}"
 
