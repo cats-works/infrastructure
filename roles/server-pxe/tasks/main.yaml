@@ -33,23 +33,23 @@
     owner: root
     group: root
 
-#- name: include_tasks for alpine
-#  include_tasks: alpine.yml
-#  when: '"alpine" in pxe_distro'
+- name: include_tasks for alpine
+  include_tasks: alpine.yml
+  when: '"alpine" in pxe_distro'
 
-#- name: "Setup Debian GNU/Linux PXE"
-#  include_tasks: debian-main.yaml
-#  when: '"debian" in pxe_distro'
-#  loop: "{{ pxe_debian_versions }}"
-#  loop_control:
-#    loop_var: debian_codename
+- name: "Setup Debian GNU/Linux PXE"
+  include_tasks: debian-main.yaml
+  when: '"debian" in pxe_distro'
+  loop: "{{ pxe_debian_versions }}"
+  loop_control:
+    loop_var: debian_codename
 
-#- name: "Setup Rocky Linux PXE"
-#  include_tasks: rocky-main.yaml
-#  when: '"rocky" in pxe_distro'
-#  loop: "{{ pxe_rocky_versions }}"
-#  loop_control:
-#    loop_var: rocky_version
+- name: "Setup Rocky Linux PXE"
+  include_tasks: rocky-main.yaml
+  when: '"rocky" in pxe_distro'
+  loop: "{{ pxe_rocky_versions }}"
+  loop_control:
+    loop_var: rocky_version
 
 - name: include_tasks for fedora
   include_tasks: fedora.yml
