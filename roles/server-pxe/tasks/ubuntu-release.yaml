@@ -1,0 +1,43 @@
+---
+# Playbook for Ubuntu LTS
+
+- name: "Set ubuntu_version fact"
+  set_fact:
+    ubuntu_version: "{{ vars['ubuntu_lts_' + target_ubuntu_version|string + '_version'] }}"
+  when: "ubuntu_flavor == 'lts'"
+- name: "Set ubuntu_version fact"
+  set_fact:
+    ubuntu_version: "{{ target_ubuntu_version }}"
+  when: "ubuntu_flavor == 'interim'"
+- name: "Check if we have existing Ubuntu live-server {{ ubuntu_version }} ISO"
+  stat:
+    path: "/srv/linux/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
+  register: iso_exists
+- name: Retrieve Ubuntu live-server {{ ubuntu_version }} ISO"
+  block:
+    - name: "Retrieve Ubuntu live-server {{ ubuntu_version }} ISO"
+      get_url: 
+        url: '{{ ubuntu_url }}'
+        dest: "/srv/linux/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
+  rescue:
+    - name: "Retrieve Ubuntu live-server {{ ubuntu_version }} ISO (from alternative)"
+      get_url: 
+        url: '{{ ubuntu_url_alt }}'
+        dest: "/srv/linux/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
+  when: "not iso_exists.stat.exists"
+- name: "Create folder for ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }} ISO mount"
+  file:
+    path: "/srv/distro/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}/"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  ignore_errors: true
+  no_log: true
+- name: Mount Ubuntu live-server {{ ubuntu_version }} ISO
+  mount:
+    path: "/srv/distro/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}/"
+    src: "/srv/linux/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
+    fstype: iso9660
+    opts: ro,loop,nofail
+    state: mounted

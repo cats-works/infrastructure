@@ -61,9 +61,21 @@
 - name: include_tasks for opensuse
   include_tasks: opensuse.yml
   when: '"opensuse" in pxe_distro'
-- name: include_tasks for Ubuntu
-  include_tasks: ubuntu.yml
+
+- name: "Setup Ubuntu Linux LTS PXE"
+  include_tasks: ubuntu-lts.yaml
   when: '"ubuntu" in pxe_distro'
+  loop: "{{ pxe_ubuntu_lts_versions }}"
+  loop_control:
+    loop_var: target_ubuntu_version
+
+- name: "Setup Ubuntu Linux PXE"
+  include_tasks: ubuntu-interim.yaml
+  when: '"ubuntu" in pxe_distro'
+  loop: "{{ pxe_ubuntu_interim_versions }}"
+  loop_control:
+    loop_var: target_ubuntu_version
+
 - name: include_tasks for windows
   include_tasks: windows.yml
   when: '"windows" in pxe_distro'

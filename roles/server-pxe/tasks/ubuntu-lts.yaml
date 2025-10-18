@@ -1,0 +1,7 @@
+- name: "Setup Ubuntu LTS"
+  include_tasks: ubuntu-release.yaml
+  vars:
+    ubuntu_flavor: lts
+  loop: "{{ pxe_debian_arch }}"
+  loop_control:
+    loop_var: desired_arch

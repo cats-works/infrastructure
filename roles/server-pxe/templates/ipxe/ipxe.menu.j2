@@ -28,6 +28,9 @@ item --key f menu-fedora        Fedora Linux -->
 {% if "rocky" in pxe_distro  %}
 item --key r menu-rocky        Rocky Linux -->
 {% endif %}
+{% if "ubuntu" in pxe_distro  %}
+item --key u menu-ubuntu        Ubuntu -->
+{% endif %}
 {% if "windows" in pxe_distro %}
 item --key w windows      Windows (${winver})
 {% endif %}
@@ -195,7 +198,43 @@ imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_hostname }}/d
 boot || goto failed
 goto start
 {% endfor %}
+{% endif %}
 
+{% if "ubuntu" in pxe_distro %}
+###################### UBUNTU MENU ####################################
+:menu-ubuntu
+menu Ubuntu
+{% for version in pxe_ubuntu_lts_versions %}
+item ubuntu{{ version }}       Install Ubuntu LTS ({{ version }})
+{% endfor %}
+{% for version in pxe_ubuntu_interim_versions %}
+item ubuntu{{ version }}       Install Ubuntu ({{ version }})
+{% endfor %}
+item
+item --key 0x08 back <-- Back to the main menu
+iseq ${menu-default} menu-ubuntu && isset ${submenu-default} && goto menu-ubuntu-timed ||
+choose selected && goto ${selected} || goto start
+:menu-ubuntu-timed
+choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
+
+{% for version in pxe_ubuntu_lts_versions %}
+:ubuntu{{ version }}
+echo Starting Ubuntu LTS {{ version }} ${archl} installer
+kernel http://{{ pxe_server_hostname }}/distro/ubuntu-{{ vars['ubuntu_lts_' + version|string + '_version'] }}-live-server-${archl}/casper/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/ubuntu-{{ vars['ubuntu_lts_' + version|string + '_version'] }}-live-server-${archl}/casper/initrd
+imgargs vmlinuz url=http://{{ pxe_server_hostname }}/linux/ubuntu-{{ vars['ubuntu_lts_' + version|string + '_version'] }}-live-server-${archl}.iso only-ubiquity ip=dhcp quiet
+boot || goto failed
+goto start
+{% endfor %}
+{% for version in pxe_ubuntu_interim_versions %}
+:ubuntu{{ version }}
+echo Starting Ubuntu {{ version }} ${archl} installer
+kernel http://{{ pxe_server_hostname }}/distro/ubuntu-{{ version }}-live-server-${archl}/casper/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/ubuntu-{{ version }}-live-server-${archl}/casper/initrd
+imgargs vmlinuz url=http://{{ pxe_server_hostname }}/linux/ubuntu-{{ version }}-live-server-${archl}.iso only-ubiquity ip=dhcp quiet
+boot || goto failed
+goto start
+{% endfor %}
 {% endif %}
 
 ###################### OTHER DISTROS ####################################
