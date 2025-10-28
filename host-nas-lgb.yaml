@@ -33,10 +33,10 @@
         pxe_distro:
           - alpine
           - debian
-          #- fedora
+          - fedora
           - rocky
-          #- opensuse
-          #- ubuntu
+          - opensuse
+          - ubuntu
           - windows
 
   tasks:
