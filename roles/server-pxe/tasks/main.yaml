@@ -58,9 +58,12 @@
   loop_control:
     loop_var: fedora_version
 
-- name: include_tasks for opensuse
-  include_tasks: opensuse.yml
+- name: "Setup OpenSuSE Leap PXE"
+  include_tasks: opensuse-leap.yaml
   when: '"opensuse" in pxe_distro'
+  loop: "{{ pxe_opensuse_leap_versions }}"
+  loop_control:
+    loop_var: opensuse_leap_version
 
 - name: "Setup Ubuntu Linux LTS PXE"
   include_tasks: ubuntu-lts.yaml

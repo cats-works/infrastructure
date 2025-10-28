@@ -22,6 +22,9 @@ pxe_ubuntu_lts_versions:
 pxe_ubuntu_interim_versions:
   - "25.10"
   - "25.04"
+pxe_opensuse_leap_versions:
+  - 16.0
+  - 15.6
 
 debian_trixie_version: "13.1.0"
 debian_bookworm_version: "12.12.0"
@@ -36,8 +39,6 @@ rocky_8_version: "8.10"
 alpine_stable_version: "3.22.2"
 ubuntu_lts_24.04_version: "24.04.3"
 ubuntu_interim_version: "25.10"
-opensuse_leap_version: "15.6"
-opensuse_leap_build: "710.3"
 
 # architecture variables
 pxe_debian_arch:
@@ -46,11 +47,10 @@ pxe_debian_arch:
 pxe_linux_arch:
   - x86_64
   - aarch64
-
   
 #rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky
 ubuntu_linux_mirror: https://releases.ubuntu.com/
-#opensuse_mirror: https://mirror.sfo12.us.leaseweb.net/opensuse
+opensuse_mirror: https://download.opensuse.org
 ipxe_version: "v1.21.1"
 pxeprov_enable_arm64: false
 deploy_pxe_wds: false
@@ -66,7 +66,8 @@ fedora_iso_url: "https://ziply.mm.fcix.net/fedora/linux/releases/{{ fedora_versi
 fedora_archive_iso_url: "https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/{{ fedora_version }}/Everything/{{ desired_arch }}/iso/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
 rocky_iso_url: "https://dl.rockylinux.org/pub/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
 rocky_vault_iso_url: "https://dl.rockylinux.org/vault/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
-opensuse_leap_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_leap_version }}/iso/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+opensuse_leap_15_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_leap_version }}/iso/openSUSE-Leap-{{ opensuse_leap_version }}-NET-{{ desired_arch }}-Build{{ opensuse_leap_build }}-Media.iso"
+opensuse_leap_16_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_leap_version }}/iso/Leap-{{ opensuse_leap_version }}-online-installer-{{ desired_arch }}.install.iso"
 ubuntu_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
 ubuntu_url_alt: "https://cdimage.ubuntu.com/releases/{{ ubuntu_version | regex_search('^([0-9]*\\.[0-9]*)') }}/release/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
 ubuntu_netinst_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-netboot-{{ desired_arch }}.tar.gz"

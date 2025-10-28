@@ -13,35 +13,38 @@ isset ${menu-default} || set menu-default exit
 
 ###################### MAIN MENU ####################################
 :start
-menu Kitty Telecom Boot Services (${archdisp} ${platform})
+menu Network Boot Services (${archdisp} ${platform})
 item --key x exit         Continue normal boot...
 item --gap --             ------------------------- System installers ------------------------------
 {% if "alpine" in pxe_distro %}
-item --key a menu-alpine       Alpine Linux -->
+item --key a menu-alpine        Alpine Linux ...... -->
 {% endif %}
 {% if "debian" in pxe_distro  %}
-item --key d menu-debian        Debian GNU/Linux -->
+item --key d menu-debian        Debian GNU/Linux .. -->
 {% endif %}
 {% if "fedora" in pxe_distro %}
-item --key f menu-fedora        Fedora Linux -->
+item --key f menu-fedora        Fedora Linux ...... -->
+{% endif %}
+{% if "opensuse" in pxe_distro  %}
+item --key s menu-opensuse      OpenSuSE .......... -->
 {% endif %}
 {% if "rocky" in pxe_distro  %}
-item --key r menu-rocky        Rocky Linux -->
+item --key r menu-rocky         Rocky Linux ....... -->
 {% endif %}
 {% if "ubuntu" in pxe_distro  %}
-item --key u menu-ubuntu        Ubuntu -->
+item --key u menu-ubuntu        Ubuntu ............ -->
 {% endif %}
 {% if "windows" in pxe_distro %}
-item --key w windows      Windows (${winver})
+item --key w windows            Windows (${winver})
 {% endif %}
-item --gap --             ------------------------- Advanced options -------------------------------
+item --gap --             ------------------------- Utilities / Advanced -------------------------------
 {% if "windows" in pxe_distro %}
 item dart                 Windows DaRT
 {% endif %}
 iseq ${platform} efi && item memtest              Memory Test || 
 iseq ${platform} efi && item efishell             EFI Shell || 
 
-item --key c config       Configure settings
+item --key c config       Configure iPXE settings
 item shell                Drop to iPXE shell
 item reboot               Reboot computer
 
@@ -235,6 +238,39 @@ imgargs vmlinuz url=http://{{ pxe_server_hostname }}/linux/ubuntu-{{ version }}-
 boot || goto failed
 goto start
 {% endfor %}
+{% endif %}
+
+
+{% if "opensuse" in pxe_distro %}
+###################### OPENSUSE MENU ####################################
+:menu-opensuse
+menu OpenSuSE
+{% for version in pxe_opensuse_leap_versions %}
+item suse{{ version }}       Install OpenSuSE Leap ({{ version }})
+{% endfor %}
+item
+item --key 0x08 back <-- Back to the main menu
+iseq ${menu-default} menu-opensuse && isset ${submenu-default} && goto menu-opensuse-timed ||
+choose selected && goto ${selected} || goto start
+:menu-opensuse-timed
+choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
+{% for version in pxe_opensuse_leap_versions %}
+:suse{{ version }}
+echo Starting OpenSuSE Leap {{ version }} ${archrh} installer
+{% if version|string|split|first|int <= 15 %}
+kernel http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/linux
+initrd http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/initrd
+imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
+{% elif version|string|split|first|int >= 16 %}
+kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/linux
+initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/initrd
+imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
+{% else %}
+{% endif %}
+boot || goto failed
+goto start
+{% endfor %}
+
 {% endif %}
 
 ###################### OTHER DISTROS ####################################
