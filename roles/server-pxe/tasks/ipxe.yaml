@@ -68,7 +68,7 @@
       src: /usr/src/ipxe/src/bin-x86_64-efi/ipxe.efi
       dest: /srv/tftp/ipxex64.efi
       remote_src: true
-  when: "not amd64_ipxe_exists.stat.exists"
+  when: "not amd64_ipxe_exists.stat.exists and ipxe_use_signed_efi_amd64 == false"
 
 - name: "Check if we have existing ARM64 UEFI IPXE"
   stat:

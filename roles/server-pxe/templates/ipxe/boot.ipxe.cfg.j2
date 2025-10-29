@@ -22,13 +22,20 @@ iseq ${buildarch} i386 && set archdisp IA32 ||
 iseq ${buildarch} i386 && set winver 8.1-11 || 
 iseq ${buildarch} i386 && set pconly true || 
 
+iseq ${platform} pcbios && cpuid --ext 29 && set archefi X64 ||
+iseq ${platform} pcbios && cpuid --ext 29 && set archl amd64 ||
+iseq ${platform} pcbios && cpuid --ext 29 && set archrh x86_64 ||
+iseq ${platform} pcbios && cpuid --ext 29 && set archefi X64 ||
+iseq ${platform} pcbios && cpuid --ext 29 && set archdisp AMD64 ||
+
+
 set nfs-server {{ vault_lgb_nas_ip }}
 set pxe-server {{ pxe_server_hostname }}
 set nfs-root /nas/osboot/
 set boot-url http://${pxe-server}/
 set sanboot-url http:/${pxe-server}/
-set boot-dir boot/
-set mac-config-dir bymac/
-set menu-url tftp://${pxe-server}/menu.ipxe
+set boot-dir tftp/boot/
+set mac-config-dir tftp/bymac/
+set menu-url http://${pxe-server}/tftp/menu.ipxe
 set win-base-url http://{{ pxe_server_hostname }}/winpeboot
 set dart-base-url http://{{ pxe_server_hostname }}/dartboot

@@ -55,6 +55,7 @@ pxe_linux_arch:
 ubuntu_linux_mirror: https://releases.ubuntu.com/
 opensuse_mirror: https://download.opensuse.org
 ipxe_version: "v1.21.1"
+ipxe_use_signed_efi_amd64: false
 pxeprov_enable_arm64: false
 deploy_pxe_wds: false
 pxe_server_hostname: netboot.local

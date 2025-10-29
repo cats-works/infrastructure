@@ -4,6 +4,6 @@
 # Last Update: {{ ansible_date_time.iso8601 }}
 # Do not make any manual edits they will be lost.
 
-chain --autofree boot.ipxe.cfg ||
-chain --replace --autofree ${mac-config-dir}mac-${mac:hexhyp}.ipxe ||
+chain --autofree http://{{ pxe_server_hostname }}/tftp/boot.ipxe.cfg ||
+chain --replace --autofree http://{{ pxe_server_hostname }}/${mac-config-dir}mac-${mac:hexhyp}.ipxe ||
 chain --replace --autofree ${menu-url} ||
