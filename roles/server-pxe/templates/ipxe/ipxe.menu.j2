@@ -23,23 +23,23 @@ item --key a menu-alpine        Alpine Linux ...... -->
 item --key d menu-debian        Debian GNU/Linux .. -->
 {% endif %}
 {% if "fedora" in pxe_distro %}
-item --key f menu-fedora        Fedora Linux ...... -->
+iseq ${is64} true && item --key f menu-fedora        Fedora Linux ...... --> ||
 {% endif %}
 {% if "opensuse" in pxe_distro  %}
 item --key s menu-opensuse      OpenSuSE .......... -->
 {% endif %}
 {% if "rocky" in pxe_distro  %}
-item --key r menu-rocky         Rocky Linux ....... -->
+iseq ${is64} true && item --key r menu-rocky         Rocky Linux ....... --> ||
 {% endif %}
 {% if "ubuntu" in pxe_distro  %}
-item --key u menu-ubuntu        Ubuntu ............ -->
+iseq ${is64} true && item --key u menu-ubuntu        Ubuntu ............ --> ||
 {% endif %}
 {% if "windows" in pxe_distro %}
 item --key w windows            Windows (${winver})
 {% endif %}
 item --gap --             ------------------------- Utilities / Advanced -------------------------------
 {% if "windows" in pxe_distro %}
-item dart                 Windows DaRT
+iseq ${is64} true && item dart                 Windows DaRT ||
 {% endif %}
 
 {% if "gparted" in pxe_distro %}
