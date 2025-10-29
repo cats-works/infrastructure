@@ -2,6 +2,7 @@ pxe_distro:
   - alpine
   - debian
   - fedora
+  - gparted
   - rocky
   - opensuse
   - ubuntu
@@ -40,6 +41,8 @@ alpine_stable_version: "3.22.2"
 ubuntu_lts_24.04_version: "24.04.3"
 ubuntu_interim_version: "25.10"
 
+gparted_live_version: "1.7.0-8"
+
 # architecture variables
 pxe_debian_arch:
   - amd64
@@ -72,3 +75,4 @@ ubuntu_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_vers
 ubuntu_url_alt: "https://cdimage.ubuntu.com/releases/{{ ubuntu_version | regex_search('^([0-9]*\\.[0-9]*)') }}/release/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
 ubuntu_netinst_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-netboot-{{ desired_arch }}.tar.gz"
 ubuntu_netinst_url_alt: "https://cdimage.ubuntu.com/releases/{{ ubuntu_version | regex_search('^([0-9]*\\.[0-9]*)') }}/release/ubuntu-{{ ubuntu_version }}-netboot-{{ desired_arch }}.tar.gz"
+gparted_live_iso_url: "https://downloads.sourceforge.net/project/gparted/gparted-live-stable/{{ gparted_live_version }}/gparted-live-{{ gparted_live_version }}-amd64.iso"

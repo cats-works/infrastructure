@@ -41,6 +41,10 @@ item --gap --             ------------------------- Utilities / Advanced -------
 {% if "windows" in pxe_distro %}
 item dart                 Windows DaRT
 {% endif %}
+
+{% if "gparted" in pxe_distro %}
+iseq ${pconly} true && item gparted           GParted Live ||
+{% endif %}
 iseq ${platform} efi && item memtest              Memory Test || 
 iseq ${platform} efi && item efishell             EFI Shell || 
 
@@ -262,8 +266,8 @@ kernel http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-$
 initrd http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/initrd
 imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
 {% elif version|string|split|first|int >= 16 %}
-kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/linux
-initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/initrd
+iseq ${platform} efi && kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/linux || kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/linux
+iseq ${platform} efi && initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/initrd || initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/initrd
 imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
 {% else %}
 {% endif %}
@@ -273,6 +277,15 @@ goto start
 
 {% endif %}
 
+{% if "gparted" in pxe_distro %}
+:gparted
+echo Starting GParted Live Partition Editor
+kernel http://{{ pxe_server_hostname }}/distro/gparted-live-{{ gparted_live_version }}-amd64/live/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/gparted-live-{{ gparted_live_version }}-amd64/live/initrd.img 
+imgargs vmlinuz boot=live config components union=overlay username=user noswap noeject vga=788 fetch=http://{{ pxe_server_hostname }}/distro/gparted-live-{{ gparted_live_version }}-amd64/live/filesystem.squashfs
+boot || goto failed
+goto start
+{% endif %}
 ###################### OTHER DISTROS ####################################
 
 {% if "windows" in pxe_distro %}

@@ -1,0 +1,24 @@
+- name: "Check if we have existing ISO"
+  stat:
+    path: "/srv/linux/gparted-live-{{ gparted_live_version }}-amd64.iso"
+  register: iso_exists
+- name: "Retrieve GParted Live {{ gparted_live_version }} ISO"
+  get_url: 
+    url: '{{ gparted_live_iso_url }}'
+    dest: "/srv/linux/gparted-live-{{ gparted_live_version }}-amd64.iso"
+  when: "not iso_exists.stat.exists"
+- name: "Create folder for gparted-live-{{ gparted_live_version }}-amd64 ISO mount"
+  file:
+    path: "/srv/distro/gparted-live-{{ gparted_live_version }}-amd64/"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  ignore_errors: true
+- name: "Mount gparted live {{ gparted_live_version }} ISO"
+  mount:
+    path: "/srv/distro/gparted-live-{{ gparted_live_version }}-amd64/"
+    src: "/srv/linux/gparted-live-{{ gparted_live_version }}-amd64.iso"
+    fstype: iso9660
+    opts: ro,loop,nofail
+    state: mounted

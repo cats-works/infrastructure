@@ -9,6 +9,7 @@ iseq ${buildarch} x86_64 && set archl amd64 ||
 iseq ${buildarch} x86_64 && set archrh x86_64 || 
 iseq ${buildarch} x86_64 && set archdisp AMD64 || 
 iseq ${buildarch} x86_64 && set winver 8.1-11 || 
+iseq ${buildarch} x86_64 && set pconly true || 
 iseq ${buildarch} arm64 && set archefi AA64 || 
 iseq ${buildarch} arm64 && set archl arm64 || 
 iseq ${buildarch} arm64 && set archrh aarch64 || 
@@ -19,6 +20,7 @@ iseq ${buildarch} i386 && set archl i686 ||
 iseq ${buildarch} i386 && set archrh i686 || 
 iseq ${buildarch} i386 && set archdisp IA32 || 
 iseq ${buildarch} i386 && set winver 8.1-11 || 
+iseq ${buildarch} i386 && set pconly true || 
 
 set nfs-server {{ vault_lgb_nas_ip }}
 set pxe-server {{ pxe_server_hostname }}

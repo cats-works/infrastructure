@@ -83,6 +83,10 @@
   include_tasks: windows.yml
   when: '"windows" in pxe_distro'
 
+- name: "Setup GParted Live"
+  include_tasks: gparted-main.yaml
+  when: '"gparted" in pxe_distro'
+
 - name: install iPXE
   include_tasks: ipxe.yaml
 
