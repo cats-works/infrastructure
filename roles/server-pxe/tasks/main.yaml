@@ -35,57 +35,57 @@
 
 - name: "Setup Alpine Linux PXE"
   include_tasks: alpine-main.yaml
-  when: '"alpine" in pxe_distro'
+  when: '"alpine" in pxe_distro and pxe_role_do_quick == false'
 
 - name: "Setup Debian GNU/Linux PXE"
   include_tasks: debian-main.yaml
-  when: '"debian" in pxe_distro'
+  when: '"debian" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_debian_versions }}"
   loop_control:
     loop_var: debian_codename
 
 - name: "Setup Rocky Linux PXE"
   include_tasks: rocky-main.yaml
-  when: '"rocky" in pxe_distro'
+  when: '"rocky" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_rocky_versions }}"
   loop_control:
     loop_var: rocky_version
 
 - name: "Setup Fedora Linux PXE"
   include_tasks: fedora-main.yaml
-  when: '"fedora" in pxe_distro'
+  when: '"fedora" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_fedora_versions }}"
   loop_control:
     loop_var: fedora_version
 
 - name: "Setup OpenSuSE Leap PXE"
   include_tasks: opensuse-leap.yaml
-  when: '"opensuse" in pxe_distro'
+  when: '"opensuse" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_opensuse_leap_versions }}"
   loop_control:
     loop_var: opensuse_leap_version
 
 - name: "Setup Ubuntu Linux LTS PXE"
   include_tasks: ubuntu-lts.yaml
-  when: '"ubuntu" in pxe_distro'
+  when: '"ubuntu" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_ubuntu_lts_versions }}"
   loop_control:
     loop_var: target_ubuntu_version
 
 - name: "Setup Ubuntu Linux PXE"
   include_tasks: ubuntu-interim.yaml
-  when: '"ubuntu" in pxe_distro'
+  when: '"ubuntu" in pxe_distro and pxe_role_do_quick == false'
   loop: "{{ pxe_ubuntu_interim_versions }}"
   loop_control:
     loop_var: target_ubuntu_version
 
 - name: include_tasks for windows
   include_tasks: windows.yml
-  when: '"windows" in pxe_distro'
+  when: '"windows" in pxe_distro and pxe_role_do_quick == false'
 
 - name: "Setup GParted Live"
   include_tasks: gparted-main.yaml
-  when: '"gparted" in pxe_distro'
+  when: '"gparted" in pxe_distro and pxe_role_do_quick == false'
 
 - name: install iPXE
   include_tasks: ipxe.yaml
