@@ -69,7 +69,7 @@ alpine_netboot_url: "https://dl-cdn.alpinelinux.org/alpine/v{{ alpine_stable_ver
 debian_iso_url: "https://cdimage.debian.org/debian-cd/current/{{ desired_arch }}/iso-cd/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso"
 debian_archive_iso_url: "https://cdimage.debian.org/mirror/cdimage/archive/{{ debian_version}}/{{ desired_arch }}/iso-cd/debian-{{ debian_version }}-{{ desired_arch }}-netinst.iso"
 debian_netinst_url: "https://deb.debian.org/debian/dists/{{ debian_codename }}/main/installer-{{ desired_arch }}/current/images/netboot/netboot.tar.gz"
-fedora_iso_url: "https://ziply.mm.fcix.net/fedora/linux/releases/{{ fedora_version }}/Everything/{{ desired_arch }}/iso/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
+fedora_iso_url: "https://archives.fedoraproject.org/pub/fedora/linux/releases/{{ fedora_version }}/Everything/{{ desired_arch }}/iso/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
 fedora_archive_iso_url: "https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/{{ fedora_version }}/Everything/{{ desired_arch }}/iso/Fedora-Everything-netinst-{{ desired_arch }}-{{ fedora_version }}-{{ fedora_release_version }}.iso"
 rocky_iso_url: "https://dl.rockylinux.org/pub/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
 rocky_vault_iso_url: "https://dl.rockylinux.org/vault/rocky/{{ rocky_linux_version }}/isos/{{ desired_arch }}/Rocky-{{ rocky_linux_version }}-{{ desired_arch }}-minimal.iso"
