@@ -77,6 +77,4 @@ opensuse_leap_15_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_l
 opensuse_leap_16_iso_url: "{{ opensuse_mirror }}/distribution/leap/{{ opensuse_leap_version }}/iso/Leap-{{ opensuse_leap_version }}-online-installer-{{ desired_arch }}.install.iso"
 ubuntu_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
 ubuntu_url_alt: "https://cdimage.ubuntu.com/releases/{{ ubuntu_version | regex_search('^([0-9]*\\.[0-9]*)') }}/release/ubuntu-{{ ubuntu_version }}-live-server-{{ desired_arch }}.iso"
-ubuntu_netinst_url: "{{ ubuntu_linux_mirror }}{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-netboot-{{ desired_arch }}.tar.gz"
-ubuntu_netinst_url_alt: "https://cdimage.ubuntu.com/releases/{{ ubuntu_version | regex_search('^([0-9]*\\.[0-9]*)') }}/release/ubuntu-{{ ubuntu_version }}-netboot-{{ desired_arch }}.tar.gz"
 gparted_live_iso_url: "https://downloads.sourceforge.net/project/gparted/gparted-live-stable/{{ gparted_live_version }}/gparted-live-{{ gparted_live_version }}-amd64.iso"
