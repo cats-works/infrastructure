@@ -262,13 +262,14 @@ choose --timeout ${submenu-timeout} --default ${submenu-default} selected && got
 :suse{{ version }}
 echo Starting OpenSuSE Leap {{ version }} ${archrh} installer
 {% if version|string|split|first|int <= 15 %}
-kernel http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/linux
-initrd http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/initrd
+iseq ${archrh} aarch64 && kernel http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/linux || kernel http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/linux
+iseq ${archrh} aarch64 && initrd http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/initrd || initrd http://{{ pxe_server_hostname }}/distro/openSUSE-Leap-{{ version }}-NET-${archrh}-Media/boot/${archrh}/loader/initrd
 imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
 {% elif version|string|split|first|int >= 16 %}
-iseq ${platform} efi && kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/linux || kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/linux
-iseq ${platform} efi && initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/initrd || initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/initrd
-imgargs linux install=http://download.opensuse.org/distribution/leap/{{ version }}/repo/oss/ addrepo=http://download.opensuse.org/distribution/leap/{{ version }}/repo/non-oss/ splash=silent vga=0x314 showopts
+set netsetup netsetup=hostip,gateway,nameserver hostip=${ip}/${prefix} gateway=${gateway} nameserver=${dns}
+kernel http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/linux 
+initrd http://{{ pxe_server_hostname }}/distro/Leap-{{ version }}-online-installer-${archrh}/boot/${archrh}/loader/initrd
+imgargs linux root=live:http://{{ pxe_server_hostname }}/linux/Leap-{{ version }}-online-installer-${archrh}.install.iso ${netsetup} 
 {% else %}
 {% endif %}
 boot || goto failed
