@@ -1,11 +1,11 @@
 ---
 # Playbook to deploy automatic installation
 - name: "Include server-pxe defaults"
-  include_vars: roles/server-pxe/defaults/main.yml
+  include_vars: roles/server-pxe/defaults/main.yaml
 
 - name: "Check Hypervisor for architecture"
   command: "uname -m"
-  delegate_to: "{{ pxe_server_delegation }}"
+  delegate_to: "{{ vm_hypervisor }}"
   register: hypervisor_uname_machine
   when: vm_hypervisor is defined
 
@@ -30,7 +30,6 @@
   vars:
     desired_arch: "arm64"
   when: "pxe_os == 'debian' and deploy_system_arch == 'aarch64'"
-
 
 - name: Deploy PXE/Unattended Windows
   include_tasks: tasks/win-unattend.yml
