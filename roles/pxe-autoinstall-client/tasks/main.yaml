@@ -15,22 +15,22 @@
   when: vm_hypervisor is defined
 
 - name: Deploy RHEL PXE/Kickstart
-  include_tasks: tasks/kickstart.yml
+  include_tasks: tasks/kickstart.yaml
   vars:
     desired_arch: "{{ deploy_system_arch }}"
   when: pxe_os == "rocky" or pxe_os == "fedora"
 
 - name: Deploy Debian PXE/Preseed (AMD64)
-  include_tasks: tasks/preseed.yml
+  include_tasks: tasks/preseed.yaml
   vars:
     desired_arch: "amd64"
   when: "pxe_os == 'debian' and deploy_system_arch == 'x86_64'"
 - name: Deploy Debian PXE/Preseed (ARM64)
-  include_tasks: tasks/preseed.yml
+  include_tasks: tasks/preseed.yaml
   vars:
     desired_arch: "arm64"
   when: "pxe_os == 'debian' and deploy_system_arch == 'aarch64'"
 
 - name: Deploy PXE/Unattended Windows
-  include_tasks: tasks/win-unattend.yml
+  include_tasks: tasks/win-unattend.yaml
   when: pxe_os == "windows"
