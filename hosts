@@ -12,11 +12,13 @@ all:
                 rhelshell.ad.kittytel.net:
                 route-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
+                fedora-desktop.ad.kittytel.net:
         testing:
             hosts:
                 hv2-lgb.ad.kittytel.net:
                 k3stest.ad.kittytel.net:
                 testvm.ad.kittytel.net:
+                fedora-desktop.ad.kittytel.net:
         managed_vms:
             hosts:
                 winbox.ad.kittytel.net:
@@ -24,9 +26,13 @@ all:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
                 testvm.ad.kittytel.net:
+        mac_vms:
+            hosts:
+                fedora-desktop.ad.kittytel.net:
         pxe_boot:
             hosts:
                 hv2-lgb.ad.kittytel.net:
+                fedora-desktop.ad.kittytel.net:
         pxe_server:
             hosts:
                 nas-lgb.ad.kittytel.net:
@@ -67,3 +73,7 @@ all:
                 route-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
                 testvm.ad.kittytel.net:
+                arm-rocky10.ad.kittytel.net:
+                arm-debian.ad.kittytel.net:
+                arm-fedora43.ad.kittytel.net:
+                

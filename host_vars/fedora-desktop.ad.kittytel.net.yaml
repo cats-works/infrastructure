@@ -1,0 +1,5 @@
+system_os: fedora
+system_os_version: 43
+system_use_desktop: true
+sys_mac_addr: "00:50:56:25:E9:B2"
+ks_use_disk: nvme0n1
