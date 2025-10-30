@@ -6,27 +6,8 @@ ansible_user: "ANSIBLE@AD.KITTYTEL.NET"
 ansible_password: "{{ vault_ad_pass }}"
 ansible_user_dir: "C:\\Users\\ansible"
 ansible_winrm_kerberos_delegation: True
-
-win_deploy_server_versions:
-  - server2022
-  - server2019
-  - server2016
-  - server2012r2
-  - server2012
-  - server2008r2
-  - server2008
-
-win_deploy_ltsc_versions:
-  - win11ltsc2021
-  - ltsc2021
-  - ltsc2019
-  - ltsc2016
-  - ltsc2015
-
-win_deploy_client_versions:
-  - win1123h2
-  - win81
-
+become: no
+remote_user: "{{ ansible_user }}"
 deploy_windows_version: "server2022"
 win_deploy_server_core: false
 win_deploy_reg_user: "User"

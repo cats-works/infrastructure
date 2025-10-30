@@ -1,9 +1,8 @@
 ---
 - name: Provision RHEL shell
   hosts: rhelshell.ad.kittytel.net
+  ignore_unreachable: yes
   become: yes
-  remote_user: "{{ vault_ansible_deployment_user }}"
-  become_method: sudo
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml

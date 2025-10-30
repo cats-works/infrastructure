@@ -2,8 +2,6 @@
 - name: Provision LGB hypervisor
   hosts: hv-lgb.ad.kittytel.net
   become: yes
-  remote_user: "{{ vault_ansible_deployment_user }}"
-  become_method: sudo
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml
