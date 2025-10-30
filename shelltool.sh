@@ -7,10 +7,10 @@ case "$SN" in
 	ansible-vault edit /etc/ansible/group_vars/all/vault
         ;;
     pxe-boot)
-	ansible-playbook /etc/ansible/pxe-boot.yml --limit $1
+	ansible-playbook /etc/ansible/tool-pxe-boot.yaml --limit $1
         ;;
     deploy-vm)
-	ansible-playbook /etc/ansible/deploy-vm.yml --limit $1
+	ansible-playbook /etc/ansible/tool-deploy-vm.yaml --limit $1
         ;;
     install-galaxy)
 	ansible-galaxy install -r /etc/ansible/requirements.yaml

@@ -22,4 +22,4 @@
     delegate_to: localhost
     become: no
   - name: Cleanup PXE
-    include_tasks: tasks/deployment/pxe-cleanup.yml
+    include_tasks: tasks/preflight/vm/pxe-cleanup.yaml
