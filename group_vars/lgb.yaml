@@ -4,7 +4,7 @@ directory_type: ad
 int_dns_primary: 10.4.20.2
 int_dns_secondary: 10.4.24.31
 pxe_server_ip: 10.4.20.9
-pxe_server_delegation: "{{ pxe_server_hostname }}"
+pxe_server_delegation: nas-lgb.ad.kittytel.net
 dhcp_server: route-lgb.ad.kittytel.net
 snmp_location: Long Beach, CA
 timezone: America/Los_Angeles
