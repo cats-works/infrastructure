@@ -1,4 +1,8 @@
 win_deploy_versions:
+  server2025:
+    amd64:
+      iso: "X23-81958_26100.1742.240906-0331.ge_release_svc_refresh_SERVER_OEMRET_x64FRE_en-us.iso"
+      display: "Windows Server 2025"
   server2022:
     amd64:
       iso: "en_windows_server_2022x64_dvd_.iso"
@@ -6,13 +10,26 @@ win_deploy_versions:
   win11ltsc2024:
     amd64:
       iso: "26100.1.240331-1435.ge_release_CLIENT_ENTERPRISES_OEM_x64FRE_en-us.iso"
-      display: "Windows 11 LTSC 2024 (AMD64)"
+      display: "Windows 11 Enterprise IoT LTSC 2024"
+    arm64:
+      iso: "26100.1.240331-1435.ge_release_CLIENT_ENTERPRISES_OEM_A64FRE_en-us.iso"
+      display: "Windows 11 Enterprise IoT LTSC 2024"
   win10ltsc2021:
     amd64:
       iso: "en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso"
-      name: "windows-10-ltsc-2021"
-      display: "Windows 10 LTSC 2021"
+      display: "Windows 10 Enterprise LTSC 2021"
+    arm64:
+      iso: "en-us_windows_10_iot_enterprise_ltsc_2021_arm64_dvd_e8d4fc46.iso"
+      display: "Windows 10 IoT Enterprise LTSC 2021"
   win10ltsc2019:
     amd64:
       iso: "en_windows_10_enterprise_ltsc_2019_x64_dvd_74865958.iso"
-      display: "Windows 10 LTSC 2019"
+      display: "Windows 10 Enterprise LTSC 2019"
+  win7:
+    amd64:
+      iso: "en_windows_7_enterprise_with_sp1_x64_dvd_u_677651.iso"
+      display: "Windows 7 Enterprise"
+    i386:
+      iso: "en_windows_7_enterprise_with_sp1_x86_dvd_u_677710.iso"
+      display: "Windows 7 Enterprise"
+    
