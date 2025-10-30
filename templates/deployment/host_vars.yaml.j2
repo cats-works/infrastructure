@@ -1,0 +1,17 @@
+# Available Options for AutoInstall:
+# debian, fedora, rocky, windows
+system_os: rocky
+# Debian Versions: bookworm, trixie
+# Fedora Versions: 41, 42, 43
+# Rocky Versions: 8, 9, 10
+system_os_version: 10
+# Use KDE on supported Linux distros?
+system_use_desktop: false
+# Only required on non-managed VMs
+# sys_mac_addr: ""
+# deploy_system_arch: "aarch64"
+# Only required on managed VMs
+vm_vcpus: 2
+vm_memory_mb: 4096
+vm_volumes:
+-  capacity: 25000M

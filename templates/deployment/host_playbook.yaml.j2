@@ -1,0 +1,14 @@
+---
+- name: "Host-Based Playbook for {{ new_system_hostname }}"
+  hosts: "{{ new_system_hostname }}"
+  become: yes
+  ignore_unreachable: yes
+  pre_tasks:
+    - name: Standard pre-flight tasks
+      import_tasks: tasks/preflight/main.yaml
+  roles:
+  tasks:
+
+  post_tasks:
+    - name: Standard post-flight tasks
+      import_tasks: tasks/postflight/main.yaml
