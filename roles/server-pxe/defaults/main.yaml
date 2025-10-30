@@ -54,14 +54,12 @@ pxe_linux_arch:
   - aarch64
   
 pxe_role_do_quick: false
-#rocky_linux_mirror: http://dl.rockylinux.org/pub/rocky
 ubuntu_linux_mirror: https://releases.ubuntu.com/
 opensuse_mirror: https://download.opensuse.org
 ipxe_version: "v1.21.1"
 ipxe_use_signed_efi_amd64: false
 pxeprov_enable_arm64: false
 deploy_pxe_wds: false
-pxe_server_hostname: netboot.local
 pxe_http_ip: '{{ ansible_default_ipv4.address }}'
 
 alpine_iso_url: "https://dl-cdn.alpinelinux.org/alpine/v{{ alpine_stable_version | regex_search('^([0-9]*\\.[0-9]*)') }}/releases/{{ desired_arch }}/alpine-{{ alpine_flavor }}-{{ alpine_stable_version }}-{{ desired_arch }}.iso"
