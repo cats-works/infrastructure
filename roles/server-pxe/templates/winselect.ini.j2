@@ -1,0 +1,10 @@
+[Config]
+UnattendFolder=tftp/ks
+
+{% for version_name, archs in win_deploy_versions.items() %}
+{% for arch, info in archs.items() %}
+[{{ version_name}}-{{ arch }}]
+Name={{ info.display }} ({{ arch|upper }})
+Path=\\10.4.20.9\ISO\distro\{{ version_name}}-{{ arch }}
+{% endfor %}
+{% endfor %}

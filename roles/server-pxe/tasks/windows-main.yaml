@@ -1,3 +1,11 @@
 - name: "Setup Microsoft Windows"
   include_tasks: windows-setup.yaml
   loop: "{{ win_deploy_versions | dict2items }}"
+
+- name: Install winselect.ini
+  template:
+    src: winselect.ini.j2
+    dest: /srv/winselect.ini
+    owner: root
+    group: root
+    mode: 0644
