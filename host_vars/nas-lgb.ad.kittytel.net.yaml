@@ -1,0 +1,18 @@
+win_deploy_versions:
+  server2022:
+    amd64:
+      iso: "en_windows_server_2022x64_dvd_.iso"
+      display: "Windows Server 2022"
+  win11ltsc2024:
+    amd64:
+      iso: "26100.1.240331-1435.ge_release_CLIENT_ENTERPRISES_OEM_x64FRE_en-us.iso"
+      display: "Windows 11 LTSC 2024 (AMD64)"
+  win10ltsc2021:
+    amd64:
+      iso: "en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso"
+      name: "windows-10-ltsc-2021"
+      display: "Windows 10 LTSC 2021"
+  win10ltsc2019:
+    amd64:
+      iso: "en_windows_10_enterprise_ltsc_2019_x64_dvd_74865958.iso"
+      display: "Windows 10 LTSC 2019"

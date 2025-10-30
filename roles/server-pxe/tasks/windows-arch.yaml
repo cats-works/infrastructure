@@ -1,0 +1,15 @@
+- name: "Create folder for Windows {{ win_id_key }}-{{ architem.key }} ISO mount"
+  file:
+    path: "/srv/distro/{{ win_id_key }}-{{ architem.key }}/"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  ignore_errors: true
+- name: Mount Windows {{ win_id_key }} ISO
+  mount:
+    path: "/srv/distro/{{ win_id_key }}-{{ architem.key }}/"
+    src: "/srv/windows/{{ architem.value.iso }}"
+    fstype: udf
+    opts: ro,loop,nofail
+    state: mounted

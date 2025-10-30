@@ -79,8 +79,8 @@
   loop_control:
     loop_var: target_ubuntu_version
 
-- name: include_tasks for windows
-  include_tasks: windows.yml
+- name: "Setup Microsoft Windows"
+  include_tasks: windows-main.yaml
   when: '"windows" in pxe_distro and pxe_role_do_quick == false'
 
 - name: "Setup GParted Live"

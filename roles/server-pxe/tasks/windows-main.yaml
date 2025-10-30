@@ -1,0 +1,3 @@
+- name: "Setup Microsoft Windows"
+  include_tasks: windows-setup.yaml
+  loop: "{{ win_deploy_versions | dict2items }}"
