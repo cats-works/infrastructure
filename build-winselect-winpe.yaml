@@ -1,7 +1,6 @@
 ---
 - name: "Build WinPE based WinSelect ISO for PXE"
   hosts: winbox.ad.kittytel.net
-  remote_user: '{{ ansible_user }}'
   vars:
     virtio_version: "0.1.248"
   roles:
