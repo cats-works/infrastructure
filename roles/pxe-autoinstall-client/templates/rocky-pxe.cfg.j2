@@ -1,33 +1,17 @@
 #!ipxe
 
-{% if pxe_os == 'rocky' and deploy_rocky_version == 10 %}
-echo Starting Rocky Linux {{ rocky_10_version }} ${archl} installer
-kernel http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_10_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
-initrd http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_10_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
-imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_10_version }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
-boot 
-{% endif %}
-
-{% if pxe_os == 'rocky' and deploy_rocky_version == 9 %}
-echo Starting Rocky Linux {{ rocky_9_version }} ${archl} installer
-kernel http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
-initrd http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
-imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_9_version }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
-boot 
-{% endif %}
-
-{% if pxe_os == 'rocky' and deploy_rocky_version == 8 %}
-echo Starting Rocky Linux {{ rocky_8_version }} ${archl} installer
-kernel http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
-initrd http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
-imgargs vmlinuz inst.repo=http://{{ pxe_server_ip }}/distro/rocky-{{ rocky_8_version }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
+{% if pxe_os == 'rocky' %}
+echo Starting Rocky Linux {{ vars['rocky_' + deploy_rocky_version|string + '_version'] }} ${archl} installer
+kernel http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + deploy_rocky_version|string + '_version'] }}-{{ desired_arch }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + deploy_rocky_version|string + '_version'] }}-{{ desired_arch }}/images/pxeboot/initrd.img
+imgargs vmlinuz inst.repo=http://{{ pxe_server_hostname }}/distro/rocky-{{ vars['rocky_' + deploy_rocky_version|string + '_version'] }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_hostname }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
 boot 
 {% endif %}
 
 {% if pxe_os == 'fedora' %}
-echo Starting Fedora Linux {{ fedora_current_version }} ${archl} installer
-kernel http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/vmlinuz
-initrd http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/initrd.img
+echo Starting Fedora Linux {{ deploy_fedora_version }} ${archl} installer
+kernel http://{{ pxe_server_ip }}/distro/fedora-current-{{ deploy_fedora_version }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/vmlinuz
+initrd http://{{ pxe_server_ip }}/distro/fedora-current-{{ deploy_fedora_version }}-{{ fedora_current_release }}-{{ desired_arch }}/images/pxeboot/initrd.img
 imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_ip }}/distro/fedora-current-{{ fedora_current_ver }}-{{ fedora_current_release }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks devfs=nomount quiet inst.text
 boot 
 {% endif %}
