@@ -16,7 +16,7 @@ network --bootproto=static --ip={{ public_ip_addr }} --netmask={{ public_ip_nm }
 network --bootproto=static  --ip={{ private_ip_addr }} --netmask={{ private_ip_nm }} --gateway={{ private_ip_gw }} --device=link --noipv6 --nameserver={{ int_dns_primary }},{{ int_dns_secondary }} --activate
 {% endif %}
 
-url --url="{{ rocky_linux_mirror }}/{{ deploy_rocky_version }}/BaseOS/{{ desired_arch }}/os/"
+url --url="{{ rocky_linux_mirror }}/{{ system_os_version }}/BaseOS/{{ desired_arch }}/os/"
 
 authselect --useshadow --passalgo=sha512
 rootpw --iscrypted {{ vault_ks_root_pw_crypted }}

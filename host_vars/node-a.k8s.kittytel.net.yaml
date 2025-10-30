@@ -1,6 +1,6 @@
 ---
-pxe_os: rocky
-deploy_rocky_version: 10
+system_os: rocky
+system_os_version: 10
 ks_use_disk: vda
 vm_name: node-a
 sys_mac_addr: "52:54:00:d7:f0:a9"

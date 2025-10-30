@@ -1,6 +1,6 @@
 ---
-pxe_os: rocky
-deploy_rocky_version: 10
+system_os: rocky
+system_os_version: 10
 ks_use_disk: vda
 vm_name: node-b
 short_host: "{{ vm_name }}"

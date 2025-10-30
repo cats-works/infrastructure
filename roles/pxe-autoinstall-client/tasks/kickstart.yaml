@@ -1,41 +1,13 @@
 ---
 # Ansible tasks to deploy a PXE configuration and kickstart file for RHEL/friends
 
-- name: "Create Kickstart Template (Rocky Linux 10)"
+- name: "Create Kickstart Template"
   template:
-    src: rocky.ks.j2
+    src: kickstart.ks.j2
     dest: /srv/tftp/ks/{{ inventory_hostname }}.ks
     mode: 0644
   delegate_to: "{{ pxe_server_delegation }}"
-  vars:
-    rocky_linux_version: "{{ rocky_10_version }}"
-  when: "pxe_os == 'rocky' and deploy_rocky_version == 10"
-
-- name: "Create Kickstart Template (Rocky Linux 9)"
-  template:
-    src: rocky.ks.j2
-    dest: /srv/tftp/ks/{{ inventory_hostname }}.ks
-    mode: 0644
-  delegate_to: "{{ pxe_server_delegation }}"
-  vars:
-    rocky_linux_version: "{{ rocky_9_version }}"
-  when: "pxe_os == 'rocky' and deploy_rocky_version == 9"
-
-- name: "Create Kickstart Template (Rocky Linux 8)"
-  template:
-    src: rocky-8.ks.j2
-    dest: /srv/tftp/ks/{{ inventory_hostname }}.ks
-    mode: 0644
-  delegate_to: "{{ pxe_server_delegation }}"
-  when: "pxe_os == 'rocky' and deploy_rocky_version == 8"
-
-- name: "Create Kickstart Template (Fedora)"
-  template:
-    src: fedora.ks.j2
-    dest: /srv/tftp/ks/{{ inventory_hostname }}.ks
-    mode: 0644
-  delegate_to: "{{ pxe_server_delegation }}"
-  when: "pxe_os == 'fedora'"
+  when: "system_os == 'rocky' or system_os == 'rhel' or system_os == 'almalinux' or system_os == 'fedora'"
 
 - name: Create iPXE boot for MAC address
   template:
