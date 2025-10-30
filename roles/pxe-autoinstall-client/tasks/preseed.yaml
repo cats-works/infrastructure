@@ -6,7 +6,7 @@
     dest: /srv/tftp/ks/{{ inventory_hostname }}.preseed.cfg
     mode: 0644
   delegate_to: "{{ pxe_server_delegation }}"
-  when: pxe_os == "debian"
+  when: system_os == "debian"
   
 - name: Create iPXE boot for MAC address (Debian GNU/Linux EFI)
   template:
@@ -14,4 +14,4 @@
     dest: /srv/tftp/bymac/mac-{{ sys_mac_addr | replace(":","-") | lower }}.ipxe
     mode: 0644
   delegate_to: "{{ pxe_server_delegation }}"
-  when: pxe_os == "debian" 
+  when: system_os == "debian" 
