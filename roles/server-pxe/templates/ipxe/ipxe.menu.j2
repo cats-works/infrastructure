@@ -292,20 +292,22 @@ goto start
 {% if "windows" in pxe_distro %}
 :windows
 echo Starting Microsoft Windows ${arch} installer
-kernel http://{{ pxe_server_hostname }}/winpeboot/AMD64/wimboot
-initrd ${win-base-url}/AMD64/bootmgr                     bootmgr
-initrd ${win-base-url}/AMD64/Boot/BCD                    BCD
-initrd ${win-base-url}/AMD64/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
-initrd ${win-base-url}/AMD64/Boot/Fonts/segoe_slboot.ttf segoe_slboot.ttf
-initrd ${win-base-url}/AMD64/Boot/Fonts/wgl4_boot.ttf    wgl4_boot.ttf
-initrd ${win-base-url}/AMD64/Boot/boot.sdi               boot.sdi
-initrd ${win-base-url}/AMD64/boot.wim                    boot.wim
+kernel http://{{ pxe_server_hostname }}/winpeboot/${archdisp}/wimboot
+iseq ${platform} efi && set windowsurl ${win-base-url}/${archdisp}/EFI/Microsoft/Boot || set windowsurl ${win-base-url}/${archdisp}/Boot
+iseq ${platform} efi && initrd ${win-base-url}/${archdisp}/bootmgr.efi                 bootmgr.efi
+iseq ${platform} efi || initrd ${win-base-url}/${archdisp}/bootmgr		       bootmgr
+initrd ${windowsurl}/BCD                    BCD
+initrd ${windowsurl}/Fonts/segmono_boot.ttf segmono_boot.ttf
+initrd ${windowsurl}/Fonts/segoe_slboot.ttf segoe_slboot.ttf
+initrd ${windowsurl}/Fonts/wgl4_boot.ttf    wgl4_boot.ttf
+initrd ${win-base-url}/${archdisp}/Boot/boot.sdi boot.sdi
+initrd ${win-base-url}/${archdisp}/boot.wim          boot.wim
 boot || goto failed
 goto start
 
 :dart
 echo Starting Microsoft Diagnostics and Recovery Toolkit (${arch})
-kernel http://{{ pxe_server_hostname }}/winpeboot/AMD64/wimboot
+kernel http://{{ pxe_server_hostname }}/winpeboot/${archdisp}/wimboot
 initrd ${dart-base-url}/bootmgr                     bootmgr
 initrd ${dart-base-url}/Boot/BCD                    BCD
 initrd ${dart-base-url}/Boot/Fonts/segmono_boot.ttf segmono_boot.ttf
