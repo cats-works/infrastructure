@@ -4,7 +4,7 @@ deploy_debian_version: bookworm
 deploy_windows_version: server2019
 pxe_server_delegation: []
 deploy_system_arch: x86_64
-
+system_use_desktop: false
 
 # Values for Windows
 deploy_windows_version: "server2022"

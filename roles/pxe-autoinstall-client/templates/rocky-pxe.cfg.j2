@@ -12,6 +12,6 @@ boot
 echo Starting Fedora Linux {{ system_os_version }} ${archl} installer
 kernel http://{{ pxe_server_hostname }}/distro/fedora-{{ system_os_version }}-{{ desired_arch }}/images/pxeboot/vmlinuz
 initrd http://{{ pxe_server_hostname }}/distro/fedora-{{ system_os_version }}-{{ desired_arch }}/images/pxeboot/initrd.img
-imgargs vmlinuz devfs=nomount quiet inst.repo=http://{{ pxe_server_ip }}/distro/fedora-{{ system_os_version }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
+imgargs vmlinuz inst.repo=http://{{ pxe_server_hostname }}/distro/fedora-{{ system_os_version }}-{{ desired_arch }} inst.ks=http://{{ pxe_server_hostname }}/tftp/ks/{{ inventory_hostname }}.ks quiet inst.text
 boot 
 {% endif %}

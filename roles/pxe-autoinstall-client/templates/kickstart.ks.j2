@@ -16,8 +16,11 @@ network --bootproto=static --ip={{ public_ip_addr }} --netmask={{ public_ip_nm }
 network --bootproto=static  --ip={{ private_ip_addr }} --netmask={{ private_ip_nm }} --gateway={{ private_ip_gw }} --device=link --noipv6 --nameserver={{ int_dns_primary }},{{ int_dns_secondary }} --activate
 {% endif %}
 
+{% if system_os == 'rocky' %}
 url --url="{{ rocky_linux_mirror }}/{{ system_os_version }}/BaseOS/{{ desired_arch }}/os/"
-
+{% elif system_os == 'fedora' %}
+url --url="{{ fedora_linux_mirror }}/linux/releases/{{ system_os_version }}/Everything/{{ desired_arch }}/os/"
+{% endif %}
 authselect --useshadow --passalgo=sha512
 rootpw --iscrypted {{ vault_ks_root_pw_crypted }}
 
@@ -26,7 +29,9 @@ firewall --enabled --ssh
 firstboot --disable
 
 reboot
+{% if system_use_desktop|bool == false %}
 skipx
+{% endif %}
 
 ignoredisk --only-use={{ ks_use_disk }}
 clearpart --all --initlabel
@@ -39,7 +44,17 @@ user --name={{ vault_ansible_deployment_user }} --password="{{ vault_ks_root_pw_
 sshkey --username={{ vault_ansible_deployment_user }} "{{ vault_ansible_deployment_sshkey }}"
 
 %packages
+{% if system_os == 'rocky' %}
 @^minimal-environment
+{% elif system_os == 'fedora' %}
+@core
+@standard
+{% if system_use_desktop|bool == true %}
+@kde-desktop-environment
+{% else %}
+@^Server
+{% endif %}
+{% endif %}
 nano
 sudo
 %end

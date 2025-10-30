@@ -11,6 +11,7 @@ timezone: America/Los_Angeles
 win_deploy_timezone: "Pacific Standard Time"
 #rocky_linux_mirror: "http://repocache.kittytel.net/rocky"
 rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
+fedora_linux_mirror: "http://ziply.mm.fcix.net/fedora/"
 vm_pool_directory: default
 default_vlan: domain
 vm_use_efi: true

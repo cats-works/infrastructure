@@ -4,3 +4,4 @@ ip_use_dhcp: true
 int_dns_primary: 10.4.20.2
 int_dns_secondary: 10.4.24.31
 rocky_linux_mirror: "https://rocky-linux-us-west1.production.gcp.mirrors.ctrliq.cloud/pub/rocky/"
+fedora_linux_mirror: "https://mirror.sfo12.us.leaseweb.net/fedora/"
