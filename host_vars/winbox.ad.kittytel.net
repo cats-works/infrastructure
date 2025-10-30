@@ -1,5 +1,6 @@
 ---
-pxe_os: windows
+system_os: windows
+system_os_version: server2022
 ks_use_disk: vda
 vm_name: jumpbox
 short_host: "{{ vm_name }}"
