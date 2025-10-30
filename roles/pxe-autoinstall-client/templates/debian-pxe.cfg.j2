@@ -1,6 +1,6 @@
 #!ipxe
 echo Starting Debian GNU/Linux ({{ deploy_debian_version }}) ${archl} pre-seeded installer
-kernel http://{{ pxe_server_ip }}/distro/debian-netinst-{{ deploy_debian_version }}-{{ desired_arch }}/debian-installer/{{ desired_arch }}/linux
-initrd http://{{ pxe_server_ip }}/distro/debian-netinst-{{ deploy_debian_version }}-{{ desired_arch }}/debian-installer/{{ desired_arch }}/initrd.gz
-imgargs linux auto=true fb=false vga=788 quiet auto auto=true url=http://{{ pxe_server_ip }}/tftp/ks/{{ inventory_hostname }}.preseed.cfg priority=critical interface=auto debian-installer/allow_unauthenticated_ssl=true netcfg/dhcp_timeout=120 console-setup/layoutcode=us
+kernel http://{{ pxe_server_hostname }}/distro/debian-netinst-{{ deploy_debian_version }}-{{ desired_arch }}/debian-installer/{{ desired_arch }}/linux
+initrd http://{{ pxe_server_hostname }}/distro/debian-netinst-{{ deploy_debian_version }}-{{ desired_arch }}/debian-installer/{{ desired_arch }}/initrd.gz
+imgargs linux auto=true fb=false vga=788 quiet auto auto=true url=http://{{ pxe_server_hostname }}/tftp/ks/{{ inventory_hostname }}.preseed.cfg priority=critical interface=auto debian-installer/allow_unauthenticated_ssl=true netcfg/dhcp_timeout=120 console-setup/layoutcode=us
 boot 
