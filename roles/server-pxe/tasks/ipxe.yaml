@@ -12,10 +12,15 @@
       - liblzma-dev
     state: present
 
-- name: "Retrieve wimboot"
+- name: "Retrieve wimboot (AMD64)"
   get_url: 
     url: https://github.com/ipxe/wimboot/releases/latest/download/wimboot
-    dest: /srv/wimboot
+    dest: /srv/winpeboot/AMD64/wimboot
+
+- name: "Retrieve wimboot (ARM64)"
+  get_url:
+    url: https://github.com/ipxe/wimboot/releases/latest/download/wimboot.arm64
+    dest: /srv/winpeboot/ARM64/wimboot
 
 - name: check out iPXE source
   git: 
