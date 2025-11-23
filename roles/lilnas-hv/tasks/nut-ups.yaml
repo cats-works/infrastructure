@@ -1,28 +1,35 @@
----
+- name: Install packages
+  package: 
+    name:
+      - nut-server
+      - nut-snmp
+      - nut
+      - nut-client
+    state: present
 - name: install nut.conf
   template:
-    src: templates/hv-lgb/nut.conf.j2
+    src: templates/ups/nut.conf.j2
     dest: /etc/nut/nut.conf
     mode: '0644'
     owner: root
     group: root
 - name: install ups.conf
   template:
-    src: templates/hv-lgb/ups.conf.j2
+    src: templates/ups/ups.conf.j2
     dest: /etc/nut/ups.conf
     mode: '0644'
     owner: root
     group: root
 - name: install upsd.conf
   template:
-    src: templates/hv-lgb/upsd.conf.j2
+    src: templates/ups/upsd.conf.j2
     dest: /etc/nut/upsd.conf
     mode: '0644'
     owner: root
     group: root
 - name: install upsd.users
   template:
-    src: templates/hv-lgb/upsd.users.j2
+    src: templates/ups/upsd.users.j2
     dest: /etc/nut/upsd.users
     mode: '0644'
     owner: root
@@ -30,7 +37,7 @@
 
 - name: install upsmon.conf
   template:
-    src: templates/hv-lgb/upsmon.conf.j2
+    src: templates/ups/upsmon.conf.j2
     dest: /etc/nut/upsmon.conf
     mode: '0644'
     owner: root
@@ -38,7 +45,7 @@
 
 - name: install upsmon-exec script
   copy:
-    src: files/hv-lgb/scripts/upsmon-exec.sh 
+    src: files/libexec/upsmon-exec.sh 
     dest: /usr/libexec/upsmon-exec.sh
     mode: '0755'
     owner: root
@@ -58,7 +65,7 @@
 
 - name: install librenms ups-nut script
   copy:
-    src: files/hv-lgb/scripts/ups-nut.sh 
+    src: files/bin/ups-nut.sh 
     dest: /etc/snmp/ups-nut.sh
     mode: '0755'
     owner: root

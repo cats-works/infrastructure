@@ -1,0 +1,35 @@
+- name: "Configure ntpd"
+  include_tasks: "chrony.yaml"
+  
+- name: "Configure Networking"
+  include_tasks: networking.yaml
+
+- name: "Configure NUT UPS"
+  include_tasks: "nut-ups.yaml"
+
+- name: "Install USB libvirt hotplug script"
+  copy:
+    src: files/sbin/usb-libvirt-hotplug.sh
+    dest: /usr/local/sbin/usb-libvirt-hotplug.sh
+    mode: '0750'
+    owner: root
+    group: root
+
+- name: "Install libvirt vm pre-shutdown script"
+  copy:
+    src: files/sbin/pre-shutdown-vm.sh
+    dest: /usr/local/sbin/pre-shutdown-vm.sh
+    mode: '0750'
+    owner: root
+    group: root
+
+- name: "Configure VM pre shutdown for node-a"
+  include_tasks: pre-shutdown-vm.yaml
+  vars:
+    psvm_name: "node-a"
+
+- name: "Configure VM pre shutdown for rhelshell"
+  include_tasks: pre-shutdown-vm.yaml
+  vars:
+    psvm_name: "rhelshell"
+

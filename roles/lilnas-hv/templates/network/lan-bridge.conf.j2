@@ -1,0 +1,10 @@
+auto {{ item.value.iface[inventory_hostname] }}
+iface {{ item.value.iface[inventory_hostname] }} inet manual
+
+auto {{ item.value.bridge }}
+iface {{ item.value.bridge }} inet static
+        address {{ item.value.address[inventory_hostname] }}/{{ item.value.cidr.split('/')[-1] }}
+        bridge_ports {{ item.value.iface[inventory_hostname] }}
+        bridge_stp off
+        bridge_waitport 0
+        bridge_fd 0

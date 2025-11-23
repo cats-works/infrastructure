@@ -1,0 +1,12 @@
+- name: Install lm-sensors
+  package: 
+    name: 
+      - lm-sensors
+    state: present
+  when: "ansible_os_family == 'Debian'"
+- name: ensure lm-sensors is enabled
+  service:
+    name: lm-sensors
+    state: started
+    enabled: yes
+  when: "ansible_os_family == 'Debian'"

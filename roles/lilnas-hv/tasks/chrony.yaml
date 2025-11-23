@@ -1,0 +1,13 @@
+- name: "Install Packages"
+  package:
+    name:
+      - chrony
+    state: present
+- name: install chronyd gps time config
+  template:
+    src: templates/chrony/chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: restart chrony

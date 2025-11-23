@@ -1,0 +1,12 @@
+auto wantap0
+    iface wantap0 inet static
+    address 10.170.0.1/24
+    tunctl_user libvirt-qemu
+    pre-up ip tuntap add dev wantap0 mode tap user libvirt-qemu
+    post-down ip tuntap del dev wantap0
+auto wlx98038e42ecf3
+iface wlx98038e42ecf3 inet dhcp
+    address 192.168.1.5/24
+    gateway 192.168.1.1
+	wpa-ssid "{{ vault_wan_ssid }}"
+	wpa-psk "{{ vault_wan_key }}"

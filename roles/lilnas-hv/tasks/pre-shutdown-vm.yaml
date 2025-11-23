@@ -1,0 +1,13 @@
+- name: "Create systemd unit for pre-shutdown {{ psvm_name }}"
+  template:
+    src: templates/systemd/vm-pre-shutdown.service.j2
+    dest: "/etc/systemd/system/pre-shutdown-{{ psvm_name }}.service"
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload systemd
+- name: "Enable {{ psvm_name }} in systemd"
+  ansible.builtin.systemd:
+    name: "pre-shutdown-{{ psvm_name }}.service"
+    enabled: yes
+    state: started

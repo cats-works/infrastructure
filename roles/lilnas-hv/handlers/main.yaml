@@ -1,0 +1,18 @@
+- name: restart networking
+  service:
+    name: networking
+    state: restarted
+    enabled: yes
+- name: restart chrony
+  service:
+    name: chrony
+    state: restarted
+    enabled: yes
+- name: trigger udev
+  service:
+    name: udev
+    state: restarted
+    enabled: yes
+- name: "reload systemd"
+  systemd:
+    daemon_reload: yes

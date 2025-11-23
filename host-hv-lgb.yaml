@@ -5,67 +5,18 @@
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml
-    - name: Install base dependencies
-      package: 
-        name: 
-          - libvirt-daemon
-          - libvirt-clients
-          - nut-server
-          - nut-snmp
-          - nut
-          - nut-client
-          - lm-sensors
-        state: present
   roles:
     - monitoring-internal
+    - hardware-sensors
     - shell-niceties
+    - hypervisor
+    - lilnas-hv
   tasks:
-    - name: Setup Networking
-      block:
-      - name: Define WAN interface
-        template:
-          src: hv-lgb/network/wifi-wan.conf.j2
-          dest: "/etc/network/interfaces.d/00-wifi-wan.conf"
-      - name: Define VLAN bridges
-        template:
-          src: hv-lgb/network/lan-bridge.conf.j2
-          dest: "/etc/network/interfaces.d/01-vlan{{ item.value.id }}-{{ item.key }}.conf"
-        loop: "{{ vlans | dict2items }}"
-      notify: restart networking
-    - name: Install NUT UPS configuration
-      import_tasks: tasks/hv-lgb/nut-ups.yaml
-    - name: install chronyd gps time config
-      template:
-        src: templates/hv-lgb/chrony.conf.j2
-        dest: /etc/chrony/chrony.conf
-        mode: '0644'
-        owner: root
-        group: root
     - name: Install smartmontools and snmp configuration
       import_tasks: tasks/postflight/snmp-smart.yaml  
   post_tasks:
     - name: Install SSH authorized keys
       import_tasks: tasks/postflight/ssh-keys.yaml  
-    - name: ensure libvirtd is enabled
-      service:
-        name: libvirtd
-        state: started
-        enabled: yes
-    - name: ensure libvirt-guests is enabled
-      service:
-        name: libvirt-guests
-        state: started
-        enabled: yes
-    - name: restart snmpd
-      service:
-        name: snmpd
-        state: restarted
-        enabled: yes
-    - name: restart chrony
-      service:
-        name: chrony
-        state: restarted
-        enabled: yes
     - name: Touching run file that ansible has ran here
       file:
         path: /var/log/ansible.run

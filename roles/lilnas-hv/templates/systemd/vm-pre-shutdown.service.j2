@@ -1,0 +1,12 @@
+[Unit]
+Description=Shutdown {{ psvm_name }} VM
+After=libvirtd.service libvirt-guests.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/true
+ExecStop=/usr/local/sbin/pre-shutdown-vm.sh {{ psvm_name }}
+
+[Install]
+WantedBy=multi-user.target

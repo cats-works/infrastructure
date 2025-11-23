@@ -1,0 +1,10 @@
+- name: Define WAN interface
+  template:
+    src: templates/network/wifi-wan.conf.j2
+    dest: "/etc/network/interfaces.d/00-wifi-wan.conf"
+- name: Define VLAN bridges
+  template:
+    src: templates/network/lan-bridge.conf.j2
+    dest: "/etc/network/interfaces.d/01-vlan{{ item.value.id }}-{{ item.key }}.conf"
+  loop: "{{ vlans | dict2items }}"
+  notify: restart networking
