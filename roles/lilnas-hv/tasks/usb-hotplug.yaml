@@ -1,0 +1,8 @@
+- name: "Create udev rule for {{ hotplug_usb_name }}"
+  template:
+    src: templates/udev/usb-attach-detach.rules.j2
+    dest: "/etc/udev/rules.d/98-hotplug-usb-{{ hotplug_usb_name }}.rules"
+    mode: '0644'
+    owner: root
+    group: root
+  notify: trigger udev

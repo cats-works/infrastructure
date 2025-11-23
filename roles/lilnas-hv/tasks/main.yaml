@@ -15,6 +15,15 @@
     owner: root
     group: root
 
+- name: "Configure USB hotplug for HSM"
+  include_tasks: usb-hotplug.yaml
+  vars:
+    hotplug_usb_name: hsm
+    hotplug_target_vm: secret
+    hotplug_id_vendor: "1050"
+    hotplug_id_product: "0404"
+    hotplug_env_product: "1050/404/428"
+
 - name: "Install libvirt vm pre-shutdown script"
   copy:
     src: files/sbin/pre-shutdown-vm.sh
