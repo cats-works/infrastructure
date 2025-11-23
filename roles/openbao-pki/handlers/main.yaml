@@ -1,0 +1,9 @@
+- name: restart polkit
+  systemd:
+    name: polkit
+    state: restarted
+- name: restart openbao
+  systemd:
+    name: openbao
+    enabled: yes
+    state: restarted

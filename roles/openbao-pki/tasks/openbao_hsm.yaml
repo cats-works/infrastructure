@@ -1,0 +1,48 @@
+- name: OpenBao RPM Installation
+  block:
+  - name: Copy OpenBao GPG public key
+    copy:
+      src: files/openbao-gpg-pub.asc
+      dest: /etc/pki/rpm-gpg/openbao-gpg-pub.asc
+      mode: '0644'
+  - name: Import OpenBao GPG key into RPM keyring
+    rpm_key:
+      state: present
+      key: /etc/pki/rpm-gpg/openbao-gpg-pub.asc
+  - name: Download openbao-hsm rpm
+    get_url:
+      url: "{{ openbao_rpm_url }}"
+      dest: "/tmp/bao-hsm_{{ openbao_version }}_linux_amd64.rpm"
+      mode: '0644'
+  - name: Install bao-hsm RPM
+    package:
+      name: "/tmp/bao-hsm_{{ openbao_version }}_linux_amd64.rpm"
+      state: present
+  when: ansible_os_family == "RedHat"
+- name: Set privilege capabilities for low ports
+  command: "setcap CAP_NET_BIND_SERVICE=+eip /usr/bin/bao"
+- name: setup openbao systemd unit
+  copy:
+    src: openbao.service
+    dest: /etc/systemd/system/openbao.service
+    mode: '0644'
+  notify: restart openbao
+- name: Setup OpenBao Configuration
+  template:
+    src: openbao.hcl.j2
+    dest: /etc/openbao/openbao.hcl
+    mode: '0600'
+    owner: openbao
+  notify: restart openbao
+- name: Setup polkit rules for PCSC openbao group access
+  template:
+    src: polkit.rules.j2
+    dest: /etc/polkit-1/rules.d/60-pcsc-openbao.rules
+  notify: restart polkit
+- name: Add port 443/tcp to firewalld
+  firewalld:
+    port: 443/tcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+

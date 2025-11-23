@@ -1,0 +1,9 @@
+openbao_version: 2.4.3
+openbao_base_url: "https://github.com/openbao/openbao/releases/download/v{{ openbao_version }}"
+openbao_rpm_url: "{{ openbao_base_url }}/bao-hsm_{{ openbao_version }}_linux_amd64.rpm"
+openbao_deb_url: "{{ openbao_base_url }}/bao-hsm_{{ openbao_version }}_linux_amd64.deb"
+ykcs11_version: 2.7.2
+ykcs11_url: "https://github.com/Yubico/yubico-piv-tool/archive/refs/tags/yubico-piv-tool-{{ ykcs11_version }}.tar.gz"
+bao_token_label: ""
+bao_pkcs11_module: "/usr/lib64/opensc-pkcs11.so"
+bao_pkcs11_pin: 123456

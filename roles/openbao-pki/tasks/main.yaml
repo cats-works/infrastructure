@@ -1,0 +1,10 @@
+- name: "Install Dependencies"
+  package:
+    name:
+      - python3-pip
+    state: present
+  when: ansible_os_family == "RedHat"
+- name: Install ykcs11
+  include_tasks: ykcs11.yaml
+- name: Install OpenBao
+  include_tasks: openbao_hsm.yaml

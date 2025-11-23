@@ -1,0 +1,85 @@
+
+- name: Enable CRB repo
+  command: "dnf config-manager --set-enabled crb"
+- name: Install build dependencies (RHEL/Rocky/CentOS)
+  package:
+    name:
+      - cmake
+      - libtool
+      - openssl-devel
+      - pkgconfig
+      - pcsc-lite-devel
+      - gengetopt
+      - help2man
+      - zlib-devel
+      - check-devel
+      - gcc
+      - gcc-c++
+      - make
+      - autoconf
+      - automake
+      - python3-packaging
+      - python3-devel
+    state: present
+  when: ansible_os_family == "RedHat"
+- name: Create source directory
+  file:
+    path: /usr/local/src
+    state: directory
+- name: Download yubico-piv-tool tarball
+  get_url:
+    url: "{{ ykcs11_url }}"
+    dest: "/usr/local/src/yubico-piv-tool-{{ ykcs11_version }}.tar.gz"
+    mode: '0644'
+- name: Extract source
+  unarchive:
+    src: "/usr/local/src/yubico-piv-tool-{{ ykcs11_version }}.tar.gz"
+    dest: "/usr/local/src"
+    remote_src: yes
+    creates: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}"
+- name: Create build directory
+  file:
+    path: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}/build"
+    state: directory
+- name: Run cmake
+  command: "cmake -DCMAKE_INSTALL_PREFIX=/usr ../"
+  args:
+    chdir: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}/build"
+- name: Compile yubico PIV tool
+  command: "make -j2"
+  args:
+    chdir: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}/build"
+- name: make install PIV tool
+  command: "make install"
+  args:
+    chdir: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}/build"
+- name: Remove source directory
+  file:
+    path: "/usr/local/src/yubico-piv-tool-yubico-piv-tool-{{ ykcs11_version }}"
+    state: absent
+- name: Remove tarball
+  file:
+    path: "/usr/local/src/yubico-piv-tool-{{ ykcs11_version }}.tar.gz"
+    state: absent
+- name: install yubikey-manager with pip
+  pip:
+    name: yubikey-manager
+- name: Remove build dependencies (RHEL/Rocky/CentOS)
+  package:
+    name:
+      - cmake
+      - libtool
+      - openssl-devel
+      - pkgconfig
+      - pcsc-lite-devel
+      - gengetopt
+      - help2man
+      - zlib-devel
+      - check-devel
+      - gcc
+      - gcc-c++
+      - make
+      - autoconf
+      - automake
+      - python3-devel
+    state: present

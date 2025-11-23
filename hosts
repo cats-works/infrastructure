@@ -12,6 +12,7 @@ all:
                 rhelshell.ad.kittytel.net:
                 route-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
+                secret.ad.kittytel.net:
                 fedora-desktop.ad.kittytel.net:
         testing:
             hosts:
@@ -25,6 +26,7 @@ all:
                 node-a.k8s.kittytel.net:
                 node-b.k8s.kittytel.net:
                 rhelshell.ad.kittytel.net:
+                secret.ad.kittytel.net:
                 testvm.ad.kittytel.net:
         mac_vms:
             hosts:
@@ -72,6 +74,7 @@ all:
                 rhelshell.ad.kittytel.net:
                 route-lgb.ad.kittytel.net:
                 winbox.ad.kittytel.net:
+                secret.ad.kittytel.net:
                 testvm.ad.kittytel.net:
                 arm-rocky10.ad.kittytel.net:
                 arm-debian.ad.kittytel.net:

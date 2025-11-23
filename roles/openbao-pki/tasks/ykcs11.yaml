@@ -1,0 +1,23 @@
+- name: Check for libykcs11 versioned library (RedHat)
+  stat:
+    path: "/usr/lib64/libykcs11.so.{{ ykcs11_version }}"
+  register: ykcs11_lib
+  when: ansible_os_family == "RedHat"
+- name: Compile ykcs11
+  include_tasks: compile_ykcs11.yaml
+  when: not ykcs11_lib.stat.exists and ansible_os_family == "RedHat"
+- name: "Install Dependencies"
+  package:
+    name:
+      - opensc
+      - pcsc-lite
+    state: present
+  when: ansible_os_family == "RedHat"
+# Debian has the requirements in apt when it's trixie+
+- name: Install required dependencies (Debian)
+  package: 
+    name: 
+      - opensc
+      - ykcs11
+    state: present
+  when: ansible_os_family == "Debian"

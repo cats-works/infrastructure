@@ -1,0 +1,20 @@
+ui = true
+
+storage "file" {
+  path = "/opt/openbao/data"
+}
+
+listener "tcp" {
+  address       = "0.0.0.0:443"
+  tls_cert_file = "/opt/openbao/tls/tls.crt"
+  tls_key_file  = "/opt/openbao/tls/tls.key"
+}
+
+seal "pkcs11" {
+  lib = "{{ bao_pkcs11_module }}"
+  token_label = "{{ bao_token_label }}"
+  pin = "{{ bao_pkcs11_pin }}"
+  key_label = "{{ bao_pkcs11_key_label }}"
+  mechanism = "{{ bao_pkcs11_mechanism }}"
+  rsa_oaep_hash = "{{ bao_pkcs11_rsa_hash }}"
+}
