@@ -12,6 +12,12 @@ case "$SN" in
     deploy-vm)
 	ansible-playbook /etc/ansible/tool-deploy-vm.yaml --limit $1
         ;;
+    create-dns)
+    ansible-playbook /etc/ansible/tool-ad-dns.yaml -e "domain_name=$1" -e "zone_type=$2" -e "desired_value=$3"
+        ;;
+    create-ingress)
+    ansible-playbook /etc/ansible/tool-ad-dns.yaml -e "domain_name=$1" -e "zone_type=CNAME" -e "desired_value=ingress.kittytel.net"
+        ;;
     install-galaxy)
 	ansible-galaxy install -r /etc/ansible/requirements.yaml
         ;;

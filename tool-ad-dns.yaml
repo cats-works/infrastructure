@@ -1,0 +1,17 @@
+---
+- name: Containerized KittyTel Services beta
+  hosts: dc-lgb.ad.kittytel.net
+  remote_user: "{{ vault_ansible_deployment_user }}"
+  tasks:
+    - name: get values
+      set_fact:
+        new_hostname: "{{ domain_name.split('.')[0] }}"
+        doin_zone: "{{ domain_name.split('.')[1:] | join('.') }}"
+    - name: create DNS record 
+      ansible.windows.win_dns_record:
+        name: "{{ new_hostname }}"
+        type: "{{ zone_type }}"
+        zone: "{{ doin_zone }}"
+        value: "{{ desired_value }}"
+        state: present
+      
