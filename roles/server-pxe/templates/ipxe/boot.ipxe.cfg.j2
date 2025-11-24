@@ -71,7 +71,7 @@ iseq ${netmask} 255.255.255.252 && set prefix 30 ||
 iseq ${netmask} 255.255.255.254 && set prefix 31 ||
 iseq ${netmask} 255.255.255.255 && set prefix 32 ||
 
-set nfs-server {{ vault_lgb_nas_ip }}
+set nfs-server {{ pxe_server_ip }}
 set pxe-server {{ pxe_server_hostname }}
 set nfs-root /nas/osboot/
 set boot-url http://${pxe-server}/
