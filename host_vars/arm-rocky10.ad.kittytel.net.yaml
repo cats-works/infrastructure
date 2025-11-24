@@ -1,0 +1,4 @@
+system_os: rocky
+system_os_version: 9
+sys_mac_addr: "00:50:56:22:48:4B"
+ks_use_disk: nvme0n1

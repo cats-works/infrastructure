@@ -1,0 +1,12 @@
+---
+- name: "Host-Based Playbook for testvm.ad.kittytel.net"
+  hosts: "testvm.ad.kittytel.net"
+  pre_tasks:
+    - name: Standard pre-flight tasks
+      import_tasks: tasks/preflight/main.yaml
+  roles:
+  tasks:
+
+  post_tasks:
+    - name: Standard post-flight tasks
+      import_tasks: tasks/postflight/main.yaml

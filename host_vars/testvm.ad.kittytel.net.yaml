@@ -1,0 +1,6 @@
+system_os: rocky
+system_os_version: 10
+vm_vcpus: 2
+vm_memory_mb: 8192
+vm_volumes:
+-  capacity: 50000M
