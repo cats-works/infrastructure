@@ -1,19 +1,19 @@
 [sssd]
-default_domain_suffix = {{ vault_krb5_realm }}
+default_domain_suffix = {{ ad_domain | upper }}
 use_fully_qualified_names=False
 full_name_format = %1$s
-domains = {{ vault_krb5_realm }}
+domains = {{ ad_domain | upper }}
 config_file_version = 2
 services = nss, pam, ssh, sudo
 
-[domain/{{ vault_krb5_realm|lower }}]
+[domain/{{ ad_domain }}]
 default_shell = /bin/bash
 krb5_store_password_if_offline = True
 cache_credentials = True
-krb5_realm = {{ vault_krb5_realm }}
+krb5_realm = {{ ad_domain | upper }}
 realmd_tags = manages-system joined-with-adcli
 id_provider = ad
-ad_domain = {{ vault_krb5_realm|lower }}
+ad_domain = {{ ad_domain }}
 ldap_id_mapping = False
 fallback_homedir = /home/%u
 default_shell = /bin/bash

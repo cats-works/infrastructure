@@ -1,26 +1,26 @@
 [global]
     netbios name = {{ vm_name|upper }}
-    realm = {{ vault_krb5_realm }}
+    realm = {{ ad_domain | upper }}
     min protocol = SMB2
     encrypt passwords = true
     security = ads
     idmap backend = tdb
-    idmap config KITTYTEL : backend = ad
-    idmap config KITTYTEL : range = 10000-999999
-    idmap config KITTYTEL : schema_mode = rfc2307
+    idmap config {{ ad_netbios }} : backend = ad
+    idmap config {{ ad_netbios }} : range = 10000-999999
+    idmap config {{ ad_netbios }} : schema_mode = rfc2307
 
     winbind nss info = rfc2307
     winbind refresh tickets = Yes
     winbind enum users = yes
     winbind enum groups = yes
     winbind use default domain = yes
-    workgroup = {{ vault_ad_netbios }}
+    workgroup = {{ ad_netbios }}
     dns proxy = yes
     dedicated keytab file = /etc/krb5.keytab
     kerberos method = system keytab
     template shell = /bin/bash
     template homedir = /home/%U
-    wins server = {{ vault_krb5_realm }}
+    wins server = {{ ad_domain | upper }}
     wins proxy = no
     preferred master = no
     inherit acls = yes

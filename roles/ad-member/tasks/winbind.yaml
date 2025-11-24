@@ -51,16 +51,16 @@
 
 - name: Join Kerberos Realm
   expect:
-    command: /bin/bash -c "/usr/bin/kinit {{ vault_ad_deploy_user }}@{{ vault_krb5_realm }}"
+    command: /bin/bash -c "/usr/bin/kinit {{ ad_enroll_user }}@{{ ad_domain | upper }}"
     responses:
-      Password for *: "{{ vault_ad_pass }}"
+      Password for *: "{{ ad_enroll_pass }}"
   when: wbinfo_bound is failed
 
 #- name: Join AD via WinBind
 #  expect:
-#    command: /bin/bash -c "/usr/bin/net ads join -U {{ vault_ad_deploy_user }}"
+#    command: /bin/bash -c "/usr/bin/net ads join -U {{ ad_enroll_user }}"
 #    responses:
-#      Enter *: "{{ vault_ad_pass }}"
+#      Enter *: "{{ ad_enroll_pass }}"
 #  when: wbinfo_bound is failed
 
 - name: Add winbind passwd nsswitch entry

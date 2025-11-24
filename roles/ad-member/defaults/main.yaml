@@ -1,0 +1,5 @@
+ad_domain: ad.domain.tld
+ad_netbios: AD
+ad_enroll_user: Administrator
+ad_enroll_pass:
+ad_linux_server_ou: 
