@@ -1,0 +1,11 @@
+- name: reload smb1
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - smbd-smb1
+    - nmbd-smb1
+- name: systemd
+  systemd:
+    daemon_reload: true

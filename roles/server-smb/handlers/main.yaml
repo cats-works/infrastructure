@@ -1,0 +1,13 @@
+- name: reload samba
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - smbd
+    - winbind
+- name: reload avahi
+  service:
+    name: avahi-daemon
+    state: restarted
+    enabled: yes

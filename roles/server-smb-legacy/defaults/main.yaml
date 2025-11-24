@@ -1,0 +1,4 @@
+smb1_netbios: WORKGROUP
+smb1_server_string: "SMB Legacy Server"
+smb1_bound_interface: ""
+smb1_shares:

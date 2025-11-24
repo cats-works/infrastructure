@@ -1,0 +1,80 @@
+# This configuration is managed by ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+[global]
+min protocol = SMB2
+server string = {{ smb_server_string }}
+map to guest = Bad User
+workgroup = {{ smb_netbios | upper }}
+template homedir = /home/%U
+template shell = /bin/bash
+{% if smb_enable_time_machine == true %}
+bind interfaces only = yes
+interfaces = {{ smb_bound_interface }}
+{% endif %}
+
+# No Printer Support
+load printers = no
+cups options = raw
+printcap name = /dev/null
+
+{% if smb_domain_member == true %}
+# This is a domain member
+security = ads
+realm = {{smb_domain_name | upper  }}
+encrypt passwords = yes
+passdb backend = tdbsam
+dedicated keytab file = /etc/krb5.keytab
+kerberos method = system keytab
+ea support = yes
+idmap backend = tdb
+idmap config * : backend = tdb
+idmap config * : range = 3000-7999
+idmap config {{ smb_netbios | upper }} : backend = ad
+idmap config {{ smb_netbios | upper }} : range = 10000-999999
+idmap config {{ smb_netbios | upper }} : schema_mode = rfc2307
+
+winbind nss info = rfc2307
+winbind use default domain = yes
+winbind refresh tickets = yes
+winbind offline logon = yes
+winbind enum groups = yes
+winbind enum users = yes
+{% endif %}
+
+{% if smb_enable_time_machine == true %}
+# This supports Apple Time Machine
+vfs objects = fruit streams_xattr
+fruit:aapl = yes
+fruit:metadata = stream
+# We will manually advertise in avahi for specific TM flags
+multicast dns register = No
+{% endif %}
+
+{% if smb_enable_time_machine == true %}
+allow insecure wide links = yes
+{% endif %}
+
+# Performance
+aio read size = 16384
+aio write size = 16384
+read raw = yes
+write raw = yes
+min receivefile size = 16384
+acl allow execute always = true
+acl map full control = yes
+deadtime = 30
+use sendfile = yes
+strict sync = no
+sync always = no
+# END GENERAL
+
+{% for share in smb_shares %}
+[{{ share.name }}]
+{% for key, value in share.items() if key != 'name' %}
+   {{ key.replace('_', ' ') }} = {{ value }}
+{% endfor %}
+
+{% endfor %}
+

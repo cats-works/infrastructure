@@ -1,0 +1,9 @@
+smb_domain_member: false
+smb_netbios: WORKGROUP
+smb_domain_name: ""
+smb_server_string: "SMB Server"
+smb_allow_wide_links: false
+smb_enable_time_machine: false
+smb_bind_interfaces_only: false
+smb_bound_interface: "lo"
+smb_shares:

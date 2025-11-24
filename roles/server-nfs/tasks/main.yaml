@@ -1,0 +1,19 @@
+- name: Install packages
+  package: 
+    name: 
+      - nfs-common
+      - nfs-kernel-server
+    state: present
+  notify: systemd
+- name: install nfs exports
+  template:
+    src: templates/exports.j2
+    dest: /etc/exports
+    mode: '0644'
+    owner: root
+    group: root
+  notify: exportfs
+- name: Install NFS stats to snmpd.conf
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    line: extend nfs-server /bin/cat /proc/net/rpc/nfsd

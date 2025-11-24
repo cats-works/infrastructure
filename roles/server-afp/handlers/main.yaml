@@ -1,0 +1,5 @@
+- name: reload netatalk
+  service:
+    name: netatalk
+    state: restarted
+    enabled: yes

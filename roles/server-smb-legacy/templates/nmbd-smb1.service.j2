@@ -6,7 +6,7 @@ After=network.target network-online.target
 
 [Service]
 Type=notify
-PIDFile=/run/samba/nmbd.pid
+PIDFile=/run/samba-smb1/nmbd.pid
 EnvironmentFile=-/etc/default/smbd-smb1
 ExecStart=/usr/sbin/nmbd --foreground --no-process-group $NMBDOPTIONS
 ExecReload=/bin/kill -HUP $MAINPID

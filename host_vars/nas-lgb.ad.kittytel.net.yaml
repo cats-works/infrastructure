@@ -1,3 +1,125 @@
+# general VM stats
+system_os: debian
+system_os_version: bookworm
+vm_vcpus: 2
+vm_memory_mb: 1024
+vm_volumes:
+-  capacity: 35000M
+
+# NFS setup
+
+# SMB setup
+smb_domain_member: true
+smb_enable_time_machine: true
+smb_allow_wide_links: true
+smb_bind_interfaces_only: true
+smb_bound_interface: enp3s0
+smb_server_string: "Lil NAS X"
+smb_netbios: "{{ vault_ad_netbios }}"
+smb_domain_name: "{{ vault_krb5_realm }}"
+smb1_netbios_name: LILNASX
+smb1_server_string: "Lil NAS X"
+smb1_bound_interface: enp9s0
+
+smb_shares:
+  - name: cat
+    comment: cats data
+    path: /nas/cat_data
+    public: yes
+    guest_ok: no
+    create_mask: 660
+    directory_mask: 770
+    browseable: yes
+    read_only: no
+    valid_users: '"@domain admins"'
+    write_list: '"@domain admins"'
+    writeable: yes
+    create_mode: "0644"
+    directory_mode: "0755"
+  - name: ansible
+    comment: ansible playbooks
+    path: /nas/ansible
+    public: yes
+    guest_ok: no
+    create_mask: 660
+    directory_mask: 770
+    browseable: yes
+    read_only: no
+    valid_users: '"@domain admins"'
+    write_list: '"@domain admins"'
+    writeable: yes
+    create_mode: "0644"
+    directory_mode: "0755"
+  - name: Time Machine
+    vfs_objects: "fruit_streams_xattr"
+    fruit:time_machine: yes
+    fruit:time_machine_max_size: 1050G
+    comment: "Time Machine Backups"
+    path: /nas/tm
+    public: yes
+    writable: yes
+    guest_ok: no
+    create_mask: 660
+    directory_mask: 770
+    browseable: Yes
+    read_only: no
+    valid_users: '"@domain admins"'
+    write_list: '"@domain admins"'
+    writeable: yes
+    create_mode: "0644"
+    directory_mode: "0755"
+  - name: Library
+    comment: Library
+    path: /nas/Library
+    public: yes
+    writeable: yes
+    guest_ok: yes
+    create_mask: 660
+    directory_mask: 770
+    browseable: yes
+    read_only: no
+    write_list: '"@domain admins"'
+    create_mode: "0755"
+    directory_mode: "0755"
+    wide_links: yes
+    follow_symlinks: yes
+  - name: ISO
+    comment: PXE ISO Store
+    browseable: yes
+    path: /srv
+    guest_ok: yes
+    read_only: yes
+
+smb1_shares:
+  - name: Library
+    comment: Library
+    path: /nas/Library
+    public: yes
+    writeable: no
+    guest_ok: yes
+    browseable: yes
+    read_only: yes
+
+# AFP Setup
+afp_listen_interface: enp9s0
+afp_shares:
+  - name: TimeMachine
+    path: /nas/tmafp
+    volume_name: TimeMachine
+    valid_users: "@timemachine"
+    time_machine: yes
+
+# Deployments for server-pxe
+pxe_distro:
+  - alpine
+  - debian
+  - fedora
+  - gparted
+  - rocky
+  - opensuse
+  - ubuntu
+  - windows
+
 win_deploy_versions:
   server2025:
     amd64:

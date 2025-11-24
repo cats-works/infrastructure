@@ -1,0 +1,7 @@
+- name: exportfs
+  command: exportfs -r
+- name: systemd
+  service:
+    name: nfs-kernel-server
+    state: started
+    enabled: yes

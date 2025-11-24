@@ -5,146 +5,27 @@
   pre_tasks:
     - name: Standard pre-flight tasks
       import_tasks: tasks/preflight/main.yaml
-    - name: Install base dependencies
-      package: 
-        name: 
-          - python3-firewall
-          - ansible-core
-          - ansible-lint
-          - python3-pip
-          - nfs-common
-          - nfs-kernel-server
-          - samba
-          - heimdal-clients
-          - avahi-daemon
-          - python3-requests-kerberos
-          - python3-winrm
-        state: present
-
   roles:
     - monitoring-internal
     - shell-niceties
     - ad-member
-    - role: server-pxe
-      vars:
-        pxe_distro:
-          - alpine
-          - debian
-          - fedora
-          - gparted
-          - rocky
-          - opensuse
-          - ubuntu
-          - windows
-
+    - server-smb
+    - server-smb-legacy
+    - server-afp
+    - server-nfs
+    - server-pxe
   tasks:
-    - name: Install heimdal-clients
-      package: 
-        name: 
-          - heimdal-clients
-        state: present
-    - name: install samba configuration
-      template:
-        src: templates/lgb-nas/smb.conf.j2
-        dest: /etc/samba/smb.conf
-        mode: '0644'
-        owner: root
-        group: root
-    - name: install samba legacy smb1 configuration
-      template:
-        src: templates/lgb-nas/smb1.conf.j2
-        dest: /etc/samba/smb1.conf
-        mode: '0644'
-        owner: root
-        group: root
-    - name: install smbd-smb1 systemd unit
-      template:
-        src: templates/lgb-nas/systemd/smbd-smb1.service.j2
-        dest: /etc/systemd/system/smbd-smb1.service
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: install nmbd-smb1 systemd unit
-      template:
-        src: templates/lgb-nas/systemd/nmbd-smb1.service.j2
-        dest: /etc/systemd/system/nmbd-smb1.service
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: install smbd-smb1 defaults
-      template:
-        src: templates/lgb-nas/systemd/default.j2
-        dest: /etc/default/smbd-smb1
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: install avahi samba service
-      template:
-        src: templates/lgb-nas/samba.service.j2
-        dest: /etc/avahi/services/samba.service
-        mode: '0644'
-        owner: root
-        group: root
-        
-    - name: install nfs exports
-      template:
-        src: templates/lgb-nas/exports.j2
-        dest: /etc/exports
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: reload nfs exports
-      command: exportfs -r
-
     - name: Install smartmontools and snmp configuration
       import_tasks: tasks/postflight/snmp-smart.yaml 
-    - name: Install ntpd stats to snmpd.conf
-      lineinfile:
-        path: /etc/snmp/snmpd.conf
-        line: extend nfs-server /bin/cat /proc/net/rpc/nfsd
-        
-  post_tasks:
-    - name: Install cat's SSH keys
-      import_tasks: tasks/postflight/ssh-keys.yaml  
-    - name: restart smbd
-      service:
-        name: smbd
-        state: restarted
-        enabled: yes
-    - name: restart smbd-smb1
-      service:
-        name: smbd-smb1
-        state: restarted
-        enabled: yes
-    - name: restart nmbd-smb1
-      service:
-        name: nmbd-smb1
-        state: restarted
-        enabled: yes        
-    - name: restart winbind
-      service:
-        name: winbind
-        state: restarted
-        enabled: yes
-    - name: make sure nfs-kernel-server is started
-      service:
-        name: nfs-kernel-server
-        state: started
-        enabled: yes
-    - name: make sure avahi is started
-      service:
-        name: avahi-daemon
-        state: restarted
-        enabled: yes
+
     - name: restart snmpd
       service:
         name: snmpd
         state: restarted
-        enabled: yes
+        enabled: yes        
+  post_tasks:
+    - name: Install cat's SSH keys
+      import_tasks: tasks/postflight/ssh-keys.yaml  
     - name: Touching run file that ansible has ran here
       file:
         path: /var/log/ansible.run

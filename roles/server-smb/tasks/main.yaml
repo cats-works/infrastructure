@@ -1,0 +1,24 @@
+- name: Install required packages
+  package: 
+    name: 
+      - samba
+      - heimdal-clients
+      - avahi-daemon
+    state: present
+- name: install samba configuration
+  template:
+    src: templates/smb.conf.j2
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload samba
+
+- name: install avahi samba service
+  template:
+    src: templates/samba.service.j2
+    dest: /etc/avahi/services/samba.service
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload avahi

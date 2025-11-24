@@ -1,0 +1,13 @@
+- name: Install netatalk
+  package: 
+    name: 
+      - netatalk
+    state: present
+- name: install netatalk config
+  template:
+    src: templates/afp.conf.j2
+    dest: /etc/netatalk/afp.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload netatalk

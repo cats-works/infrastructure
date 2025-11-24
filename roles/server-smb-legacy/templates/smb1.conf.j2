@@ -1,0 +1,33 @@
+# This configuration is managed by ansible
+# Last Update: {{ ansible_date_time.iso8601 }}
+# Do not make any manual edits they will be lost.
+
+[global]
+server min protocol = CORE
+server role = standalone server
+workgroup = {{ smb1_netbios }}
+netbios name = {{ smb1_netbios_name }}
+pid directory = /run/samba-smb1
+log file = /var/log/samba/smb1-%m
+bind interfaces only = yes
+interfaces = {{ smb1_bound_interface }}
+printing = CUPS
+load printers = no
+
+map to guest = Bad User
+lanman auth = yes
+client lanman auth = yes
+ntlm auth = yes
+client ntlm auth = yes
+unix extensions = no
+server string = {{ smb1_server_string }}
+# END GENERAL
+
+{% for share in smb1_shares %}
+[{{ share.name }}]
+{% for key, value in share.items() if key != 'name' %}
+   {{ key.replace('_', ' ') }} = {{ value }}
+{% endfor %}
+
+{% endfor %}
+
