@@ -7,6 +7,31 @@ vm_volumes:
 -  capacity: 35000M
 
 # NFS setup
+nfs_shares:
+  - path: /nas/Library
+    cidr: 10.4.20.0/24
+    opts: "ro,no_root_squash,no_subtree_check"
+  - path: /nas/osboot
+    cidr: 10.4.20.0/24
+    opts: "ro,no_root_squash,no_subtree_check"
+  - path: /nas/hwdev
+    cidr: 10.4.20.0/24
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /nas/hw_cat_nethome
+    cidr: 10.4.20.0/24
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /nas/k3s_prod_pvs
+    cidr: 10.4.24.1/30
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /nas/Library/media
+    cidr: 10.4.24.1/30
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /fastnas/k3s_prod_pvs
+    cidr: 10.4.24.1/30
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /nas/ansible
+    cidr: 10.4.20.3/32
+    opts: "rw,no_root_squash,no_subtree_check"
 
 # SMB setup
 smb_domain_member: true
