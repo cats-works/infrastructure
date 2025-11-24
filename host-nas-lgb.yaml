@@ -9,27 +9,15 @@
     - monitoring-internal
     - shell-niceties
     - ad-member
+    - smart-monitoring
     - server-smb
     - server-smb-legacy
     - server-afp
     - server-nfs
-    - server-pxe
-  tasks:
-    - name: Install smartmontools and snmp configuration
-      import_tasks: tasks/postflight/snmp-smart.yaml 
-
-    - name: restart snmpd
-      service:
-        name: snmpd
-        state: restarted
-        enabled: yes        
+#    - server-pxe
+  tasks: 
   post_tasks:
     - name: Install cat's SSH keys
       import_tasks: tasks/postflight/ssh-keys.yaml  
-    - name: Touching run file that ansible has ran here
-      file:
-        path: /var/log/ansible.run
-        state: touch
-        mode: '0644'
-        owner: root
-        group: root
+    - name: Standard post-flight tasks
+      import_tasks: tasks/postflight/main.yaml
