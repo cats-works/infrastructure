@@ -14,7 +14,7 @@
     - server-smb-legacy
     - server-afp
     - server-nfs
-#    - server-pxe
+    - server-pxe
   tasks: 
   post_tasks:
     - name: Install cat's SSH keys
