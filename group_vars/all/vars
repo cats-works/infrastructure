@@ -1,8 +1,9 @@
 ---
 region_suffix: lgb
 default_iface: '{{ ansible_default_ipv4.interface }}'
-snmp_contact: Cat <snmp@kittytel.net>
 ad_domain: ad.kittytel.net
+ad_netbios: KITTYTEL
+snmp_contact: Cat <snmp@kittytel.net>
 primary_ad_dc: dc-lgb.ad.kittytel.net
 ad_linux_server_ou: "OU=Linux,OU=Servers,OU=KittyTel"
 vm_default_hypervisor: hv-lgb.ad.kittytel.net
@@ -13,6 +14,8 @@ pxe_server_ip: "{{ lookup('community.general.dig', pxe_server_hostname, 'A')[0] 
 internal_dns_controller: "{{ directory_server }}"
 become_method: sudo
 become: yes
+ad_enroll_user: "{{ vault_ad_deploy_user }}"
+ad_enroll_pass: "{{ vault_ad_pass }}"
 ansible_user: "{{ vault_ansible_deployment_user }}"
 remote_user: "{{ vault_ansible_deployment_user }}"
 # default region suffix:
