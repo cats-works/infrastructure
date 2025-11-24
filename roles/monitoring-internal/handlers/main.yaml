@@ -1,0 +1,5 @@
+- name: reload snmpd
+  service: 
+    name: snmpd
+    state: restarted
+    enabled: yes
