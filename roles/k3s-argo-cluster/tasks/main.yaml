@@ -1,17 +1,25 @@
 ---
-- name: Install K3S
-  include_tasks: install-k3s.yaml
-- name: Install Helm
-  include_tasks: helm.yaml
-- name: Install MetalLB
-  include_tasks: metallb.yaml
-- name: Install cert-manager
-  include_tasks: cert-manager.yaml
-- name: Install Lets Encrypt CloudFlare API token secret
-  include_tasks: lets-encrypt-cloudflare-dns.yaml
-- name: Install Lets Encrypt cluster issuer
-  include_tasks: clusterissuer-lets-encrypt-dns.yaml
-- name: Install ingress-nginx
-  include_tasks: nginx-ingress.yaml
-- name: Install ArgoCD
-  include_tasks: argocd.yaml
+- name: Check for k3s
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+# We only ever want to do this once, argo-cd takes over
+- name: Run tasks only if k3s is NOT installed
+  block:
+  - name: Install K3S
+    include_tasks: install-k3s.yaml
+  - name: Install Helm
+    include_tasks: helm.yaml
+  - name: Install MetalLB
+    include_tasks: metallb.yaml
+  - name: Install cert-manager
+    include_tasks: cert-manager.yaml
+  - name: Install Lets Encrypt CloudFlare API token secret
+    include_tasks: lets-encrypt-cloudflare-dns.yaml
+  - name: Install Lets Encrypt cluster issuer
+    include_tasks: clusterissuer-lets-encrypt-dns.yaml
+  - name: Install ingress-nginx
+    include_tasks: nginx-ingress.yaml
+  - name: Install ArgoCD
+    include_tasks: argocd.yaml
+  when: not k3s_binary.stat.exists
