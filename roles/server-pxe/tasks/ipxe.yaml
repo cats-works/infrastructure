@@ -39,7 +39,7 @@
 
 - name: "Check if we have existing UDNI IPXE"
   stat:
-    path: "/srv/tftp/undionly.kpxe"
+    path: "/srv/tftp/bin/undionly.kpxe"
   register: undi_exists
 - name: "Compile and load UNDI iPXE"
   block:
@@ -52,13 +52,13 @@
     become: yes
     copy:
       src: /usr/src/ipxe/src/bin/undionly.kpxe
-      dest: /srv/tftp/undionly.kpxe
+      dest: /srv/tftp/bin/undionly.kpxe
       remote_src: true
   when: "not undi_exists.stat.exists"
 
 - name: "Check if we have existing AMD64 UEFI IPXE"
   stat:
-    path: "/srv/tftp/ipxex64.efi"
+    path: "/srv/tftp/bin/ipxex64.efi"
   register: amd64_ipxe_exists
 - name: "Compile and load AMD64 EFI iPXE"
   block:
@@ -71,13 +71,13 @@
     become: yes
     copy:
       src: /usr/src/ipxe/src/bin-x86_64-efi/ipxe.efi
-      dest: /srv/tftp/ipxex64.efi
+      dest: /srv/tftp/bin/ipxex64.efi
       remote_src: true
   when: "not amd64_ipxe_exists.stat.exists and ipxe_use_signed_efi_amd64 == false"
 
 - name: "Check if we have existing ARM64 UEFI IPXE"
   stat:
-    path: "/srv/tftp/ipxeaa64.efi"
+    path: "/srv/tftp/bin/ipxeaa64.efi"
   register: arm64_ipxe_exists
 - name: "Compile and load ARM64 EFI iPXE"
   block:
@@ -90,14 +90,14 @@
     become: yes
     copy:
       src: /usr/src/ipxe/src/bin-arm64-efi/ipxe.efi
-      dest: /srv/tftp/ipxeaa64.efi
+      dest: /srv/tftp/bin/ipxeaa64.efi
       remote_src: true
   when: "not arm64_ipxe_exists.stat.exists"
 
 - name: Install boot.ipxe
   template:
     src: ipxe/boot.ipxe.j2
-    dest: /srv/tftp/boot.ipxe
+    dest: /srv/tftp/ipxe/boot.ipxe
     owner: root
     group: root
     mode: 0644
@@ -105,7 +105,7 @@
 - name: Install boot.ipxe.cfg
   template:
     src: ipxe/boot.ipxe.cfg.j2
-    dest: /srv/tftp/boot.ipxe.cfg
+    dest: /srv/tftp/ipxe/boot.ipxe.cfg
     owner: root
     group: root
     mode: 0644
@@ -113,7 +113,7 @@
 - name: Install menu.ipxe
   template:
     src: ipxe/ipxe.menu.j2
-    dest: /srv/tftp/menu.ipxe
+    dest: /srv/tftp/ipxe/menu.ipxe
     owner: root
     group: root
     mode: 0644
