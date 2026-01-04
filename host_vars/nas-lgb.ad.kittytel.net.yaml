@@ -32,7 +32,12 @@ nfs_shares:
   - path: /nas/ansible
     cidr: 10.4.20.3/32
     opts: "rw,no_root_squash,no_subtree_check"
-
+  - path: /nas/pi3b
+    cidr: 10.4.20.6/32
+    opts: "rw,no_root_squash,no_subtree_check"
+  - path: /nas/pi4b
+    cidr: 10.4.20.7/32
+    opts: "rw,no_root_squash,no_subtree_check"
 # SMB setup
 smb_domain_member: true
 smb_enable_time_machine: true
