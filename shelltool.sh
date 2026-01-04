@@ -16,7 +16,7 @@ case "$SN" in
     ansible-playbook /etc/ansible/tool-ad-dns.yaml -e "domain_name=$1" -e "zone_type=$2" -e "desired_value=$3"
         ;;
     create-ingress)
-    ansible-playbook /etc/ansible/tool-ad-dns.yaml -e "domain_name=$1" -e "zone_type=CNAME" -e "desired_value=ingress.kittytel.net"
+    ansible-playbook /etc/ansible/tool-ad-dns.yaml -e "domain_name=$1" -e "zone_type=CNAME" -e "desired_value=ingress.k8s.kittytel.net"
         ;;
     install-galaxy)
 	ansible-galaxy install -r /etc/ansible/requirements.yaml
